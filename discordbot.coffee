@@ -18,6 +18,6 @@ bot.on("message", (user, userID, channelID, message, rawEvent) ->
     if(command == "hey")
       bot.sendMessage({
           to: channelID,
-          message: "Hello!"
+          message: "Blood for the blood god!  Skulls for the skull throne!"
       });
 )
