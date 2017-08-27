@@ -4,7 +4,7 @@
   "description": "A Discord bot that runs a game of riichi mahjong.",
   "main": "discordbot.js",
   "scripts": {
-    "prestart": "coffee -c *.coffee",
+    "prestart": "coffee -c akagiCode.coffee discordbot.coffee",
     "start": "node discordbot.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

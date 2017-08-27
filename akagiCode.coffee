@@ -5,6 +5,8 @@ class Tile
     @sortValue = ["pin","sou","wan","wind","dragon"].indexOf(@suit)*17
     @sortValue += [1,2,3,4,5,6,7,8,9,"east","south","west","north","red","white","green"].indexOf(@value)
 
+  isGreen: ->
+    @suit in ["dragon","sou"] and @value in ["green",2,3,4,6,8]
 
   isHonor: ->
     @suit in ["dragon", "wind"]
@@ -53,7 +55,7 @@ class Wall
 
 class Hand
   #A Hand of tiles
-  constructor: ->
+  constructor: (@discardPile) ->
     @contains = []
 
   #Draws x tiles from anything with a drawFrom() function, then sorts the hand and returns the drawn tiles
@@ -73,39 +75,41 @@ class Hand
   discard: (whichTile) ->
     for x,i in @contains
       if(x.getName()==whichTile)
-        return @contains.splice(i,1)
+        out = @contains.splice(i,1)
+        console.log(out[0])
+        @discardPile.discardTo(out[0])
+        return out[0].getName()
     return false
 
   #prints the hand, which should be sorted already
   printHand: ->
     return (x.getName() for x in @contains)
 
+class Pile
+  #The tiles discarded by a given hand
+  constructor: ->
+    @contains = []
+    @riichi = -1
+
+  discardTo: (x) ->
+    @contains.push(x)
+
+  drawFrom: ->
+    out = @contains.splice(@contains.length-1,1)
+    return out
+
+  printDiscard: ->
+    out = []
+    for x,i in @contains
+      if i is @riichi
+        out.push("r:"+x.getName())
+      else
+        out.push(x.getName())
+    return out
 
 
-#Example Game Start
-gameWall = new Wall
-hand1 = new Hand
-hand2 = new Hand
-hand3 = new Hand
-hand4 = new Hand
-console.log(gameWall.inWall.length)
-hand1.startDraw(gameWall)
-hand2.startDraw(gameWall)
-hand3.startDraw(gameWall)
-hand4.startDraw(gameWall)
-console.log(gameWall.inWall.length)
-console.log("Player 1 Starting Hand")
-console.log(hand1.printHand())
-console.log("Player 2 Starting Hand")
-console.log(hand2.printHand())
-console.log("Player 3 Starting Hand")
-console.log(hand3.printHand())
-console.log("Player 4 Starting Hand")
-console.log(hand4.printHand())
-console.log("Player 1's First Draw")
-console.log(hand1.draw(gameWall))
-console.log("Player 1 Hand after first draw")
-console.log(hand1.printHand())
-console.log(hand1.discard(hand1.contains[0].getName()))
-console.log("Player 1 Hand after first discard")
-console.log(hand1.printHand())
+
+module.exports.Tile = Tile
+module.exports.Hand = Hand
+module.exports.Wall = Wall
+module.exports.Pile = Pile
