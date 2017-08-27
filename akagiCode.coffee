@@ -1,9 +1,32 @@
+#Returns the unicode for a given tile
+unicodeTileGetter = (suit,value) ->
+  if(suit == "pin")
+    pinTiles = ['🀙','🀚','🀛','🀜','🀝','🀞','🀟','🀠','🀡']
+    return pinTiles[value-1]
+  if(suit == "sou")
+    souTiles = ['🀐','🀑','🀒','🀓','🀔','🀕','🀖','🀗','🀘']
+    return souTiles[value-1]
+  if(suit == "wan")
+    wanTiles = ['🀇','🀈','🀉','🀊','🀋','🀌','🀍','🀎','🀏']
+    return wanTiles[value-1]
+  if(suit == "wind")
+    #windTiles = ['🀀','🀁','🀂','🀃']
+    return '🀀' if value == "east"
+    return '🀁' if value == "south"
+    return '🀂' if value == "west"
+    return '🀃' if value == "north"
+  if(suit == "dragon")
+    #dragonTiles = ['🀄','🀅','🀆']
+    return '🀄' if value == "red"
+    return '🀅' if value == "green"
+    return '🀆' if value == "white"
 class Tile
   #An individual tile in a game of mahjong
   constructor: (@suit, @value) ->
     #Generates a number that can be used for sorting in hands later on
-    @sortValue = ["pin","sou","wan","wind","dragon"].indexOf(@suit)*17
-    @sortValue += [1,2,3,4,5,6,7,8,9,"east","south","west","north","red","white","green"].indexOf(@value)
+    @sortValue = ["pin","sou","wan","wind","dragon"].indexOf(@suit)*16
+    @sortValue += [1,2,3,4,5,6,7,8,9,"east","south","west","north","red","green","white"].indexOf(@value)
+    @unicode = unicodeTileGetter(@suit,@value)
 
   isGreen: ->
     @suit in ["dragon","sou"] and @value in ["green",2,3,4,6,8]
@@ -29,7 +52,13 @@ class Tile
       false
 
   #gives a pretty printed name for the tile
-  getName: ->
+  getName: (writtenName = true) ->
+    if(writtenName)
+      return "#{@value} #{@suit} #{@unicode}"
+    else
+      return @unicode
+
+  getTextName: ->
     return "#{@value} #{@suit}"
 
 class Wall
@@ -74,7 +103,7 @@ class Hand
   #discards a specific card from the hand
   discard: (whichTile) ->
     for x,i in @contains
-      if(x.getName()==whichTile)
+      if(x.getTextName()==whichTile)
         out = @contains.splice(i,1)
         console.log(out[0])
         @discardPile.discardTo(out[0])
@@ -82,8 +111,8 @@ class Hand
     return false
 
   #prints the hand, which should be sorted already
-  printHand: ->
-    return (x.getName() for x in @contains)
+  printHand: (writtenName = true) ->
+    return (x.getName(writtenName) for x in @contains)
 
 class Pile
   #The tiles discarded by a given hand
@@ -98,13 +127,13 @@ class Pile
     out = @contains.splice(@contains.length-1,1)
     return out
 
-  printDiscard: ->
+  printDiscard: (writtenName = true) ->
     out = []
     for x,i in @contains
       if i is @riichi
-        out.push("r:"+x.getName())
+        out.push("r:"+x.getName(writtenName))
       else
-        out.push(x.getName())
+        out.push(x.getName(writtenName))
     return out
 
 

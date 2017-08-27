@@ -13,6 +13,7 @@ bot.on('ready', (event) ->
   exports.recentDiscard = false
   exports.turn = 1
   exports.phase = "draw"
+  exports.writeTiles = true
 )
 
 # When chat messages are received
@@ -41,6 +42,13 @@ bot.on("message", (user, userID, channelID, message, rawEvent) ->
           to: channelID,
           message: "Let the games begin!"
       });
+    if(command == "toggle")
+      if(subCommand == "writing")
+        exports.writeTiles = not exports.writeTiles
+        bot.sendMessage({
+          to: channelID,
+          message: "Tiles Toggled"
+        });
     if(command == "hand")
       if(not exports.gameStarted)
         bot.sendMessage({
@@ -56,12 +64,12 @@ bot.on("message", (user, userID, channelID, message, rawEvent) ->
         else if(subCommand is "1")
           bot.sendMessage({
             to: channelID,
-            message: exports.hand1.printHand()
+            message: exports.hand1.printHand(exports.writeTiles)
             })
         else if(subCommand is "2")
           bot.sendMessage({
             to: channelID,
-            message: exports.hand2.printHand()
+            message: exports.hand2.printHand(exports.writeTiles)
             })
     if(command == "pile")
       if(not exports.gameStarted)
@@ -78,12 +86,12 @@ bot.on("message", (user, userID, channelID, message, rawEvent) ->
         else if(subCommand is "1")
           bot.sendMessage({
             to: channelID,
-            message: exports.hand1.discardPile.printDiscard()
+            message: exports.hand1.discardPile.printDiscard(exports.writeTiles)
             })
         else if(subCommand is "2")
           bot.sendMessage({
             to: channelID,
-            message: exports.hand2.discardPile.printDiscard()
+            message: exports.hand2.discardPile.printDiscard(exports.writeTiles)
             })
     if(command == "draw")
       if(not exports.gameStarted)
