@@ -1,12 +1,12 @@
 class Tile
   #An individual tile in a game of mahjong
-  constructor: (@suit, @value) -> 
+  constructor: (@suit, @value) ->
     #Generates a number that can be used for sorting in hands later on
     @sortValue = ["pin","sou","wan","wind","dragon"].indexOf(@suit)*17
     @sortValue += [1,2,3,4,5,6,7,8,9,"east","south","west","north","red","white","green"].indexOf(@value)
 
 
-  isHonor: -> 
+  isHonor: ->
     @suit in ["dragon", "wind"]
 
   isTerminal: ->
@@ -60,7 +60,7 @@ class Hand
   draw: (drawSource, x=1) ->
     out = []
     for y in [0...x]
-      @contains.push(drawSource.drawFrom()) 
+      @contains.push(drawSource.drawFrom())
       out.push(@contains[@contains.length-1].getName())
     @contains.sort((x,y)->x.sortValue-y.sortValue)
     return out
