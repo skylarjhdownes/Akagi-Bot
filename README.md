@@ -19,6 +19,6 @@ Currently contains the following commands:
 
 !hand - Needs a player number.  Looks at the tiles in the hand of that player.
 
-!pile - Needs a player number.  Looks at the tiles in the discard pile of that player.\
+!pile - Needs a player number.  Looks at the tiles in the discard pile of that player.
 
 !toggle writing - Turns off or on the written form of the tiles.
