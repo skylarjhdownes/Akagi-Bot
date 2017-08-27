@@ -27,6 +27,7 @@
   },
   "homepage": "https://github.com/skylarjhdownes/Akagi-Bot#readme",
   "dependencies": {
+    "coffeescript": "^1.12.7",
     "discord.io": "^2.5.2"
   }
 }
