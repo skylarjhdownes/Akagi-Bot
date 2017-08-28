@@ -9,7 +9,9 @@ WIP.
 
 Currently contains the following commands:
 
-!hey - Test commands
+!hey - Test command
+
+ping - Test command
 
 !start - Intializes a new wall and draws 13 tiles for 2 players
 
