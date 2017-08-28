@@ -1,14 +1,18 @@
-discord = require('discord.io');
+## Import the discord.js module
+Discord = require('discord.js');
 mahjong = require('./akagiCode.coffee')
 
-bot = new discord.Client({
-  token: "MzUxMTc2MzEzMTg2Mjg3NjE2.DIPFZw.88Ci5AcfXDU1u3wMPYcwugj5kcI",
-  autorun: true
-})
+## Create an instance of a Discord client
+bot = new Discord.Client();
 
-# When the bot starts
-bot.on('ready', (event) ->
-  console.log('Logged in as %s - %s\n', bot.username, bot.id);
+## The token of your bot - https://discordapp.com/developers/applications/me
+token = 'MzUxMTc2MzEzMTg2Mjg3NjE2.DIPFZw.88Ci5AcfXDU1u3wMPYcwugj5kcI';
+
+## The ready event is vital, it means that your bot will only start reacting to information
+## from Discord _after_ ready is emitted
+bot.on('ready', => 
+  console.log('Logged in as %s - %s\n', bot.user.username, bot.user.id)
+  console.log('I am ready!')
   exports.gameStarted = false
   exports.recentDiscard = false
   exports.turn = 1
@@ -16,19 +20,19 @@ bot.on('ready', (event) ->
   exports.writeTiles = true
 )
 
-# When chat messages are received
-bot.on("message", (user, userID, channelID, message, rawEvent) ->
-  console.log("ASDF")
-  if (message.substring(0, 1) == "!")
-    messageParts = message.split(" ")
+# Create an event listener for messages
+bot.on('message', (message) => 
+  ## If the message is "ping"
+  if (message.content == 'ping') 
+    ## Send "pong" to the same channel
+    message.channel.send('pong')
+  if (message.content.substring(0, 1) == "!")
+    messageParts = message.content.split(" ")
     command = messageParts[0].substring(1)
     subCommand = messageParts[1]
     ssubCommand = messageParts[2]
     if(command == "hey")
-      bot.sendMessage({
-          to: channelID,
-          message: "Blood for the blood god!  Skulls for the skull throne!"
-      });
+      message.channel.send("Blood for the blood god!  Skulls for the skull throne!")
     if(command == "start")
       exports.gameStarted = true
       exports.wall = new mahjong.Wall()
@@ -38,95 +42,47 @@ bot.on("message", (user, userID, channelID, message, rawEvent) ->
       exports.hand2 = new mahjong.Hand(exports.pile2)
       exports.hand1.startDraw(exports.wall)
       exports.hand2.startDraw(exports.wall)
-      bot.sendMessage({
-          to: channelID,
-          message: "Let the games begin!"
-      });
+      message.channel.send("Let the games begin!")
     if(command == "toggle")
       if(subCommand == "writing")
         exports.writeTiles = not exports.writeTiles
-        bot.sendMessage({
-          to: channelID,
-          message: "Tiles Toggled"
-        });
+        message.channel.send("Tiles Toggled")
     if(command == "hand")
       if(not exports.gameStarted)
-        bot.sendMessage({
-          to: channelID,
-          message: "Please start game first."
-          })
+        message.channel.send("Please start game first.")
       else
         if(subCommand not in ["1","2"])
-          bot.sendMessage({
-          to: channelID,
-          message: "Please select a real hand."
-          })
+          message.channel.send("Please select a real hand.")
         else if(subCommand is "1")
-          bot.sendMessage({
-            to: channelID,
-            message: exports.hand1.printHand(exports.writeTiles)
-            })
+          message.channel.send(exports.hand1.printHand(exports.writeTiles))
         else if(subCommand is "2")
-          bot.sendMessage({
-            to: channelID,
-            message: exports.hand2.printHand(exports.writeTiles)
-            })
+          message.channel.send(exports.hand2.printHand(exports.writeTiles))
     if(command == "pile")
       if(not exports.gameStarted)
-        bot.sendMessage({
-          to: channelID,
-          message: "Please start game first."
-          })
+        message.channel.send("Please start game first.")
       else
         if(subCommand not in ["1","2"])
-          bot.sendMessage({
-          to: channelID,
-          message: "Please select a real discard pile."
-          })
+          message.channel.send("Please select a real discard pile.")
         else if(subCommand is "1")
-          bot.sendMessage({
-            to: channelID,
-            message: exports.hand1.discardPile.printDiscard(exports.writeTiles)
-            })
+          message.channel.send(exports.hand1.discardPile.printDiscard(exports.writeTiles))
         else if(subCommand is "2")
-          bot.sendMessage({
-            to: channelID,
-            message: exports.hand2.discardPile.printDiscard(exports.writeTiles)
-            })
+          message.channel.send(exports.hand2.discardPile.printDiscard(exports.writeTiles))
     if(command == "draw")
       if(not exports.gameStarted)
-        bot.sendMessage({
-          to: channelID,
-          message: "Please start game first."
-          })
+        message.channel.send("Please start game first.")
       else if(exports.phase != "draw")
-        bot.sendMessage({
-          to: channelID,
-          message: "It is not the draw phase."
-          })
+        message.channel.send("It is not the draw phase.")
       else
         if(exports.turn == 1)
-          bot.sendMessage({
-            to: channelID,
-            message: exports.hand1.draw(exports.wall)
-          })
+          message.channel.send(exports.hand1.draw(exports.wall))
         else if (exports.turn == 2)
-          bot.sendMessage({
-            to: channelID,
-            message: exports.hand2.draw(exports.wall)
-          })
+          message.channel.send(exports.hand2.draw(exports.wall))
         exports.phase = "discard"
     if(command == "discard")
       if(not exports.gameStarted)
-        bot.sendMessage({
-          to: channelID,
-          message: "Please start game first."
-          })
+        message.channel.send("Please start game first.")
       else if(exports.phase != "discard")
-        bot.sendMessage({
-          to: channelID,
-          message: "It is not the discard phase."
-          })
+        message.channel.send("It is not the discard phase.")
       else
         if(exports.turn == 1)
           checkDiscard = exports.hand1.discard(subCommand+" "+ssubCommand)
@@ -135,15 +91,9 @@ bot.on("message", (user, userID, channelID, message, rawEvent) ->
         if(checkDiscard)
           exports.phase = "draw"
           exports.turn = 3-exports.turn
-          bot.sendMessage({
-          to: channelID,
-          message: checkDiscard
-          })
+          message.channel.send(checkDiscard)
         else
-          bot.sendMessage({
-          to: channelID,
-          message: "You do not have that tile."
-          })
-
-
+          message.channel.send("You do not have that tile.")
 )
+## Log our bot in
+bot.login(token)

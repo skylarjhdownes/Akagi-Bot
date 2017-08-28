@@ -27,7 +27,10 @@
   },
   "homepage": "https://github.com/skylarjhdownes/Akagi-Bot#readme",
   "dependencies": {
+    "bufferutil": "^3.0.0",
     "coffeescript": "^1.12.7",
-    "discord.io": "^2.5.2"
+    "discord.js": "^11.1.0",
+    "libsodium-wrappers": "^0.5.1",
+    "uws": "^0.14.1"
   }
 }
