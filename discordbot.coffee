@@ -1,5 +1,5 @@
 discord = require('discord.io');
-mahjong = require('./akagiCode.js')
+mahjong = require('./akagiCode.coffee')
 
 bot = new discord.Client({
   token: "MzUxMTc2MzEzMTg2Mjg3NjE2.DIPFZw.88Ci5AcfXDU1u3wMPYcwugj5kcI",
@@ -144,6 +144,6 @@ bot.on("message", (user, userID, channelID, message, rawEvent) ->
           to: channelID,
           message: "You do not have that tile."
           })
-      
+
 
 )
