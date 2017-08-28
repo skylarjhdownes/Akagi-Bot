@@ -1,1 +1,1 @@
-web: coffee application.coffee
+web: coffee discordbot.coffee
