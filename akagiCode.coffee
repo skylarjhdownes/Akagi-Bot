@@ -20,6 +20,10 @@ unicodeTileGetter = (suit,value) ->
     return '🀄' if value == "red"
     return '🀅' if value == "green"
     return '🀆' if value == "white"
+
+allTilesGetter = ->
+  return ['🀙','🀚','🀛','🀜','🀝','🀞','🀟','🀠','🀡','🀐','🀑','🀒','🀓','🀔','🀕','🀖','🀗','🀘','🀇','🀈','🀉','🀊','🀋','🀌','🀍','🀎','🀏','🀀','🀁','🀂','🀃','🀄','🀅','🀆']
+
 class Tile
   #An individual tile in a game of mahjong
   constructor: (@suit, @value) ->
@@ -112,7 +116,10 @@ class Hand
 
   #prints the hand, which should be sorted already
   printHand: (writtenName = true) ->
-    return (x.getName(writtenName) for x in @contains)
+    if(@contains.length == 0)
+      return "Empty"
+    else
+      return (x.getName(writtenName) for x in @contains)
 
 class Pile
   #The tiles discarded by a given hand
@@ -134,6 +141,8 @@ class Pile
         out.push("r:"+x.getName(writtenName))
       else
         out.push(x.getName(writtenName))
+    if(@contains.length == 0)
+      out = "Empty"
     return out
 
 
@@ -142,3 +151,4 @@ module.exports.Tile = Tile
 module.exports.Hand = Hand
 module.exports.Wall = Wall
 module.exports.Pile = Pile
+module.exports.allTilesGetter = allTilesGetter

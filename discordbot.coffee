@@ -43,6 +43,8 @@ bot.on('message', (message) =>
       exports.hand1.startDraw(exports.wall)
       exports.hand2.startDraw(exports.wall)
       message.channel.send("Let the games begin!")
+    if(command == "tiles")
+      message.channel.send(mahjong.allTilesGetter())
     if(command == "toggle")
       if(subCommand == "writing")
         exports.writeTiles = not exports.writeTiles
