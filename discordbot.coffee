@@ -10,7 +10,7 @@ token = 'MzUxMTc2MzEzMTg2Mjg3NjE2.DIPFZw.88Ci5AcfXDU1u3wMPYcwugj5kcI';
 
 ## The ready event is vital, it means that your bot will only start reacting to information
 ## from Discord _after_ ready is emitted
-bot.on('ready', => 
+bot.on('ready', =>
   console.log('Logged in as %s - %s\n', bot.user.username, bot.user.id)
   console.log('I am ready!')
   exports.gameStarted = false
@@ -21,9 +21,9 @@ bot.on('ready', =>
 )
 
 # Create an event listener for messages
-bot.on('message', (message) => 
+bot.on('message', (message) =>
   ## If the message is "ping"
-  if (message.content == 'ping') 
+  if (message.content == 'ping')
     ## Send "pong" to the same channel
     message.channel.send('pong')
   if (message.content.substring(0, 1) == "!")
@@ -98,3 +98,11 @@ bot.on('message', (message) =>
 )
 ## Log our bot in
 bot.login(token)
+
+## Keepalive loop for Heroku
+http = require("http")
+setInterval(
+  () ->
+    http.get("http://<your app name>.herokuapp.com")
+  300000
+)
