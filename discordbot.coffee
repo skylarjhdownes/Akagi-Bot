@@ -94,6 +94,7 @@ bot.on('message', (message) =>
           message.channel.send(checkDiscard)
         else
           message.channel.send("You do not have that tile.")
+  console.log(exports)
 )
 ## Log our bot in
 bot.login(token)
