@@ -32,3 +32,7 @@ ping - Test command
 !dora - Displays all current dora indicators.
 
 !wind - Displays prevailing wind
+
+!turn - Displays who's turn it is.
+
+!phase - Displays what phase it is.

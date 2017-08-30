@@ -44,6 +44,8 @@ bot.on('message', (message) =>
       exports.hand1.startDraw(exports.wall)
       exports.hand2.startDraw(exports.wall)
       exports.wall.doraFlip()
+      exports.turn = 1
+      exports.phase = "draw"
       exports.prevailingWind = "East"
       message.channel.send("Let the games begin!\nThe dora indicator is: "+exports.wall.printDora(exports.writeTiles)+"\nThe prevailing wind is: "+exports.prevailingWind)
     
@@ -54,11 +56,24 @@ bot.on('message', (message) =>
         exports.gameStarted = false
         message.channel.send("Game ended.")
 
+    if(command == "turn")
+      if(not exports.gameStarted)
+        message.channel.send("Please start game first.")
+      else
+        message.channel.send("It is player #{exports.turn}'s turn.")
+
+    if(command == "phase")
+      if(not exports.gameStarted)
+        message.channel.send("Please start game first.")
+      else
+        message.channel.send("It is the #{exports.phase} phase.")
+
     if(command == "wind")
       if(not exports.gameStarted)
         message.channel.send("Please start game first.")
       else
         message.channel.send(exports.prevailingWind)
+
     if(command == "dora")
       if(not exports.gameStarted)
         message.channel.send("Please start game first.")
