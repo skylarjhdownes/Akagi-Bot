@@ -22,17 +22,11 @@ bot.on('ready', =>
 
 # Create an event listener for messages
 bot.on('message', (message) =>
-  ## If the message is "ping"
-  if (message.content == 'ping')
-    ## Send "pong" to the same channel
-    message.channel.send('pong')
   if (message.content.substring(0, 1) == "!")
     messageParts = message.content.split(" ")
     command = messageParts[0].substring(1)
     subCommand = messageParts[1]
     ssubCommand = messageParts[2]
-    if(command == "hey")
-      message.channel.send("Blood for the blood god!  Skulls for the skull throne!")
 
     if(command == "start")
       exports.gameStarted = true
@@ -47,8 +41,9 @@ bot.on('message', (message) =>
       exports.turn = 1
       exports.phase = "draw"
       exports.prevailingWind = "East"
-      message.channel.send("Let the games begin!\nThe dora indicator is: "+exports.wall.printDora(exports.writeTiles)+"\nThe prevailing wind is: "+exports.prevailingWind)
-    
+      message.channel.send("Let the games begin!\nThe dora indicator is:
+        #{exports.wall.printDora(exports.writeTiles)}\nThe prevailing wind is: #{exports.prevailingWind}")
+
     if(command == "end")
       if(not exports.gameStarted)
         message.channel.send("No game to end.")
@@ -82,12 +77,12 @@ bot.on('message', (message) =>
 
     if(command == "tiles")
       message.channel.send(mahjong.allTilesGetter())
-    
+
     if(command == "toggle")
       if(subCommand == "writing")
         exports.writeTiles = not exports.writeTiles
         message.channel.send("Tiles Toggled")
-    
+
     if(command == "hand")
       if(not exports.gameStarted)
         message.channel.send("Please start game first.")
@@ -98,7 +93,7 @@ bot.on('message', (message) =>
           message.channel.send(exports.hand1.printHand(exports.writeTiles))
         else if(subCommand is "2")
           message.channel.send(exports.hand2.printHand(exports.writeTiles))
-    
+
     if(command == "pile")
       if(not exports.gameStarted)
         message.channel.send("Please start game first.")
@@ -109,7 +104,7 @@ bot.on('message', (message) =>
           message.channel.send(exports.hand1.discardPile.printDiscard(exports.writeTiles))
         else if(subCommand is "2")
           message.channel.send(exports.hand2.discardPile.printDiscard(exports.writeTiles))
-    
+
     if(command == "draw")
       if(not exports.gameStarted)
         message.channel.send("Please start game first.")
@@ -121,7 +116,7 @@ bot.on('message', (message) =>
         else if (exports.turn == 2)
           message.channel.send(exports.hand2.draw(exports.wall))
         exports.phase = "discard"
-    
+
     if(command == "discard")
       if(not exports.gameStarted)
         message.channel.send("Please start game first.")
@@ -138,7 +133,7 @@ bot.on('message', (message) =>
           message.channel.send(checkDiscard)
         else
           message.channel.send("You do not have that tile.")
-  
+
   console.log(exports)
 )
 ## Log our bot in
