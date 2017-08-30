@@ -24,3 +24,9 @@ ping - Test command
 !pile - Needs a player number.  Looks at the tiles in the discard pile of that player.
 
 !toggle writing - Turns off or on the written form of the tiles.
+
+!end - Ends the current game.
+
+!tiles - Displays a picture of each tile.
+
+!dora - Displays all current dora indicators.
