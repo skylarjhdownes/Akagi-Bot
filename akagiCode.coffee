@@ -73,6 +73,7 @@ class Wall
     @inWall.push(new Tile(x,y)) for x in ["pin","sou","wan"] for y in [1..9] for z in [0...4]
     @inWall.push(new Tile("wind",y)) for y in ["east","south","west","north"] for z in [0...4]
     @inWall.push(new Tile("dragon",y)) for y in ["red","white","green"] for z in [0...4]
+    @dora = []
 
   drawFrom: ->
     #removes a random tile from the wall and returns it
@@ -81,10 +82,17 @@ class Wall
     return out[0]
 
   doraFlip: ->
-    #Exactly the same as draw right now, but uses a different method because it might need to be different later
+    #Draws a random tile and sets it to be the dora
     take = Math.floor(Math.random()*@inWall.length)
     out = @inWall.splice(take,1)
+    @dora.push(out[0])
     return out[0]
+
+  printDora: (writtenName = true) ->
+    if(@dora.length == 0)
+      return "No Dora"
+    else
+      return (x.getName(writtenName) for x in @dora)
 
 class Hand
   #A Hand of tiles
