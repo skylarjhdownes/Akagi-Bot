@@ -32,7 +32,7 @@ bot.on('message', (message) =>
     subCommand = messageParts[1]
     ssubCommand = messageParts[2]
     if(command == "hey")
-      message.channel.send("Blood for the blood god!  Skulls for the skull throne!")\
+      message.channel.send("Blood for the blood god!  Skulls for the skull throne!")
 
     if(command == "start")
       exports.gameStarted = true
@@ -43,7 +43,7 @@ bot.on('message', (message) =>
       exports.hand2 = new mahjong.Hand(exports.pile2)
       exports.hand1.startDraw(exports.wall)
       exports.hand2.startDraw(exports.wall)
-      exports.wall.doraDraw()
+      exports.wall.doraFlip()
       message.channel.send("Let the games begin!\nThe dora indicator is: "+exports.wall.printDora(exports.writeTiles))
     
     if(command == "end")
