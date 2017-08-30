@@ -30,3 +30,5 @@ ping - Test command
 !tiles - Displays a picture of each tile.
 
 !dora - Displays all current dora indicators.
+
+!wind - Displays prevailing wind
