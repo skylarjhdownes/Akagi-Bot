@@ -36,3 +36,9 @@ ping - Test command
 !turn - Displays who's turn it is.
 
 !phase - Displays what phase it is.
+
+!forge - Takes one argument.  Makes a channel with the argument as its name.
+
+!yell - Takes any number of arguments.  Outputs those arguments to all forged channels.
+
+!ragnarok - Deletes all forged channels.  
