@@ -13,7 +13,10 @@ token = 'MzUxMTc2MzEzMTg2Mjg3NjE2.DIPFZw.88Ci5AcfXDU1u3wMPYcwugj5kcI';
 bot.on('ready', =>
   console.log('Logged in as %s - %s\n', bot.user.username, bot.user.id)
   console.log('I am ready!')
+  exports.floppyAngels = bot.guilds.first()
+  console.log(exports.floppyAngels.name)
   exports.gameStarted = false
+  exports.parlors = [] #Created channels
   exports.recentDiscard = false
   exports.turn = 1
   exports.phase = "draw"
@@ -43,6 +46,20 @@ bot.on('message', (message) =>
       exports.prevailingWind = "East"
       message.channel.send("Let the games begin!\nThe dora indicator is:
         #{exports.wall.printDora(exports.writeTiles)}\nThe prevailing wind is: #{exports.prevailingWind}")
+
+    if(command == "forge")
+      exports.floppyAngels.createChannel(subCommand,"text")
+        .then((channel) -> exports.parlors.push(channel))
+        .catch(console.error)
+
+    if(command == "yell")
+      for x in exports.parlors
+        x.send(messageParts[1..])
+
+    if(command == "ragnarok")
+      message.channel.send("Let's Ragnarok!!!!!")
+      for x in exports.parlors
+        x.delete()
 
     if(command == "end")
       if(not exports.gameStarted)
