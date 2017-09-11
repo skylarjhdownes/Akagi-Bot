@@ -1,3 +1,5 @@
+_ = require "lodash"
+
 #Returns the unicode for a given tile
 unicodeTileGetter = (suit,value) ->
   if(suit == "pin")
@@ -77,6 +79,7 @@ class Wall
 
   drawFrom: ->
     #removes a random tile from the wall and returns it
+    #replace with _.sample ?
     take = Math.floor(Math.random()*@inWall.length)
     out = @inWall.splice(take,1)
     return out[0]
