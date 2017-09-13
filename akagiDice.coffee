@@ -22,11 +22,13 @@ rollParse = (inputString) ->
   chunks = []
   for x,i in inputString
     if(x == '+')
-      chunks.push(inputString[start..i-1])
+      if(i>0)
+        chunks.push(inputString[start..i-1])
       start = i+1
       chunks.push('+')
     else if(x == '-')
-      chunks.push(inputString[start..i-1])
+      if(i>0)
+        chunks.push(inputString[start..i-1])
       start = i+1
       chunks.push('-')
   chunks.push(inputString[start..])
