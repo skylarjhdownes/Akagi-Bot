@@ -4,10 +4,10 @@ mahjong = require('./akagiCode.coffee')
 dice = require('./akagiDice.coffee')
 
 ## Create an instance of a Discord client
-bot = new Discord.Client();
+bot = new Discord.Client();\
 
 ## The token of your bot - https://discordapp.com/developers/applications/me
-token = 'MzUxMTc2MzEzMTg2Mjg3NjE2.DIPFZw.88Ci5AcfXDU1u3wMPYcwugj5kcI';
+token = process.env.BOT_TOKEN
 
 ## The ready event is vital, it means that your bot will only start reacting to information
 ## from Discord _after_ ready is emitted
@@ -56,7 +56,7 @@ bot.on('message', (message) =>
       exports.phase = "draw"
       exports.prevailingWind = "East"
       message.channel.send("Let the games begin!\nThe dora indicator is: "+exports.wall.printDora(exports.writeTiles)+"\nThe prevailing wind is: "+exports.prevailingWind)
-    
+
     if(command == "forge")
       exports.floppyAngels.createChannel(subCommand,"text")
         .then((channel) -> exports.parlors.push(channel))
@@ -105,12 +105,12 @@ bot.on('message', (message) =>
 
     if(command == "tiles")
       message.channel.send(mahjong.allTilesGetter())
-    
+
     if(command == "toggle")
       if(subCommand == "writing")
         exports.writeTiles = not exports.writeTiles
         message.channel.send("Tiles Toggled")
-    
+
     if(command == "hand")
       if(not exports.gameStarted)
         message.channel.send("Please start game first.")
@@ -121,7 +121,7 @@ bot.on('message', (message) =>
           message.channel.send(exports.hand1.printHand(exports.writeTiles))
         else if(subCommand is "2")
           message.channel.send(exports.hand2.printHand(exports.writeTiles))
-    
+
     if(command == "pile")
       if(not exports.gameStarted)
         message.channel.send("Please start game first.")
@@ -132,7 +132,7 @@ bot.on('message', (message) =>
           message.channel.send(exports.hand1.discardPile.printDiscard(exports.writeTiles))
         else if(subCommand is "2")
           message.channel.send(exports.hand2.discardPile.printDiscard(exports.writeTiles))
-    
+
     if(command == "draw")
       if(not exports.gameStarted)
         message.channel.send("Please start game first.")
@@ -144,7 +144,7 @@ bot.on('message', (message) =>
         else if (exports.turn == 2)
           message.channel.send(exports.hand2.draw(exports.wall))
         exports.phase = "discard"
-    
+
     if(command == "discard")
       if(not exports.gameStarted)
         message.channel.send("Please start game first.")
@@ -161,7 +161,7 @@ bot.on('message', (message) =>
           message.channel.send(checkDiscard)
         else
           message.channel.send("You do not have that tile.")
-  
+
   console.log(exports)
 )
 ## Log our bot in
