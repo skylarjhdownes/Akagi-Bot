@@ -1,6 +1,7 @@
 ## Import the discord.js module
 Discord = require('discord.js');
 mahjong = require('./akagiCode.coffee')
+dice = require('./akagiDice.coffee')
 
 ## Create an instance of a Discord client
 bot = new Discord.Client();
@@ -37,7 +38,11 @@ bot.on('message', (message) =>
     if(command == "hey")
       message.channel.send("Blood for the blood god!  Skulls for the skull throne!")
 
+    if(command == "roll")
+      message.channel.send(dice.rollDice(subCommand))
+
     if(command == "start")
+      bot.user.setStatus('online','Mahjong')
       exports.gameStarted = true
       exports.wall = new mahjong.Wall()
       exports.pile1 = new mahjong.Pile()
@@ -72,6 +77,7 @@ bot.on('message', (message) =>
       else
         exports.gameStarted = false
         message.channel.send("Game ended.")
+        bot.user.setGame("")
 
     if(command == "turn")
       if(not exports.gameStarted)

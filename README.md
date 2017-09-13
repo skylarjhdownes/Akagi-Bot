@@ -42,3 +42,5 @@ ping - Test command
 !yell - Takes any number of arguments.  Outputs those arguments to all forged channels.
 
 !ragnarok - Deletes all forged channels.  
+
+!roll - Rolls dice in the XdY+AdB-V-CdD sorta format
