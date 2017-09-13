@@ -4,7 +4,7 @@ mahjong = require('./akagiCode.coffee')
 dice = require('./akagiDice.coffee')
 
 ## Create an instance of a Discord client
-bot = new Discord.Client();\
+bot = new Discord.Client()
 
 ## The token of your bot - https://discordapp.com/developers/applications/me
 token = process.env.BOT_TOKEN
