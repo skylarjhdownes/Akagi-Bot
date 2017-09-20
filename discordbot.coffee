@@ -59,7 +59,14 @@ bot.on('message', (message) =>
 
     if(command == "forge")
       exports.floppyAngels.createChannel(subCommand,"text")
-        .then((channel) -> exports.parlors.push(channel))
+        .then((channel) -> 
+          channel.overwritePermissions(exports.floppyAngels.defaultRole, {READ_MESSAGES: false})
+            .then(console.log("Hidden!!"))
+            .catch(console.error)
+          channel.overwritePermissions(message, {READ_MESSAGES: true})
+            .then(console.log("Revealed!!"))
+            .catch(console.error)
+          exports.parlors.push(channel))
         .catch(console.error)
 
     if(command == "yell")
