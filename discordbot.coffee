@@ -58,14 +58,20 @@ bot.on('message', (message) =>
       message.channel.send("Let the games begin!\nThe dora indicator is: "+exports.wall.printDora(exports.writeTiles)+"\nThe prevailing wind is: "+exports.prevailingWind)
 
     if(command == "forge")
+      usersMentioned = message.mentions.members
+      console.log(usersMentioned.array().length)
       exports.floppyAngels.createChannel(subCommand,"text")
         .then((channel) -> 
           channel.overwritePermissions(exports.floppyAngels.defaultRole, {READ_MESSAGES: false})
             .then(console.log("Hidden!!"))
             .catch(console.error)
-          channel.overwritePermissions(message, {READ_MESSAGES: true})
+          channel.overwritePermissions(message, {READ_MESSAGES: true, MANAGE_CHANNELS: true})
             .then(console.log("Revealed!!"))
             .catch(console.error)
+          for x in usersMentioned.array()
+            channel.overwritePermissions(x, {READ_MESSAGES: true})
+              .then(console.log(x.displayName))
+              .catch(console.error)
           exports.parlors.push(channel))
         .catch(console.error)
 
@@ -169,7 +175,7 @@ bot.on('message', (message) =>
         else
           message.channel.send("You do not have that tile.")
 
-  console.log(exports)
+  #console.log(exports)
 )
 ## Log our bot in
 bot.login(token)
