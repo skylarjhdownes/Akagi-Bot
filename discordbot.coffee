@@ -1,13 +1,16 @@
 ## Import the discord.js module
 Discord = require('discord.js');
-mahjong = require('./akagiCode.coffee')
+mahjongTiles = require('./akagiTiles.coffee')
+mahjongGame = require('./akagiGame.coffee')
+mahjongPlayer = require('./akagiPlayer.coffee')
 dice = require('./akagiDice.coffee')
+_ = require('./node_modules/lodash/lodash.js')
 
 ## Create an instance of a Discord client
 bot = new Discord.Client()
 
 ## The token of your bot - https://discordapp.com/developers/applications/me
-token = process.env.BOT_TOKEN
+token = 'MzUxMTc2MzEzMTg2Mjg3NjE2.DJpZzA.urPi2eCVIXkZdYndSNCB_uUAQ4I'
 
 ## The ready event is vital, it means that your bot will only start reacting to information
 ## from Discord _after_ ready is emitted
@@ -16,12 +19,11 @@ bot.on('ready', =>
   console.log('I am ready!')
   exports.floppyAngels = bot.guilds.first()
   console.log(exports.floppyAngels.name)
-  exports.gameStarted = false
+  exports.mahjongGames = []
   exports.parlors = [] #Created channels
   exports.recentDiscard = false
-  exports.turn = 1
   exports.phase = "draw"
-  exports.writeTiles = true
+  exports.writemahjongTiles = true
 )
 
 # Create an event listener for messages
@@ -36,21 +38,16 @@ bot.on('message', (message) =>
       message.channel.send(dice.rollDice(subCommand))
 
     if(command == "start")
-      bot.user.setStatus('online','Mahjong')
-      exports.gameStarted = true
-      exports.wall = new mahjong.Wall()
-      exports.pile1 = new mahjong.Pile()
-      exports.pile2 = new mahjong.Pile()
-      exports.hand1 = new mahjong.Hand(exports.pile1)
-      exports.hand2 = new mahjong.Hand(exports.pile2)
-      exports.hand1.startDraw(exports.wall)
-      exports.hand2.startDraw(exports.wall)
-      exports.wall.doraFlip()
-      exports.turn = 1
-      exports.phase = "draw"
-      exports.prevailingWind = "East"
+      bot.user.setStatus('online','mahjongTiles')
+      exports.mahjongGames.push(new mahjongGame)
+      newGame = _.last(exports.mahjongGames)
+
+      for player in newGame.players
+        player.hand.startDraw(newGame.wall)
+      newGame.wall.doraFlip()
+
       message.channel.send("Let the games begin!\nThe dora indicator is:
-        #{exports.wall.printDora(exports.writeTiles)}\nThe prevailing wind is: #{exports.prevailingWind}")
+        #{newGame.wall.printDora(exports.writemahjongTiles)}\nThe prevailing wind is: #{newGame.prevailingWind}")
 
     if(command == "forge")
       usersMentioned = message.mentions.members
@@ -79,6 +76,8 @@ bot.on('message', (message) =>
       for x in exports.parlors
         x.delete()
 
+    #TODO: make game commands work with game objects
+
     if(command == "end")
       if(not exports.gameStarted)
         message.channel.send("No game to end.")
@@ -92,6 +91,7 @@ bot.on('message', (message) =>
         message.channel.send("Please start game first.")
       else
         message.channel.send("It is player #{exports.turn}'s turn.")
+
 
     if(command == "phase")
       if(not exports.gameStarted)
@@ -109,15 +109,15 @@ bot.on('message', (message) =>
       if(not exports.gameStarted)
         message.channel.send("Please start game first.")
       else
-        message.channel.send(exports.wall.printDora(exports.writeTiles))
+        message.channel.send(exports.wall.printDora(exports.writemahjongTiles))
 
-    if(command == "tiles")
-      message.channel.send(mahjong.allTilesGetter())
+    if(command == "mahjongTiles")
+      message.channel.send(mahjongTiles.allmahjongTilesGetter())
 
     if(command == "toggle")
       if(subCommand == "writing")
-        exports.writeTiles = not exports.writeTiles
-        message.channel.send("Tiles Toggled")
+        exports.writemahjongTiles = not exports.writemahjongTiles
+        message.channel.send("mahjongTiles Toggled")
 
     if(command == "hand")
       if(not exports.gameStarted)
@@ -126,9 +126,9 @@ bot.on('message', (message) =>
         if(subCommand not in ["1","2"])
           message.channel.send("Please select a real hand.")
         else if(subCommand is "1")
-          message.channel.send(exports.hand1.printHand(exports.writeTiles))
+          message.channel.send(exports.hand1.printHand(exports.writemahjongTiles))
         else if(subCommand is "2")
-          message.channel.send(exports.hand2.printHand(exports.writeTiles))
+          message.channel.send(exports.hand2.printHand(exports.writemahjongTiles))
 
     if(command == "pile")
       if(not exports.gameStarted)
@@ -137,9 +137,9 @@ bot.on('message', (message) =>
         if(subCommand not in ["1","2"])
           message.channel.send("Please select a real discard pile.")
         else if(subCommand is "1")
-          message.channel.send(exports.hand1.discardPile.printDiscard(exports.writeTiles))
+          message.channel.send(exports.hand1.discardPile.printDiscard(exports.writemahjongTiles))
         else if(subCommand is "2")
-          message.channel.send(exports.hand2.discardPile.printDiscard(exports.writeTiles))
+          message.channel.send(exports.hand2.discardPile.printDiscard(exports.writemahjongTiles))
 
     if(command == "draw")
       if(not exports.gameStarted)
