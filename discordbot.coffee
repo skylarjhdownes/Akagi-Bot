@@ -1,12 +1,13 @@
 ## Import the discord.js module
 Discord = require('discord.js');
 mahjong = require('./akagiCode.coffee')
+dice = require('./akagiDice.coffee')
 
 ## Create an instance of a Discord client
-bot = new Discord.Client();
+bot = new Discord.Client()
 
 ## The token of your bot - https://discordapp.com/developers/applications/me
-token = 'MzUxMTc2MzEzMTg2Mjg3NjE2.DIPFZw.88Ci5AcfXDU1u3wMPYcwugj5kcI';
+token = process.env.BOT_TOKEN
 
 ## The ready event is vital, it means that your bot will only start reacting to information
 ## from Discord _after_ ready is emitted
@@ -31,7 +32,11 @@ bot.on('message', (message) =>
     subCommand = messageParts[1]
     ssubCommand = messageParts[2]
 
+    if(command == "roll")
+      message.channel.send(dice.rollDice(subCommand))
+
     if(command == "start")
+      bot.user.setStatus('online','Mahjong')
       exports.gameStarted = true
       exports.wall = new mahjong.Wall()
       exports.pile1 = new mahjong.Pile()
@@ -48,8 +53,21 @@ bot.on('message', (message) =>
         #{exports.wall.printDora(exports.writeTiles)}\nThe prevailing wind is: #{exports.prevailingWind}")
 
     if(command == "forge")
+      usersMentioned = message.mentions.members
+      console.log(usersMentioned.array().length)
       exports.floppyAngels.createChannel(subCommand,"text")
-        .then((channel) -> exports.parlors.push(channel))
+        .then((channel) ->
+          channel.overwritePermissions(exports.floppyAngels.defaultRole, {READ_MESSAGES: false})
+            .then(console.log("Hidden!!"))
+            .catch(console.error)
+          channel.overwritePermissions(message, {READ_MESSAGES: true, MANAGE_CHANNELS: true})
+            .then(console.log("Revealed!!"))
+            .catch(console.error)
+          for x in usersMentioned.array()
+            channel.overwritePermissions(x, {READ_MESSAGES: true})
+              .then(console.log(x.displayName))
+              .catch(console.error)
+          exports.parlors.push(channel))
         .catch(console.error)
 
     if(command == "yell")
@@ -67,6 +85,7 @@ bot.on('message', (message) =>
       else
         exports.gameStarted = false
         message.channel.send("Game ended.")
+        bot.user.setGame("")
 
     if(command == "turn")
       if(not exports.gameStarted)
@@ -151,7 +170,7 @@ bot.on('message', (message) =>
         else
           message.channel.send("You do not have that tile.")
 
-  console.log(exports)
+  #console.log(exports)
 )
 ## Log our bot in
 bot.login(token)
