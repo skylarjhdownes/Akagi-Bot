@@ -29,15 +29,12 @@ bot.on('ready', =>
 # Create an event listener for messages
 bot.on('message', (message) =>
   if (message.content.substring(0, 1) == "!")
-    messageParts = message.content.split(" ")
-    command = messageParts[0].substring(1)
-    subCommand = messageParts[1]
-    ssubCommand = messageParts[2]
+    commandArgs = message.substring(1).content.split(" ")
 
-    if(command == "roll")
+    if(commandArgs[0] == "roll")
       message.channel.send(dice.rollDice(subCommand))
 
-    if(command == "start")
+    if(commandArgs[0] == "start")
       bot.user.setStatus('online','Mahjong')
       exports.mahjongGames.push(new mahjongGame)
       newGame = _.last(exports.mahjongGames)
@@ -49,10 +46,10 @@ bot.on('message', (message) =>
       message.channel.send("Let the games begin!\nThe dora indicator is:
         #{newGame.wall.printDora(exports.writeTiles)}\nThe prevailing wind is: #{newGame.prevailingWind}")
 
-    if(command == "forge")
+    if(commandArgs[0] == "forge")
       usersMentioned = message.mentions.members
       console.log(usersMentioned.array().length)
-      exports.floppyAngels.createChannel(subCommand,"text")
+      exports.floppyAngels.createChannel(commandArgs[1],"text")
         .then((channel) ->
           channel.overwritePermissions(exports.floppyAngels.defaultRole, {READ_MESSAGES: false})
             .then(console.log("Hidden!!"))
@@ -67,18 +64,18 @@ bot.on('message', (message) =>
           exports.parlors.push(channel))
         .catch(console.error)
 
-    if(command == "yell")
+    if(commandArgs[0] == "yell")
       for x in exports.parlors
-        x.send(messageParts[1..])
+        x.send(commandArgs[1..])
 
-    if(command == "ragnarok")
+    if(commandArgs[0] == "ragnarok")
       message.channel.send("Let's Ragnarok!!!!!")
       for x in exports.parlors
         x.delete()
 
     #TODO: make game commands work with game objects
 
-    if(command == "end")
+    if(commandArgs[0] == "end")
       if(not exports.gameStarted)
         message.channel.send("No game to end.")
       else
@@ -86,62 +83,62 @@ bot.on('message', (message) =>
         message.channel.send("Game ended.")
         bot.user.setGame("")
 
-    if(command == "turn")
+    if(commandArgs[0] == "turn")
       if(not exports.gameStarted)
         message.channel.send("Please start game first.")
       else
         message.channel.send("It is player #{exports.turn}'s turn.")
 
 
-    if(command == "phase")
+    if(commandArgs[0] == "phase")
       if(not exports.gameStarted)
         message.channel.send("Please start game first.")
       else
         message.channel.send("It is the #{exports.phase} phase.")
 
-    if(command == "wind")
+    if(commandArgs[0] == "wind")
       if(not exports.gameStarted)
         message.channel.send("Please start game first.")
       else
         message.channel.send(exports.prevailingWind)
 
-    if(command == "dora")
+    if(commandArgs[0] == "dora")
       if(not exports.gameStarted)
         message.channel.send("Please start game first.")
       else
         message.channel.send(exports.wall.printDora(exports.writeTiles))
 
-    if(command == "tiles")
+    if(commandArgs[0] == "tiles")
       message.channel.send(mahjongTiles.allTilesGetter())
 
-    if(command == "toggle")
-      if(subCommand == "writing")
+    if(commandArgs[0] == "toggle")
+      if(commandArgs[1] == "writing")
         exports.writeTiles = not exports.writeTiles
         message.channel.send("Tiles Toggled")
 
-    if(command == "hand")
+    if(commandArgs[0] == "hand")
       if(not exports.gameStarted)
         message.channel.send("Please start game first.")
       else
-        if(subCommand not in ["1","2"])
+        if(commandArgs[1] not in ["1","2"])
           message.channel.send("Please select a real hand.")
-        else if(subCommand is "1")
+        else if(commandArgs[1] is "1")
           message.channel.send(exports.hand1.printHand(exports.writeTiles))
-        else if(subCommand is "2")
+        else if(commandArgs[1] is "2")
           message.channel.send(exports.hand2.printHand(exports.writeTiles))
 
-    if(command == "pile")
+    if(commandArgs[0] == "pile")
       if(not exports.gameStarted)
         message.channel.send("Please start game first.")
       else
-        if(subCommand not in ["1","2"])
+        if(commandArgs[1] not in ["1","2"])
           message.channel.send("Please select a real discard pile.")
-        else if(subCommand is "1")
+        else if(commandArgs[1] is "1")
           message.channel.send(exports.hand1.discardPile.printDiscard(exports.writeTiles))
-        else if(subCommand is "2")
+        else if(commandArgs[1] is "2")
           message.channel.send(exports.hand2.discardPile.printDiscard(exports.writeTiles))
 
-    if(command == "draw")
+    if(commandArgs[0] == "draw")
       if(not exports.gameStarted)
         message.channel.send("Please start game first.")
       else if(exports.phase != "draw")
@@ -153,16 +150,16 @@ bot.on('message', (message) =>
           message.channel.send(exports.hand2.draw(exports.wall))
         exports.phase = "discard"
 
-    if(command == "discard")
+    if(commandArgs[0] == "discard")
       if(not exports.gameStarted)
         message.channel.send("Please start game first.")
       else if(exports.phase != "discard")
         message.channel.send("It is not the discard phase.")
       else
         if(exports.turn == 1)
-          checkDiscard = exports.hand1.discard(subCommand+" "+ssubCommand)
+          checkDiscard = exports.hand1.discard(commandArgs[1]+" "+commandArgs[2])
         else if (exports.turn == 2)
-          checkDiscard = exports.hand2.discard(subCommand+" "+ssubCommand)
+          checkDiscard = exports.hand2.discard(commandArgs[1]+" "+commandArgs[2])
         if(checkDiscard)
           exports.phase = "draw"
           exports.turn = 3-exports.turn
