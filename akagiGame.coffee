@@ -3,11 +3,12 @@ player = require('./akagiPlayer.coffee')
 
 class MahjongGame
   #A four player game of Mahjong
-  constructor: (playerID0, playerID1, playerID2, playerID3, gameSettings) ->
+  constructor: (playerIDs, gameSettings) ->
     @wall = new gamePieces.Wall()
-    @players = [new player(playerID0), new player(playerID1), new player(playerID2), new player(playerID3)]
+    @players = [new player(playerIDs[0]), new player(playerIDs[1]), new player(playerIDs[2]), new player(playerIDs[3])]
     @turn = 1
     @phase = 'draw'
     @prevailingWind = "East"
+    @discordRoom = {}
 
 module.exports = MahjongGame
