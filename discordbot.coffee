@@ -32,7 +32,7 @@ bot.on('message', (message) =>
     commandArgs = message.substring(1).content.split(" ")
 
     if(commandArgs[0] == "roll")
-      message.channel.send(dice.rollDice(subCommand))
+      message.channel.send(dice.rollDice(commandArgs[1]))
 
     if(commandArgs[0] == "start")
       bot.user.setStatus('online','Mahjong')
