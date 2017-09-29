@@ -17,7 +17,7 @@ token = process.env.BOT_TOKEN
 bot.on('ready', =>
   console.log('Logged in as %s - %s\n', bot.user.username, bot.user.id)
   console.log('I am ready!')
-  exports.floppyAngels = bot.guilds.first()
+  exports.floppyAngels = bot.guilds.first()  #TODO: track which server commands are coming from
   console.log(exports.floppyAngels.name)
   exports.mahjongGames = []
   exports.parlors = [] #Created channels
