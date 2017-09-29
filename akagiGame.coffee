@@ -3,9 +3,9 @@ player = require('./akagiPlayer.coffee')
 
 class MahjongGame
   #A four player game of Mahjong
-  constructor: (playerIDs, gameSettings) ->
+  constructor: (playerUserObjects, gameSettings) ->
     @wall = new gamePieces.Wall()
-    @players = [new player(playerIDs[0]), new player(playerIDs[1]), new player(playerIDs[2]), new player(playerIDs[3])]
+    @players = [new player(playerUserObjects[0]), new player(playerUserObjects[1]), new player(playerUserObjects[2]), new player(playerUserObjects[3])]
     @turn = 1
     @phase = 'draw'
     @prevailingWind = "East"
