@@ -2,6 +2,7 @@
 Discord = require('discord.js');
 mahjong = require('./akagiCode.coffee')
 dice = require('./akagiDice.coffee')
+Promise = require('promise')
 
 ## Create an instance of a Discord client
 bot = new Discord.Client()
@@ -61,7 +62,7 @@ bot.on('message', (message) =>
       usersMentioned = message.mentions.members
       console.log(usersMentioned.array().length)
       exports.floppyAngels.createChannel(subCommand,"text")
-        .then((channel) -> 
+        .then((channel) ->
           channel.overwritePermissions(exports.floppyAngels.defaultRole, {READ_MESSAGES: false})
             .then(console.log("Hidden!!"))
             .catch(console.error)
@@ -75,6 +76,61 @@ bot.on('message', (message) =>
           exports.parlors.push(channel))
         .catch(console.error)
 
+    if(command == "parlorMaker")
+      usersMentioned = message.mentions.members.array()
+      if(usersMentioned.length < 3)
+        message.channel.send("Not enough players.")
+      else
+        firstChan = exports.floppyAngels.createChannel(subCommand+"Player1","text")
+          .then((channel) ->
+            return channel)
+          .catch(console.error)
+        secondChan = exports.floppyAngels.createChannel(subCommand+"Player2","text")
+          .then((channel) ->
+            return channel)
+            .catch(console.error)
+        thirdChan = exports.floppyAngels.createChannel(subCommand+"Player3","text")
+          .then((channel) ->
+            return channel)
+          .catch(console.error)
+        forthChan = exports.floppyAngels.createChannel(subCommand+"Player4","text")
+          .then((channel) ->
+            return channel)
+          .catch(console.error)
+        fifthChan = exports.floppyAngels.createChannel(subCommand+"GroupChat","text")
+          .then((channel) ->
+            return channel)
+          .catch(console.error)
+        Promise.all([firstChan,secondChan,thirdChan,forthChan,fifthChan])
+          .then((channels) ->
+            console.log(channels)
+            channels[0].overwritePermissions(message, {READ_MESSAGES: true, MANAGE_CHANNELS: true})
+              .then(console.log("Revealed!!"))
+              .catch(console.error)
+            channels[1].overwritePermissions(usersMentioned[0], {READ_MESSAGES: true, MANAGE_CHANNELS: true})
+              .then(console.log("Revealed!!"))
+              .catch(console.error)
+            channels[2].overwritePermissions(usersMentioned[0], {READ_MESSAGES: true, MANAGE_CHANNELS: true})
+              .then(console.log("Revealed!!"))
+              .catch(console.error)
+            channels[3].overwritePermissions(usersMentioned[0], {READ_MESSAGES: true, MANAGE_CHANNELS: true})
+              .then(console.log("Revealed!!"))
+              .catch(console.error)
+            channels[4].overwritePermissions(message, {READ_MESSAGES: true, MANAGE_CHANNELS: true})
+              .then(console.log("Revealed!!"))
+              .catch(console.error)
+            for x in usersMentioned
+              channels[4].overwritePermissions(x, {READ_MESSAGES: true})
+                .then(console.log("Revealed!!"))
+                .catch(console.error)
+            for x in channels
+              x.overwritePermissions(exports.floppyAngels.defaultRole, {READ_MESSAGES: false})
+                .then(console.log("Hidden"))
+                .catch(console.error)
+              exports.parlors.push(x)
+            )
+            .catch(console.error)
+
     if(command == "yell")
       for x in exports.parlors
         x.send(messageParts[1..])
@@ -83,6 +139,7 @@ bot.on('message', (message) =>
       message.channel.send("Let's Ragnarok!!!!!")
       for x in exports.parlors
         x.delete()
+      exports.parlors = []
 
     if(command == "end")
       if(not exports.gameStarted)
