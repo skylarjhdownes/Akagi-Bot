@@ -37,7 +37,9 @@ ping - Test command
 
 !phase - Displays what phase it is.
 
-!forge - Takes one argument.  Makes a channel with the argument as its name.
+!forge - Takes one argument.  Makes a channel with the argument as its name. People mentioned are able to see the channel.
+
+!parlorMaker - Takes one argument, and at least 3 mentions.  Makes a channel for poster and each of the first three mentions, as well as a group channel that everyone mentioned can see.  
 
 !yell - Takes any number of arguments.  Outputs those arguments to all forged channels.
 
