@@ -9,33 +9,29 @@ WIP.
 
 Currently contains the following commands:
 '#' means it is currently being worked on and doesn't work
-
-
-!hey - Test command
-
-ping - Test command
+~ means it only works in mahjong channels
 
 #!draw - Draws a tile for the active players
 
 #!discard - Needs name of tile to discard.  Discards the specified tile from the hand of the active player.
 
-#!hand - Needs a player number.  Looks at the tiles in the hand of that player.
+~hand - Only usable in player channel.  Looks at the tiles in that player's hand.
 
 #!pile - Needs a player number.  Looks at the tiles in the discard pile of that player.
 
 #!toggle writing - Turns off or on the written form of the tiles.
 
-#!end - Ends the current game.
+~abort game - Currently does nothing, but claims the game is over
 
 !tiles - Displays a picture of each tile.
 
-#!dora - Displays all current dora indicators.
+~dora - Displays all current dora indicators.
 
-#!wind - Displays prevailing wind
+~prevailing - Displays prevailing wind
 
-#!turn - Displays who's turn it is.
+~turn - Displays who's turn it is.
 
-#!phase - Displays what phase it is.
+~phase - Displays what phase it is.
 
 !forge - Takes one argument.  Makes a channel with the argument as its name. People mentioned are able to see the channel.
 
