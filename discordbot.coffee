@@ -18,13 +18,10 @@ token = process.env.BOT_TOKEN
 bot.on('ready', =>
   console.log('Logged in as %s - %s\n', bot.user.username, bot.user.id)
   console.log('I am ready!')
-  exports.floppyAngels = bot.guilds.first()  #TODO: track which server commands are coming from
-  console.log(exports.floppyAngels.name)
+  exports.activeServer = bot.guilds.first()  #TODO: track which server commands are coming from
+  console.log(exports.activeServer.name)
   exports.mahjongGames = []
   exports.parlors = [] #Created channels
-  exports.recentDiscard = false
-  exports.phase = "draw"
-  exports.writeTiles = true
 )
 
 # Create an event listener for messages
@@ -43,7 +40,7 @@ bot.on('message', (message) =>
         playersToAddToGame.unshift(message.author)
 
         userPermissions = [
-          {type:'role', id:exports.floppyAngels.defaultRole.id, deny: Discord.Permissions.FLAGS.VIEW_CHANNEL}
+          {type:'role', id:exports.activeServer.defaultRole.id, deny: Discord.Permissions.FLAGS.VIEW_CHANNEL}
         ]
         for gameObserver,i in playersToAddToGame
           if(i<4)
@@ -51,18 +48,18 @@ bot.on('message', (message) =>
           else
             userPermissions.push({type:'member', id:gameObserver.id, allow: Discord.Permissions.FLAGS.VIEW_CHANNEL})
 
-        chatChannel = exports.floppyAngels.createChannel(commandArgs[1]+"GroupChat","text",userPermissions)
+        chatChannel = exports.activeServer.createChannel(commandArgs[1]+"GroupChat","text",userPermissions)
           .then((channel) ->
             return channel)
           .catch(console.error)
 
         channelHolder = []
         for i in [0..3]
-          temp = exports.floppyAngels.createChannel(
+          temp = exports.activeServer.createChannel(
             commandArgs[1]+"Player"+(i+1),
             "text",
             [
-              {type:'role', id:exports.floppyAngels.defaultRole.id, deny: Discord.Permissions.FLAGS.VIEW_CHANNEL},
+              {type:'role', id:exports.activeServer.defaultRole.id, deny: Discord.Permissions.FLAGS.VIEW_CHANNEL},
               {type:'member', id:playersToAddToGame[i].id, allow: Discord.Permissions.FLAGS.VIEW_CHANNEL+Discord.Permissions.FLAGS.MANAGE_ROLES}
             ]
             )
@@ -85,9 +82,9 @@ bot.on('message', (message) =>
     if(commandArgs[0] == "forge")
       usersMentioned = message.mentions.members
       console.log(usersMentioned.array().length)
-      exports.floppyAngels.createChannel(commandArgs[1],"text")
+      exports.activeServer.createChannel(commandArgs[1],"text")
         .then((channel) ->
-          channel.overwritePermissions(exports.floppyAngels.defaultRole, {READ_MESSAGES: false})
+          channel.overwritePermissions(exports.activeServer.defaultRole, {READ_MESSAGES: false})
             .then(console.log("Hidden!!"))
             .catch(console.error)
           channel.overwritePermissions(message, {READ_MESSAGES: true, MANAGE_CHANNELS: true})
