@@ -35,19 +35,52 @@ bot.on('message', (message) =>
     if(commandArgs[0] == "roll")
       message.channel.send(dice.rollDice(commandArgs[1]))
 
-    if(commandArgs[0] == "start")
+    if(commandArgs[0] == "mahjong")
       playersToAddToGame = message.mentions.members.array()
       if (playersToAddToGame.length < 3)
         message.channel.send("Please @ mention at least 3 other users to play in your game.")
       else
         playersToAddToGame.unshift(message.author)
-        exports.mahjongGames.push(new mahjongGame(playersToAddToGame, message.guild, {}))
-        newGame = _.last(exports.mahjongGames)
-        bot.user.setStatus('online','Mahjong')
 
-        for player in newGame.players
-          player.hand.startDraw(newGame.wall)
-        newGame.wall.doraFlip()
+        userPermissions = [
+          {type:'role', id:exports.floppyAngels.defaultRole.id, deny: Discord.Permissions.FLAGS.VIEW_CHANNEL}
+        ]
+        for gameObserver,i in playersToAddToGame
+          if(i<4)
+            userPermissions.push({type:'member', id:gameObserver.id, allow: Discord.Permissions.FLAGS.VIEW_CHANNEL+Discord.Permissions.FLAGS.MANAGE_ROLES})
+          else
+            userPermissions.push({type:'member', id:gameObserver.id, allow: Discord.Permissions.FLAGS.VIEW_CHANNEL})
+
+        chatChannel = exports.floppyAngels.createChannel(commandArgs[1]+"GroupChat","text",userPermissions)
+          .then((channel) ->
+            return channel)
+          .catch(console.error)
+
+        channelHolder = []
+        for i in [0..3]
+          temp = exports.floppyAngels.createChannel(
+            commandArgs[1]+"Player"+(i+1),
+            "text",
+            [
+              {type:'role', id:exports.floppyAngels.defaultRole.id, deny: Discord.Permissions.FLAGS.VIEW_CHANNEL},
+              {type:'member', id:playersToAddToGame[i].id, allow: Discord.Permissions.FLAGS.VIEW_CHANNEL+Discord.Permissions.FLAGS.MANAGE_ROLES}
+            ]
+            )
+            .then((channel) ->
+              console.log("Hapa")
+              return channel
+              )
+            .catch(console.error)
+          channelHolder.push(temp)
+
+        Promise.all([chatChannel,channelHolder[0],channelHolder[1],channelHolder[2],channelHolder[3]])
+          .then((allChannels) ->
+            exports.mahjongGames.push(new mahjongGame(allChannels, message.guild, {}))
+            for channel in allChannels
+              exports.parlors.push(channel)
+            bot.user.setStatus('online','Mahjong')
+            )
+          .catch(console.error)
 
     if(commandArgs[0] == "forge")
       usersMentioned = message.mentions.members
@@ -67,61 +100,6 @@ bot.on('message', (message) =>
           exports.parlors.push(channel))
         .catch(console.error)
 
-    if(commandArgs[0] == "parlorMaker")
-      usersMentioned = message.mentions.members.array()
-      if(usersMentioned.length < 3)
-        message.channel.send("Not enough players.")
-      else
-        firstChan = exports.floppyAngels.createChannel(commandArgs[1]+"Player1","text")
-          .then((channel) ->
-            return channel)
-          .catch(console.error)
-        secondChan = exports.floppyAngels.createChannel(commandArgs[1]+"Player2","text")
-          .then((channel) ->
-            return channel)
-            .catch(console.error)
-        thirdChan = exports.floppyAngels.createChannel(commandArgs[1]+"Player3","text")
-          .then((channel) ->
-            return channel)
-          .catch(console.error)
-        forthChan = exports.floppyAngels.createChannel(commandArgs[1]+"Player4","text")
-          .then((channel) ->
-            return channel)
-          .catch(console.error)
-        fifthChan = exports.floppyAngels.createChannel(commandArgs[1]+"GroupChat","text")
-          .then((channel) ->
-            return channel)
-          .catch(console.error)
-        Promise.all([firstChan,secondChan,thirdChan,forthChan,fifthChan])
-          .then((channels) ->
-            console.log(channels)
-            channels[0].overwritePermissions(message, {READ_MESSAGES: true, MANAGE_CHANNELS: true})
-              .then(console.log("Revealed!!"))
-              .catch(console.error)
-            channels[1].overwritePermissions(usersMentioned[0], {READ_MESSAGES: true, MANAGE_CHANNELS: true})
-              .then(console.log("Revealed!!"))
-              .catch(console.error)
-            channels[2].overwritePermissions(usersMentioned[0], {READ_MESSAGES: true, MANAGE_CHANNELS: true})
-              .then(console.log("Revealed!!"))
-              .catch(console.error)
-            channels[3].overwritePermissions(usersMentioned[0], {READ_MESSAGES: true, MANAGE_CHANNELS: true})
-              .then(console.log("Revealed!!"))
-              .catch(console.error)
-            channels[4].overwritePermissions(message, {READ_MESSAGES: true, MANAGE_CHANNELS: true})
-              .then(console.log("Revealed!!"))
-              .catch(console.error)
-            for x in usersMentioned
-              channels[4].overwritePermissions(x, {READ_MESSAGES: true})
-                .then(console.log("Revealed!!"))
-                .catch(console.error)
-            for x in channels
-              x.overwritePermissions(exports.floppyAngels.defaultRole, {READ_MESSAGES: false})
-                .then(console.log("Hidden"))
-                .catch(console.error)
-              exports.parlors.push(x)
-            )
-            .catch(console.error)
-
     if(commandArgs[0] == "yell")
       for x in exports.parlors
         x.send(commandArgs[1..])
@@ -131,6 +109,7 @@ bot.on('message', (message) =>
       for x in exports.parlors
         x.delete()
       exports.parlors = []
+      exports.mahjongGames = []
 
     #TODO: make game commands work with game objects
 

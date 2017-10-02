@@ -3,48 +3,35 @@ player = require('./akagiPlayer.coffee')
 
 class MahjongGame
   #A four player game of Mahjong
-  constructor: (playerUserObjects, server, gameSettings) ->
+  constructor: (playerChannels, server, gameSettings) ->
     @wall = new gamePieces.Wall()
     @players = [
-      new player(playerUserObjects[0]),
-      new player(playerUserObjects[1]),
-      new player(playerUserObjects[2]),
-      new player(playerUserObjects[3])
+      new player(playerChannels[1]),
+      new player(playerChannels[2]),
+      new player(playerChannels[3]),
+      new player(playerChannels[4])
     ]
+    @gameObservationChannel = playerChannels[0]
+    @startRoundOne()
+
+  startRoundOne: ->
+    #TODO: Randomize starting locations later
+    @eastPlayer = @players[0]
+    @southPlayer = @players[1]
+    @westPlayer = @players[2]
+    @northPlayer = @players[3]
+    @startRound("East",@eastPlayer)
+
+  startRound:(prevailingWind,dealer) ->
+    @prevailingWind = prevailingWind
+    @dealer = dealer
     @turn = 1
     @phase = 'draw'
-    @prevailingWind = "East"
-    @playerChannels = []
-    @gameObservationChannel = {}
-
-    #TODO: Convert permissions code to use
-    # Discord.Permissions.FLAGS for readability
-    userPermissions = [
-      {type:'role', id:server.defaultRole.id, deny: 1024}
-    ]
-    for gameObserver in playerUserObjects
-      userPermissions.push({type:'member', id:gameObserver.id, allow: 1275583681})
-
-    server.createChannel("testGameChannel", "text", userPermissions)
-      .then((channel) =>
-          @gameObservationChannel = channel
-          channel.send("Let the games begin!\n
-          The dora indicator is: #{@wall.printDora(true)}\n
-          The prevailing wind is: #{@prevailingWind}")
-        )
-      .catch(console.error)
-
-    for player in playerUserObjects
-      server.createChannel(
-        "testGameChannel-#{player.username}", # This is breaking for users other than the game creator.
-        "text",
-        [
-          {type:'role', id:server.defaultRole.id, deny: 1024},
-          {type:'member', id:player.id, allow: 1275583681}
-        ]
-      ).then((channel) =>
-          @playerChannels.push(channel)
-        )
-      .catch(console.error)
+    @wall.doraFlip()
+    for player in @players
+      player.hand.startDraw(@wall)
+      player.roundStart()
+      player.sendMessage("Prevailing wind is #{@prevailingWind}.")
+      player.sendMessage("Dora is #{@wall.printDora()}.")
 
 module.exports = MahjongGame

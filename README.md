@@ -8,38 +8,38 @@ Akagi-Bot is meant to follow the rules outlined in the [European Mahjong Associa
 WIP.
 
 Currently contains the following commands:
+'#' means it is currently being worked on and doesn't work
+
 
 !hey - Test command
 
 ping - Test command
 
-!start - Intializes a new wall and draws 13 tiles for 2 players
+#!draw - Draws a tile for the active players
 
-!draw - Draws a tile for the active players
+#!discard - Needs name of tile to discard.  Discards the specified tile from the hand of the active player.
 
-!discard - Needs name of tile to discard.  Discards the specified tile from the hand of the active player.
+#!hand - Needs a player number.  Looks at the tiles in the hand of that player.
 
-!hand - Needs a player number.  Looks at the tiles in the hand of that player.
+#!pile - Needs a player number.  Looks at the tiles in the discard pile of that player.
 
-!pile - Needs a player number.  Looks at the tiles in the discard pile of that player.
+#!toggle writing - Turns off or on the written form of the tiles.
 
-!toggle writing - Turns off or on the written form of the tiles.
-
-!end - Ends the current game.
+#!end - Ends the current game.
 
 !tiles - Displays a picture of each tile.
 
-!dora - Displays all current dora indicators.
+#!dora - Displays all current dora indicators.
 
-!wind - Displays prevailing wind
+#!wind - Displays prevailing wind
 
-!turn - Displays who's turn it is.
+#!turn - Displays who's turn it is.
 
-!phase - Displays what phase it is.
+#!phase - Displays what phase it is.
 
 !forge - Takes one argument.  Makes a channel with the argument as its name. People mentioned are able to see the channel.
 
-!parlorMaker - Takes one argument, and at least 3 mentions.  Makes a channel for poster and each of the first three mentions, as well as a group channel that everyone mentioned can see.  
+!mahjong - Takes one argument, and at least 3 mentions.  Makes a channel for poster and each of the first three mentions, as well as a group channel that everyone mentioned can see, and starts a game of mahjong.  
 
 !yell - Takes any number of arguments.  Outputs those arguments to all forged channels.
 
