@@ -30,28 +30,28 @@ bot.on('ready', =>
 # Create an event listener for messages
 bot.on('message', (message) =>
   if (message.content.substring(0, 1) == "!")
-    commandArgs = message.substring(1).content.split(" ")
+    commandArgs = message.content.substring(1).split(" ")
 
     if(commandArgs[0] == "roll")
       message.channel.send(dice.rollDice(commandArgs[1]))
 
     if(commandArgs[0] == "start")
-      if (message.mentions.members.length != 3)
+      playersToAddToGame = message.mentions.members.array()
+      if (playersToAddToGame.length != 3)
         message.channel.send("Please @ mention 3 other players to play in your game.")
       else
-
-        bot.user.setStatus('online','Mahjong')
-        playersToAddToGame = message.mentions.members
         playersToAddToGame.push(message.author)
         exports.mahjongGames.push(new mahjongGame(playersToAddToGame, {}))
         newGame = _.last(exports.mahjongGames)
+        bot.user.setStatus('online','Mahjong')
 
         for player in newGame.players
           player.hand.startDraw(newGame.wall)
         newGame.wall.doraFlip()
 
-        message.channel.send("Let the games begin!\nThe dora indicator is:
-          #{newGame.wall.printDora(exports.writeTiles)}\nThe prevailing wind is: #{newGame.prevailingWind}")
+        message.channel.send("Let the games begin!\n
+          The dora indicator is: #{newGame.wall.printDora(exports.writeTiles)}\n
+          The prevailing wind is: #{newGame.prevailingWind}")
 
     if(commandArgs[0] == "forge")
       usersMentioned = message.mentions.members
