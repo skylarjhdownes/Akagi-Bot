@@ -37,21 +37,17 @@ bot.on('message', (message) =>
 
     if(commandArgs[0] == "start")
       playersToAddToGame = message.mentions.members.array()
-      if (playersToAddToGame.length != 3)
-        message.channel.send("Please @ mention 3 other players to play in your game.")
+      if (playersToAddToGame.length < 3)
+        message.channel.send("Please @ mention at least 3 other users to play in your game.")
       else
-        playersToAddToGame.push(message.author)
-        exports.mahjongGames.push(new mahjongGame(playersToAddToGame, {}))
+        playersToAddToGame.unshift(message.author)
+        exports.mahjongGames.push(new mahjongGame(playersToAddToGame, message.guild, {}))
         newGame = _.last(exports.mahjongGames)
         bot.user.setStatus('online','Mahjong')
 
         for player in newGame.players
           player.hand.startDraw(newGame.wall)
         newGame.wall.doraFlip()
-
-        message.channel.send("Let the games begin!\n
-          The dora indicator is: #{newGame.wall.printDora(exports.writeTiles)}\n
-          The prevailing wind is: #{newGame.prevailingWind}")
 
     if(commandArgs[0] == "forge")
       usersMentioned = message.mentions.members
@@ -172,6 +168,7 @@ bot.on('message', (message) =>
         message.channel.send(exports.wall.printDora(exports.writeTiles))
 
     if(commandArgs[0] == "tiles")
+      console.log(Discord.Permissions.FLAGS.READ_MESSAGES)
       message.channel.send(mahjongTiles.allTilesGetter())
 
     if(commandArgs[0] == "toggle")
