@@ -113,12 +113,9 @@ bot.on('message', (message) =>
 
     #TODO: make game commands work with game objects
   if(exports.mahjongGames.length > 0)
-    console.log("At least one game")
     commandArgs = message.content.split(" ")
-    console.log(commandArgs)
     channelType = "none"
     fromChannel = message.channel
-    console.log("FromChannel: #{fromChannel}")
     for game in exports.mahjongGames
       if(fromChannel.id == game.gameObservationChannel.id)
         channelType = "public"
@@ -129,7 +126,6 @@ bot.on('message', (message) =>
             channelType = "player"
             fromGame = game
             fromPlayer = player
-    console.log(channelType)
     if(channelType == "player" or channelType == "public")
       #Game Commands
       if(commandArgs[0] == "abort" and commandArgs[1] == "game" and channelType == "player")
