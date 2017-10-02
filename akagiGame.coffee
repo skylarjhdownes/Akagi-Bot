@@ -6,10 +6,10 @@ class MahjongGame
   constructor: (playerChannels, server, gameSettings) ->
     @wall = new gamePieces.Wall()
     @players = [
-      new player(playerChannels[1]),
-      new player(playerChannels[2]),
-      new player(playerChannels[3]),
-      new player(playerChannels[4])
+      new player(playerChannels[1],1),
+      new player(playerChannels[2],2),
+      new player(playerChannels[3],3),
+      new player(playerChannels[4],4)
     ]
     @gameObservationChannel = playerChannels[0]
     @startRoundOne()
@@ -25,7 +25,7 @@ class MahjongGame
   startRound:(prevailingWind,dealer) ->
     @prevailingWind = prevailingWind
     @dealer = dealer
-    @turn = 1
+    @turn = dealer.playerNumber
     @phase = 'draw'
     @wall.doraFlip()
     for player in @players

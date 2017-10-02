@@ -108,60 +108,50 @@ bot.on('message', (message) =>
       exports.parlors = []
       exports.mahjongGames = []
 
-    #TODO: make game commands work with game objects
-
-    if(commandArgs[0] == "end")
-      if(not exports.gameStarted)
-        message.channel.send("No game to end.")
-      else
-        exports.gameStarted = false
-        message.channel.send("Game ended.")
-        bot.user.setGame("")
-
-    if(commandArgs[0] == "turn")
-      if(not exports.gameStarted)
-        message.channel.send("Please start game first.")
-      else
-        message.channel.send("It is player #{exports.turn}'s turn.")
-
-
-    if(commandArgs[0] == "phase")
-      if(not exports.gameStarted)
-        message.channel.send("Please start game first.")
-      else
-        message.channel.send("It is the #{exports.phase} phase.")
-
-    if(commandArgs[0] == "wind")
-      if(not exports.gameStarted)
-        message.channel.send("Please start game first.")
-      else
-        message.channel.send(exports.prevailingWind)
-
-    if(commandArgs[0] == "dora")
-      if(not exports.gameStarted)
-        message.channel.send("Please start game first.")
-      else
-        message.channel.send(exports.wall.printDora(exports.writeTiles))
-
     if(commandArgs[0] == "tiles")
-      console.log(Discord.Permissions.FLAGS.READ_MESSAGES)
       message.channel.send(mahjongTiles.allTilesGetter())
 
+    #TODO: make game commands work with game objects
+  if(exports.mahjongGames.length > 0)
+    console.log("At least one game")
+    commandArgs = message.content.split(" ")
+    console.log(commandArgs)
+    channelType = "none"
+    fromChannel = message.channel
+    console.log("FromChannel: #{fromChannel}")
+    for game in exports.mahjongGames
+      if(fromChannel.id == game.gameObservationChannel.id)
+        channelType = "public"
+        fromGame = game
+      else
+        for player in game.players
+          if(fromChannel.id == player.playerChannel.id)
+            channelType = "player"
+            fromGame = game
+            fromPlayer = player
+    console.log(channelType)
+    if(channelType == "player" or channelType == "public")
+      #Game Commands
+      if(commandArgs[0] == "abort" and commandArgs[1] == "game" and channelType == "player")
+        #TODO Delete game
+        fromGame.gameObservationChannel.sendMessage("Game Ended")
+      if(commandArgs[0] == "turn")
+        message.channel.send("It is player #{fromGame.turn}'s turn.")
+      if(commandArgs[0] == "phase")
+        message.channel.send("It is the #{fromGame.phase} phase.")
+      if(commandArgs[0] == "prevailing")
+        message.channel.send("The prevailing wind is #{fromGame.prevailingWind}.")
+      if(commandArgs[0] == "dora")
+        message.channel.send("Dora Indicator: #{fromGame.wall.printDora()}")
+      if(commandArgs[0] == "hand" and channelType == "player")
+        message.channel.send("Hand: #{fromPlayer.hand.printHand()}")
+
+
+    ###
     if(commandArgs[0] == "toggle")
       if(commandArgs[1] == "writing")
         exports.writeTiles = not exports.writeTiles
         message.channel.send("Tiles Toggled")
-
-    if(commandArgs[0] == "hand")
-      if(not exports.gameStarted)
-        message.channel.send("Please start game first.")
-      else
-        if(commandArgs[1] not in ["1","2"])
-          message.channel.send("Please select a real hand.")
-        else if(commandArgs[1] is "1")
-          message.channel.send(exports.hand1.printHand(exports.writeTiles))
-        else if(commandArgs[1] is "2")
-          message.channel.send(exports.hand2.printHand(exports.writeTiles))
 
     if(commandArgs[0] == "pile")
       if(not exports.gameStarted)
@@ -203,6 +193,7 @@ bot.on('message', (message) =>
         else
           message.channel.send("You do not have that tile.")
 
+      ###
   #console.log(exports)
 )
 ## Log our bot in

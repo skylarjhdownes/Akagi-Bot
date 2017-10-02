@@ -1,7 +1,7 @@
 gamePieces = require('./akagiTiles.coffee')
 
 class Player
-  constructor: (@playerChannel) ->
+  constructor: (@playerChannel, @playerNumber) ->
     @discardPile = new gamePieces.Pile()
     @hand = new gamePieces.Hand(@discardPile)
     @gamePoints = 0
