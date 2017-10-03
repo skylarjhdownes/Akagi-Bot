@@ -138,17 +138,17 @@ bot.on('message', (message) =>
       if(commandArgs[0] == "prevailing")
         message.channel.send("The prevailing wind is #{fromGame.prevailingWind}.")
       if(commandArgs[0] == "dora")
-        message.channel.send("Dora Indicator: #{fromGame.wall.printDora()}")
+        if(channeType == "player")
+          message.channel.send("Dora Indicator: #{fromGame.wall.printDora(fromPlayer.namedTiles)}")
+        else
+          message.channel.send("Dora Indicator: #{fromGame.wall.printDora()}")
       if(commandArgs[0] == "hand" and channelType == "player")
-        message.channel.send("Hand: #{fromPlayer.hand.printHand()}")
+        message.channel.send("Hand: #{fromPlayer.printHand()}")
+      if(commandArgs[0] == "toggle" and channelType == "player")
+        fromPlayer.toggleTiles()
 
 
     ###
-    if(commandArgs[0] == "toggle")
-      if(commandArgs[1] == "writing")
-        exports.writeTiles = not exports.writeTiles
-        message.channel.send("Tiles Toggled")
-
     if(commandArgs[0] == "pile")
       if(not exports.gameStarted)
         message.channel.send("Please start game first.")

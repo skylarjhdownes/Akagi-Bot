@@ -19,7 +19,7 @@ Currently contains the following commands:
 
 #!pile - Needs a player number.  Looks at the tiles in the discard pile of that player.
 
-#!toggle writing - Turns off or on the written form of the tiles.
+~toggle - Turns off or on the written form of the tiles. Only usable by players.
 
 ~abort game - Currently does nothing, but claims the game is over
 

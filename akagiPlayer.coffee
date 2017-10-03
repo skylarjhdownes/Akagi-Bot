@@ -6,9 +6,18 @@ class Player
     @hand = new gamePieces.Hand(@discardPile)
     @gamePoints = 0
     @roundPoints = 27000
+    @namedTiles = true
   roundStart: ->
     @playerChannel.send("New Round Start")
     @playerChannel.send("Starting Hand : "+@hand.printHand())
   sendMessage:(message) ->
     @playerChannel.send(message)
+  toggleTiles: ->
+    @namedTiles = not @namedTiles
+    if(@namedTiles)
+      @playerChannel.send("Tile names visible")
+    else
+      @playerChannel.send("Tile names hidden")
+  printHand: ->
+    @hand.printHand(@namedTiles)
 module.exports = Player
