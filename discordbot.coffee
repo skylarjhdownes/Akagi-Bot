@@ -12,8 +12,7 @@ Express = require('express')
 website = Express()
 website.use(Express.static('public'))
 website.get('/', (req, res) ->
-  #res.sendFile('public/index.html', { root: __dirname})
-  res.send("Hello World!")
+  res.sendFile('public/index.html')
   )
 website.listen(process.env.PORT || 9000)
 
