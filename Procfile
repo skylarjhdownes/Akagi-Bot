@@ -1,2 +1,2 @@
-web: npm start
+web: coffee akagiWeb.coffee
 worker: npm start
