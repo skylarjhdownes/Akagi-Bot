@@ -138,7 +138,7 @@ bot.on('message', (message) =>
       if(commandArgs[0] == "prevailing")
         message.channel.send("The prevailing wind is #{fromGame.prevailingWind}.")
       if(commandArgs[0] == "dora")
-        if(channeType == "player")
+        if(channelType == "player")
           message.channel.send("Dora Indicator: #{fromGame.wall.printDora(fromPlayer.namedTiles)}")
         else
           message.channel.send("Dora Indicator: #{fromGame.wall.printDora()}")
