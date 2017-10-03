@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="Website dealing with the Akagibot discord bot.">
+    <meta name="author" content="Skylar Downes and Micah Workman">
+    <link rel="icon" href="redDragon.ico">
+
+    <title>Akagi-Bot</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="akagiWeb.css" rel="stylesheet">
+  </head>
+
+  <body>
+
+    <div class="container">
+      <div class="header clearfix">
+        <nav>
+          <ul class="nav nav-pills float-right">
+            <li class="nav-item">
+              <a class="nav-link active" href="#">Home <span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="https://github.com/skylarjhdownes/Akagi-Bot">Contact</a>
+            </li>
+          </ul>
+        </nav>
+        <h3 class="text-muted">Akagi-Bot</h3>
+      </div>
+
+      <div class="jumbotron">
+        <h1 class="display-3">Akagi-Bot 赤木</h1>
+        <p class="lead">A Discord bot that runs a game of riichi mahjong.</p>
+        <p class="lead">Akagi-Bot is meant to follow the rules outlined in the <a href="http://mahjong-europe.org/portal/images/docs/Riichi-rules-2016-EN.pdf">European Mahjong Association's 2016 rulebook</a>.  If you notice a discrepancy, please document it and open a Github issue, or better yet fix it and open a pull request.</p>
+        <p  class="lead">WIP. <a href="https://github.com/skylarjhdownes/Akagi-Bot">Github</a></p>
+      </div>
+
+      <div class="row marketing">
+        <div class="col-lg-6">
+          <h4>!mahjong</h4>
+          <p>First argument will be game name, then it needs at least 3 users mentioned.  It will start a game of mahjong for you and the first 3 mentions, and let all other mentions observe the game.</p>
+
+          <h4>Observer commands</h4>
+          <p>Usable in a mahjong channel to observe the state of the game.</p>
+          <p>dora - Displays the dora indicators currently flipped up.</p>
+          <p>prevailing - Displays the prevailing wind.</p>
+          <p>turn - Displays who's turn it is.</p>
+          <p>phase - Displays what phase the game is in.</p>
+
+          <h4>Player Commands</h4>
+          <p>Usable in a mahjong player channel to play the game.</p>
+          <p>hand - Displays your hand.</p>
+          <p>toggle - Switches between displaying text and unicode, or unicode only for tile display.</p>
+        </div>
+
+        <div class="col-lg-6">
+          <h4>!roll</h4>
+          <p>Rolls dice.  Any number of XdY rolls added or subtracted from each other, plus any constants.</p>
+
+          <h4>!tiles</h4>
+          <p>Displays all unicode mahjong tiles.</p>
+
+          <h4>!ragnarok</h4>
+          <p>Deletes all channels created by this bot.</p>
+        </div>
+      </div>
+
+      <footer class="footer">
+        <p>&copy; Skylar and Micah 2017</p>
+      </footer>
+
+    </div> <!-- /container -->
+
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="../node_modules/jquery/dist/jquery.slim.min.js"></script>
+    <script>window.jQuery || document.write('<script src="../node_modules/jquery/dist/jquery.min.js"><\/script>')</script>
+    <script src="../node_modules/popper.js/dist/umd/popper.min.js"></script>
+    <script src="../node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+  </body>
+</html>
