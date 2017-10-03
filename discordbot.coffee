@@ -11,8 +11,9 @@ Express = require('express')
 ## For running a website as well
 website = Express()
 website.use(Express.static('public'))
-website.get('/', (req, res) ->
-  res.sendFile('public.index.html', { root: __dirname}))
+website.get('/', (req, res) -> {
+  res.sendFile('public.index.html', { root: __dirname})
+  })
 website.listen(process.env.PORT || 9000)
 
 ## Create an instance of a Discord client
