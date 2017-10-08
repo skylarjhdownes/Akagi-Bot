@@ -98,6 +98,7 @@ class Hand
   #A Hand of tiles
   constructor: (@discardPile) ->
     @contains = []
+    @calledTileSets = {}
 
   #Draws x tiles from anything with a drawFrom() function, then sorts the hand and returns the drawn tiles
   draw: (drawSource, x=1) ->
@@ -128,6 +129,9 @@ class Hand
       return "Empty"
     else
       return (x.getName(writtenName) for x in @contains)
+
+  isConcealed: ->
+    return _.isEmpty(@calledTileSets)
 
 class Pile
   #The tiles discarded by a given hand
