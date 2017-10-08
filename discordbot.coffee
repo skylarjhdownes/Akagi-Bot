@@ -148,6 +148,8 @@ bot.on('message', (message) =>
         fromPlayer.toggleTiles()
       if(commandArgs[0] == "draw" and channelType == "player")
         fromGame.drawTile(fromPlayer)
+      if(commandArgs[0] == "discard" and channelType == "player")
+        fromGame.discardTile(fromPlayer,commandArgs[1]+" "+commandArgs[2])
 
 
     ###
@@ -161,23 +163,6 @@ bot.on('message', (message) =>
           message.channel.send(exports.hand1.discardPile.printDiscard(exports.writeTiles))
         else if(commandArgs[1] is "2")
           message.channel.send(exports.hand2.discardPile.printDiscard(exports.writeTiles))
-
-    if(commandArgs[0] == "discard")
-      if(not exports.gameStarted)
-        message.channel.send("Please start game first.")
-      else if(exports.phase != "discard")
-        message.channel.send("It is not the discard phase.")
-      else
-        if(exports.turn == 1)
-          checkDiscard = exports.hand1.discard(commandArgs[1]+" "+commandArgs[2])
-        else if (exports.turn == 2)
-          checkDiscard = exports.hand2.discard(commandArgs[1]+" "+commandArgs[2])
-        if(checkDiscard)
-          exports.phase = "draw"
-          exports.turn = 3-exports.turn
-          message.channel.send(checkDiscard)
-        else
-          message.channel.send("You do not have that tile.")
 
       ###
   #console.log(exports)

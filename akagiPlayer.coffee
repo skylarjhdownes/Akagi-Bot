@@ -22,5 +22,9 @@ class Player
     @hand.printHand(@namedTiles)
   wallDraw:(wall) ->
     @playerChannel.send(@hand.draw(wall).getName(@namedTiles))
+  setNextPlayer:(nextPlayerNumber)->
+    @nextPlayer = nextPlayerNumber
+  discardTile:(tileToDiscard)->
+    return @hand.discard(tileToDiscard)
 
 module.exports = Player

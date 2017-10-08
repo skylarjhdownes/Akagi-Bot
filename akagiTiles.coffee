@@ -120,7 +120,7 @@ class Hand
         out = @contains.splice(i,1)
         console.log(out[0])
         @discardPile.discardTo(out[0])
-        return out[0].getName()
+        return out[0]
     return false
 
   #prints the hand, which should be sorted already

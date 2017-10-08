@@ -1,5 +1,6 @@
 gamePieces = require('./akagiTiles.coffee')
 player = require('./akagiPlayer.coffee')
+Promise = require('promise')
 
 class MahjongGame
   #A four player game of Mahjong
@@ -20,6 +21,13 @@ class MahjongGame
     @southPlayer = @players[1]
     @westPlayer = @players[2]
     @northPlayer = @players[3]
+
+    #Makes sure we know who plays after who
+    @eastPlayer.setNextPlayer(@southPlayer.playerNumber)
+    @southPlayer.setNextPlayer(@westPlayer.playerNumber)
+    @westPlayer.setNextPlayer(@northPlayer.playerNumber)
+    @northPlayer.setNextPlayer(@eastPlayer.playerNumber)
+
     @startRound("East",@eastPlayer)
 
   startRound:(prevailingWind,dealer) ->
@@ -43,6 +51,35 @@ class MahjongGame
         @phase = "discard"
     else
       playerToDraw.sendMessage("It is not your turn.")
+
+  discardTile:(playerToDiscard,tileToDiscard) ->
+    if(@turn == playerToDiscard.playerNumber)
+      if(@phase == "discard")
+        discarded = playerToDiscard.discardTile(tileToDiscard)
+        if(discarded)
+          @gameObservationChannel.send("Player #{playerToDiscard.playerNumber} discarded a #{discarded.getName()}.")
+          for player in @players
+            if(player.playerNumber != playerToDiscard.playerNumber)
+              player.sendMessage("Player #{playerToDiscard.playerNumber} discarded a #{discarded.getName(player.namedTiles)}.")
+          @turn = playerToDiscard.nextPlayer
+          @phase = "react"
+          waitTenSeconds = new Promise(resolve, reject) ->
+            setTimeout(->
+              resolve("Time has Passed")
+            ,1000)
+          waitTenSeconds
+            .then((message)->
+              @phase = "draw"
+              for player in @players
+              if(@turn == player.playerNumber)
+                player.sendMessage("It is your turn.  You may draw a tile."))
+            .catch(console.error)
+        else
+          playerToDiscard.sendMessage("You don't have that tile.")
+      else
+        playerToDiscard.sendMessage("Its not the discard phase.")
+    else
+      playerToDiscard.sendMessage("Its not your turn.")
 
 
 module.exports = MahjongGame
