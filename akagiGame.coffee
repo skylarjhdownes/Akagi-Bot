@@ -34,4 +34,15 @@ class MahjongGame
       player.sendMessage("Prevailing wind is #{@prevailingWind}.")
       player.sendMessage("Dora is #{@wall.printDora()}.")
 
+  drawTile:(playerToDraw) ->
+    if(@turn == playerToDraw.playerNumber)
+      if(@phase != "draw")
+        playerToDraw.sendMessage("It is not the draw phase.")
+      else
+        playerToDraw.wallDraw(@wall)
+        @phase = "discard"
+    else
+      playerToDraw.sendMessage("It is not your turn.")
+
+
 module.exports = MahjongGame

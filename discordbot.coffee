@@ -146,6 +146,8 @@ bot.on('message', (message) =>
         message.channel.send("Hand: #{fromPlayer.printHand()}")
       if(commandArgs[0] == "toggle" and channelType == "player")
         fromPlayer.toggleTiles()
+      if(commandArgs[0] == "draw" and channelType == "player")
+        fromGame.drawTile(fromPlayer)
 
 
     ###
@@ -159,18 +161,6 @@ bot.on('message', (message) =>
           message.channel.send(exports.hand1.discardPile.printDiscard(exports.writeTiles))
         else if(commandArgs[1] is "2")
           message.channel.send(exports.hand2.discardPile.printDiscard(exports.writeTiles))
-
-    if(commandArgs[0] == "draw")
-      if(not exports.gameStarted)
-        message.channel.send("Please start game first.")
-      else if(exports.phase != "draw")
-        message.channel.send("It is not the draw phase.")
-      else
-        if(exports.turn == 1)
-          message.channel.send(exports.hand1.draw(exports.wall))
-        else if (exports.turn == 2)
-          message.channel.send(exports.hand2.draw(exports.wall))
-        exports.phase = "discard"
 
     if(commandArgs[0] == "discard")
       if(not exports.gameStarted)

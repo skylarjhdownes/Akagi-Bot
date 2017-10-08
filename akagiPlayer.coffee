@@ -20,4 +20,7 @@ class Player
       @playerChannel.send("Tile names hidden")
   printHand: ->
     @hand.printHand(@namedTiles)
+  wallDraw:(wall) ->
+    @playerChannel.send(@hand.draw(wall).getName(@namedTiles))
+
 module.exports = Player
