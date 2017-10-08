@@ -11,9 +11,9 @@ Currently contains the following commands:
 '#' means it is currently being worked on and doesn't work
 ~ means it only works in mahjong channels
 
-#!draw - Draws a tile for the active players
+~draw - Draws a tile for the active players
 
-#!discard - Needs name of tile to discard.  Discards the specified tile from the hand of the active player.
+~discard - Needs name of tile to discard.  Discards the specified tile from the hand of the active player.
 
 ~hand - Only usable in player channel.  Looks at the tiles in that player's hand.
 
