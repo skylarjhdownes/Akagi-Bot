@@ -21,7 +21,8 @@ class Player
   printHand: ->
     @hand.printHand(@namedTiles)
   wallDraw:(wall) ->
-    @playerChannel.send(@hand.draw(wall).getName(@namedTiles))
+    tileDrawn = @hand.draw(wall)
+    @playerChannel.send(tileDrawn[0].getName(@namedTiles))
   setNextPlayer:(nextPlayerNumber)->
     @nextPlayer = nextPlayerNumber
   discardTile:(tileToDiscard)->

@@ -105,7 +105,7 @@ class Hand
     out = []
     for y in [0...x]
       @contains.push(drawSource.drawFrom())
-      out.push(@contains[@contains.length-1].getName())
+      out.push(@contains[@contains.length-1])
     @contains.sort((x,y)->x.sortValue-y.sortValue)
     return out
 
