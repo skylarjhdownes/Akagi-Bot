@@ -155,9 +155,9 @@ bot.on('message', (message) =>
           fromPlayer.sendMessage("You have discarded #{fromPlayer.hand.discardPile.printDiscard(fromPlayer.namedTiles)}.")
         else if(commandArgs[1] in ["1","2","3","4"])
           if(channelType == "player")
-            fromPlayer.sendMessage("Player #{commandArgs[1]} has discarded #{fromGame[commandArgs[1]-1].hand.discardPile.printDiscard(fromPlayer.namedTiles)}.")
+            fromPlayer.sendMessage("Player #{commandArgs[1]} has discarded #{fromGame.players[commandArgs[1]-1].hand.discardPile.printDiscard(fromPlayer.namedTiles)}.")
           else
-            message.channel.send("Player #{commandArgs[1]} has discarded #{fromGame[commandArgs[1]-1].hand.discardPile.printDiscard()}.")
+            message.channel.send("Player #{commandArgs[1]} has discarded #{fromGame.players[commandArgs[1]-1].hand.discardPile.printDiscard()}.")
         else
           message.channel.send("Please select a real discard pile.")
 
