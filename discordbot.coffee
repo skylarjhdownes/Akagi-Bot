@@ -150,21 +150,17 @@ bot.on('message', (message) =>
         fromGame.drawTile(fromPlayer)
       if(commandArgs[0] == "discard" and channelType == "player")
         fromGame.discardTile(fromPlayer,commandArgs[1]+" "+commandArgs[2])
-
-
-    ###
-    if(commandArgs[0] == "pile")
-      if(not exports.gameStarted)
-        message.channel.send("Please start game first.")
-      else
-        if(commandArgs[1] not in ["1","2"])
+      if(commandArgs[0] == "pile")
+        if(commandArgs.length == 1 and channelType == "player")
+          fromPlayer.sendMessage("You have discarded #{fromPlayer.hand.discardPile.printDiscard(fromPlayer.namedTiles)}.")
+        else if(commandArgs[1] in ["1","2","3","4"])
+          if(channelType == "player")
+            fromPlayer.sendMessage("Player #{commandArgs[1]} has discarded #{fromGame[commandArgs[1]-1].hand.discardPile.printDiscard(fromPlayer.namedTiles)}.")
+          else
+            message.channel.send("Player #{commandArgs[1]} has discarded #{fromGame[commandArgs[1]-1].hand.discardPile.printDiscard()}.")
+        else
           message.channel.send("Please select a real discard pile.")
-        else if(commandArgs[1] is "1")
-          message.channel.send(exports.hand1.discardPile.printDiscard(exports.writeTiles))
-        else if(commandArgs[1] is "2")
-          message.channel.send(exports.hand2.discardPile.printDiscard(exports.writeTiles))
 
-      ###
   #console.log(exports)
 )
 ## Log our bot in
