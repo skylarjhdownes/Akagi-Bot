@@ -17,7 +17,7 @@ Currently contains the following commands:
 
 ~hand - Only usable in player channel.  Looks at the tiles in that player's hand.
 
-#!pile - Needs a player number.  Looks at the tiles in the discard pile of that player.
+~pile - If given a player number, looks at the tiles in the discard pile of that player. If used alone, looks at your own discard pile.
 
 ~toggle - Turns off or on the written form of the tiles. Only usable by players.
 

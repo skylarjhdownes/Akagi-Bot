@@ -61,6 +61,8 @@ class MahjongGame
           for player in @players
             if(player.playerNumber != playerToDiscard.playerNumber)
               player.sendMessage("Player #{playerToDiscard.playerNumber} discarded a #{discarded.getName(player.namedTiles)}.")
+            else
+              player.sendMessage("You discarded a #{discarded.getName(player.namedTiles)}.")
           @turn = playerToDiscard.nextPlayer
           @phase = "react"
           waitTenSeconds = new Promise((resolve, reject) =>
