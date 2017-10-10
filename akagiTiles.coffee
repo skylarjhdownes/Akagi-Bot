@@ -24,6 +24,32 @@ unicodeTileGetter = (suit,value) ->
 allTilesGetter = ->
   return ['🀙','🀚','🀛','🀜','🀝','🀞','🀟','🀠','🀡','🀐','🀑','🀒','🀓','🀔','🀕','🀖','🀗','🀘','🀇','🀈','🀉','🀊','🀋','🀌','🀍','🀎','🀏','🀀','🀁','🀂','🀃','🀄','🀅','🀆']
 
+#returns type of tileset, or false if not a legal set.
+isTileSet = (tiles) ->
+  tiles.sort((x,y)->x.value-y.value)
+  if(tiles.length == 2)
+    if(tiles[0].getTextName() == tiles[1].getTextName())
+      return "Pair"
+    else
+      return false
+  else if(tiles.length == 4)
+    if(tiles[0].getTextName() == tiles[1].getTextName() and tiles[0].getTextName() == tiles[2].getTextName() and tiles[0].getTextName() == tiles[3].getTextName())
+      return "Kong"
+    else
+      return false
+  else if(tiles.length == 3)
+    if(tiles[0].suit == tiles[1].suit and tiles[0].suit == tiles[2].suit)
+      if(tiles[0].value == tiles[1].value and tiles[0].suit == tiles[2].value)
+        return "Pung"
+      else if(tiles[0].value + 1 == tiles[1].value and tiles[1].value + 1 == tiles[2].value)
+        return "Chow"
+      else
+        return false
+    else
+      return false
+  else
+    return false
+
 class Tile
   #An individual tile in a game of mahjong
   constructor: (@suit, @value) ->
@@ -99,6 +125,7 @@ class Hand
   constructor: (@discardPile) ->
     @contains = []
     @calledTileSets = {}
+    @lastTileDrawn = false
 
   #Draws x tiles from anything with a drawFrom() function, then sorts the hand and returns the drawn tiles
   draw: (drawSource, x=1) ->
@@ -106,6 +133,8 @@ class Hand
     for y in [0...x]
       @contains.push(drawSource.drawFrom())
       out.push(@contains[@contains.length-1])
+    if(x == 1)
+      @lastTileDrawn = @contains[@contains.length-1]
     @contains.sort((x,y)->x.sortValue-y.sortValue)
     return out
 
@@ -130,29 +159,57 @@ class Hand
     else
       return (x.getName(writtenName) for x in @contains)
 
+
+  #returns true if there are no calledTileSets, or if they are all self-called Kongs
   isConcealed: ->
-    return _.isEmpty(@calledTileSets)
+    if(_.isEmpty(@calledTileSets))
+      return true
+    else
+      return _.every(@calledTileSets, (x) -> x.takenFrom == "self" and x.type == "Kong"))
+
+#This class assumes that a legal tileSet has been passed to it.
+class TileSet
+  #A set of two, three or four tiles
+  constructor: (@tiles, @takenFrom = "self")
+    if(@tiles.length == 4)
+      @type = "Kong"
+    else if(@tiles.length == 2)
+      @type = "Pair"
+    else if(@tiles[0].getTextName() == @tiles[1].getTextName())
+      @type = "Pung"
+    else
+      @type = "Chow"
+
+  printTileSet: (writtenName = true) ->
+    return (x.getName(writtenName) for x in @tiles)
 
 class Pile
   #The tiles discarded by a given hand
   constructor: ->
-    @contains = []
-    @riichi = -1
+    @contains = [] #Contains all tiles ever discarded by this player
+    @riichi = -1 #Tells which tile is turned sideways for riichi
+    @stolenTiles = [] #Tells indexs of tiles that have been stolen so they are not displayed when printing
 
   discardTo: (x) ->
     @contains.push(x)
 
+  #Returns the most recent tile, adds that tile to @stolenTiles, and makes next tile riichi if the stolen tile was.
   drawFrom: ->
-    out = @contains.splice(@contains.length-1,1)
+    out = @contains[@contains.length-1]
+    stolenTiles.push[@contains.length-1]
+    if(@riichi == @contains.length-1)
+      @riichi+=1
     return out
 
+  #Prints all non stolen tiles, and tells which, if any, are turned sideways for riichi.
   printDiscard: (writtenName = true) ->
     out = []
     for x,i in @contains
-      if i is @riichi
-        out.push("r:"+x.getName(writtenName))
-      else
-        out.push(x.getName(writtenName))
+      if(not i in @stolenTiles)
+        if i is @riichi
+          out.push("r:"+x.getName(writtenName))
+        else
+          out.push(x.getName(writtenName))
     if(@contains.length == 0)
       out = "Empty"
     return out
@@ -164,3 +221,4 @@ module.exports.Hand = Hand
 module.exports.Wall = Wall
 module.exports.Pile = Pile
 module.exports.allTilesGetter = allTilesGetter
+module.exports.isTileSet = isTileSet
