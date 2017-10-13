@@ -79,9 +79,9 @@ class MahjongGame
         else
           playerToDiscard.sendMessage("You don't have that tile.")
       else
-        playerToDiscard.sendMessage("Its not the discard phase.")
+        playerToDiscard.sendMessage("It is not the discard phase.")
     else
-      playerToDiscard.sendMessage("Its not your turn.")
+      playerToDiscard.sendMessage("It is not your turn.")
 
 
 module.exports = MahjongGame
