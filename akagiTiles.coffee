@@ -170,7 +170,7 @@ class Hand
 #This class assumes that a legal tileSet has been passed to it.
 class TileSet
   #A set of two, three or four tiles
-  constructor: (@tiles, @takenFrom = "self")
+  constructor: (@tiles, @takenFrom = "self") ->
     if(@tiles.length == 4)
       @type = "Kong"
     else if(@tiles.length == 2)
