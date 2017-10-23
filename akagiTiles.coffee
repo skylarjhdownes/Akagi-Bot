@@ -165,7 +165,7 @@ class Hand
     if(_.isEmpty(@calledTileSets))
       return true
     else
-      return _.every(@calledTileSets, (x) -> x.takenFrom == "self" and x.type == "Kong"))
+      return _.every(@calledTileSets, (x) -> x.takenFrom == "self" and x.type == "Kong")
 
 #This class assumes that a legal tileSet has been passed to it.
 class TileSet
