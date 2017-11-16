@@ -40,3 +40,5 @@ Thumbs.db
 # Compiled Coffeescript #
 #########################
 *.js
+
+!karma.conf.js
