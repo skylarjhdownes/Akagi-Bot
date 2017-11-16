@@ -38,5 +38,13 @@
     "popper.js": "^1.11.0",
     "promise": "^8.0.1",
     "uws": "^0.14.5"
+  },
+  "devDependencies": {
+    "jasmine-core": "^2.8.0",
+    "karma": "^1.7.1",
+    "karma-chrome-launcher": "^2.2.0",
+    "karma-firefox-launcher": "^1.0.1",
+    "karma-jasmine": "^1.1.0",
+    "karma-phantomjs-launcher": "^1.0.4"
   }
 }
