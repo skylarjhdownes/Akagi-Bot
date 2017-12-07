@@ -25,7 +25,21 @@ allTilesGetter = ->
   return ['🀙','🀚','🀛','🀜','🀝','🀞','🀟','🀠','🀡','🀐','🀑','🀒','🀓','🀔','🀕','🀖','🀗','🀘','🀇','🀈','🀉','🀊','🀋','🀌','🀍','🀎','🀏','🀀','🀁','🀂','🀃','🀄','🀅','🀆']
 
 allTerminalsAndHonorsGetter = ->
-  return ['🀙','🀡','🀐','🀘','🀇','🀏','🀄','🀅','🀆','🀀','🀁','🀂','🀃']
+  return [
+    new Tile("pin", 1),           #🀙
+    new Tile("pin", 9),           #🀡
+    new Tile("sou", 1),           #🀐
+    new Tile("sou", 9),           #🀘
+    new Tile("wan", 1),           #🀇
+    new Tile("wan", 9),           #🀏
+    new Tile("dragon", "red"),    #🀄
+    new Tile("dragon", "green"),  #🀅
+    new Tile("dragon", "white"),  #🀆
+    new Tile("wind", "east"),     #🀀
+    new Tile("wind", "south"),    #🀁
+    new Tile("wind", "west"),     #🀂
+    new Tile("wind", "north"),    #🀃
+  ]
 
 #returns type of tileset, or false if not a legal set.
 isTileSet = (tiles) ->
