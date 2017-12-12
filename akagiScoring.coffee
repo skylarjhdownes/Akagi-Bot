@@ -12,9 +12,9 @@ getPossibleHands = (hand) ->
   allTerminalsAndHonors = gamePieces.allTerminalsAndHonorsGetter()
 
   if _.intersection(hand, allTerminalsAndHonors).length == 13 && _.xor(hand, allTerminalsAndHonors).length == 0
-    hands.push("thirteenorphans")
+    possibleHands.push("thirteenorphans")
 
-  return hands
+  return possibleHands
 
 getMelds = (hand) ->
 
