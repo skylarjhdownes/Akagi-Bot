@@ -26,11 +26,11 @@ bot.on('ready', =>
 
 # Create an event listener for messages
 bot.on('message', (message) =>
-  if (message.content.substring(0, 1) == "!")
+  if (message.content.substring(0, 1) in ["!","/"])
     commandArgs = message.content.substring(1).split(" ")
 
     if(commandArgs[0] == "roll")
-      message.channel.send(dice.rollDice(commandArgs[1]))
+      message.channel.send(dice.rollDice(commandArgs[1..].join("")))
 
     if(commandArgs[0] == "mahjong")
       playersToAddToGame = message.mentions.members.array()
