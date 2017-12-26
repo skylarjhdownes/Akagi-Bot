@@ -17,6 +17,10 @@ getPossibleHands = (hand) ->
   if _.intersection(hand, allTerminalsAndHonors).length == 13 && _.xor(hand, allTerminalsAndHonors).length == 0
     possibleHands.push("thirteenorphans") #Potentially want to add a check to see if it was a 13 way wait to this.  Some rules have double yakuman for that.
 
+  if _.uniq(hand).length == 7
+    pairGroup = _.chunk(hand, 2)
+    if _.every(pairGroup, (x) -> gamePieces.isTileSet(x) == "Pair")
+      possibleHands.push({runs: [], triplets: [], pairs: pairGroup}) #I forget how objects work in js. If pairGroup is just a reference, maybe this will cause bugs.
 
   return possibleHands
 
