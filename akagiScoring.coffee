@@ -4,8 +4,10 @@ gamePieces = require('./akagiTiles.coffee')
 scoreMahjongHand = (hand) ->
   #Takes a hand of mahajong tiles and finds the highest scoring way it can be interpreted, returning the score, and the melds which lead to that score
   possibleHands = getPossibleHands(hand)
+  if possibleHands == []
+    return(0,"Not a Scoring Hand")
   scores = getScore(x) for x in possibleHands
-  maxScore = _.max(scores)
+  maxScore = _.maxBy(scores, (x) -> x[0])
   maxLocation = _.indexOf(scores,maxScore)
   return(maxScore,possibleHands[maxLocation])
 
@@ -31,15 +33,24 @@ getPossibleHands = (hand) ->
   #return [{runs: [], triplets: [], pairs: []}, {runs: [], triplets: [], pairs: []}]
 
 getScore = (melds) ->
+
+  #Function to round up to the closest hundred
+  roundUp = (inScore) ->
+    if (inScore%100)!=0
+      return (inScore//100+1)*100
+    else
+      inScore
   #Takes a set of melds and returns the score of that particular combination of getMelds and the yaku that made up that score
   yakuman = false
   yaku = 0
   dora = 0
   fu = 0
+  playerEast = false #Going to have to get this info in somehow.
+  seldDraw = false #Going to have to get this info in somehow.
   if(melds == "thirteenorphans")
     yakuman = "thirteenorphans"
   #Check for yakuman
-  if(isYakuman)
+  if(yakuman)
     #Return yakuman score and name of isYakuman
   #Check for yaku
   if(yaku == 0)
@@ -49,6 +60,8 @@ getScore = (melds) ->
   if(fan>=5)
     #Return scored points and yaku plus dora in hand
   #Check for fu
+
+  baseScore = math.pow(fu,2+fan)
   #Return scored points and yaku + dora + fu in hand
 
 module.exports = scoreMahjongHand
