@@ -30,7 +30,7 @@ bot.on('message', (message) =>
     commandArgs = message.content.substring(1).split(" ")
 
     if(commandArgs[0] == "roll")
-      message.channel.send(dice.rollDice(commandArgs[1..].join("")))
+      message.channel.send("#{message.author.username} rolled: "+dice.rollDice(commandArgs[1..].join("")))
 
     if(commandArgs[0] == "mahjong")
       playersToAddToGame = message.mentions.members.array()
