@@ -54,9 +54,10 @@ getScore = (melds, winningPlayer) -> # melds will be a TileSet object, the winni
       for chow1, index1 in chowList
         for chow2, index2 in chowList
           if chow1 == chow2 && index1 != index2
-            identicalChow
+            identicalChow = true
       if identicalChow
         yaku++
+
 
 
 
