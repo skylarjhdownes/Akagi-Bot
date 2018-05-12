@@ -46,7 +46,7 @@ getScore = (melds) ->
   dora = 0
   fu = 0
   playerEast = false #Going to have to get this info in somehow.
-  selfdDraw = false #Going to have to get this info in somehow.
+  selfDraw = false #Going to have to get this info in somehow.
   if(melds == "thirteenorphans")
     yakuman = "thirteenorphans"
   #Check for yakuman
