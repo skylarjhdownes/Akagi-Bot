@@ -15,22 +15,59 @@ getPossibleHands = (hand) ->
   #Takes a hand of mahjong tiles and finds every possible way the hand could be interpreted to be a winning hand, returning each different meld combination
   possibleHands = []
   allTerminalsAndHonors = gamePieces.allTerminalsAndHonorsGetter()
+  handTiles = hand.contains
+  if _.intersection(handTiles, allTerminalsAndHonors).length == 13 && _.xor(hand, allTerminalsAndHonors).length == 0
+    drawLocation = _.indexOf(handTiles,hand.lastTileDrawn)
+    if(drawLocation == 13 || handTiles[drawLocation] != handTiles[drawLocation+1])
+      possibleHands.push("thirteenorphans") #Normal 13 orphans
+    else
+      possibleHands.push("thirteenorphans+") #13 way wait, 13 orphans
 
-  if _.intersection(hand, allTerminalsAndHonors).length == 13 && _.xor(hand, allTerminalsAndHonors).length == 0
-    possibleHands.push("thirteenorphans") #Potentially want to add a check to see if it was a 13 way wait to this.  Some rules have double yakuman for that.
-
-  if _.uniq(hand).length == 7
-    pairGroup = _.chunk(hand, 2)
+  if _.uniq(handTiles).length == 7
+    pairGroup = _.chunk(handTiles, 2)
     if _.every(pairGroup, (x) -> gamePieces.isTileSet(x) == "Pair")
-      possibleHands.push({runs: [], triplets: [], pairs: pairGroup}) #I forget how objects work in js. If pairGroup is just a reference, maybe this will cause bugs.
+      possibleHands.push(_.map(pairGroup,gamePieces.TileSet)) #I forget how objects work in js. If pairGroup is just a reference, maybe this will cause bugs.
+
+  #Normal Hand Logic Here
+  normalHandFinder = (melds, remaining) =>
+    if(remaining.length == 0)
+      possibleHands.push(melds)
+    else if(remaining.length == 1)
+      return "Nope"
+    pairRemaining = true
+    for x in melds
+      if(x.type == "Pair")
+        pairRemaining = false
+    if(!pairRemaining && remaining.length == 2)
+      return "Nope"
+    if(pairRemaining && remaining[0]==remaining[1])
+      normalHandFinder(_.concat(melds,gamePieces.TileSet([remaining[0],remaining[1]])),remaining[2..])
+    if(remaining[0]==remaining[1] && remaining[1]==remaining[2])
+      normalHandFinder(_.concat(melds,gamePieces.TileSet([remaining[0],remaining[1],remaining[2]])),remaining[3..])
+    nextInRun = gamePieces.Tile(remaining[0].type,remaining[0].value+1)
+    nextAt = remaining.indexOf(nextInRun)
+    afterThat = gamePieces.Tile(remaining[0].type,remaining[0].value+2)
+    afterAt = remaining.indexOf(afterThat)
+    if(nextAt != -1 && afterAt != -1)
+      pruned = remaining.slice[0]
+      pruned.splice(nextAt,1)
+      afterAt = remaining.indexOf(afterThat)
+      pruned.splice(afterAt,1)
+      pruned = pruned.slice[1]
+      normalHandFinder(_.concat(melds,remaining[0],nextInRun,afterThat),pruned)
+
+
+
+  uncalled = handTiles
+  for x in hand.calledTileSets
+    for y in x
+      remove = uncalled.indexOf(y)
+      uncalled.splice(remove,1)
+
+  normalHandFinder(hand.calledTileSets,uncalled)
 
   return possibleHands
 
-
-#I don't know what this function does differently than getPossibleHands, unless its just a subfunction dealing with some of the logic for normal kinds of melds
-#getMelds = (hand) ->
-
-  #return [{runs: [], triplets: [], pairs: []}, {runs: [], triplets: [], pairs: []}]
 
 getScore = (melds) ->
 
