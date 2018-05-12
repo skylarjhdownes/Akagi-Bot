@@ -11,7 +11,12 @@ Promise = require('promise')
 bot = new Discord.Client()
 
 ## The token of your bot - https://discordapp.com/developers/applications/me
-token = process.env.BOT_TOKEN
+token = process.env.AKAGI_BOT_TOKEN
+debugId = process.env.AKAGI_DEBUG_ID
+
+#Usable for debugging if source of message is unclear.
+sendID = (placeOfSending, toPrint) ->
+  placeOfSending.send("#{debugId}"+toPrint)
 
 ## The ready event is vital, it means that your bot will only start reacting to information
 ## from Discord _after_ ready is emitted
