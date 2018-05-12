@@ -1,12 +1,12 @@
 _ = require('lodash')
 gamePieces = require('./akagiTiles.coffee')
 
-scoreMahjongHand = (hand) ->
+scoreMahjongHand = (hand, winningPlayer) ->
   #Takes a hand of mahajong tiles and finds the highest scoring way it can be interpreted, returning the score, and the melds which lead to that score
   possibleHands = getPossibleHands(hand)
   if possibleHands == []
-    return(0,"Not a Scoring Hand")
-  scores = getScore(x) for x in possibleHands
+    return(0, "Not a Scoring Hand")
+  scores = getScore(hand, winningPlayer) for hand in possibleHands
   maxScore = _.maxBy(scores, (x) -> x[0])
   maxLocation = _.indexOf(scores,maxScore)
   return(maxScore,possibleHands[maxLocation])
@@ -32,11 +32,14 @@ getPossibleHands = (hand) ->
 
   #return [{runs: [], triplets: [], pairs: []}, {runs: [], triplets: [], pairs: []}]
 
-getScore = (melds) ->
-
-
-
+getScore = (melds, winningPlayer) -> # melds will be a TileSet object, the winning player's hand
   #Takes a set of melds and returns the score of that particular combination of getMelds and the yaku that made up that score
+
+  if (melds.discardPile.riichi != 0 && melds.hand.isConcealed()) # winning player has called riichi
+
+  else # has not called riichi
+    # stuff
+
   yakuman = false
   yaku = 0
   dora = 0
@@ -65,4 +68,5 @@ getScore = (melds) ->
       return (inScore//100+1)*100
     else
       inScore
+
 module.exports = scoreMahjongHand
