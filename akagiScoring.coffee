@@ -34,12 +34,8 @@ getPossibleHands = (hand) ->
 
 getScore = (melds) ->
 
-  #Function to round up to the closest hundred
-  roundUp = (inScore) ->
-    if (inScore%100)!=0
-      return (inScore//100+1)*100
-    else
-      inScore
+
+
   #Takes a set of melds and returns the score of that particular combination of getMelds and the yaku that made up that score
   yakuman = false
   yaku = 0
@@ -64,4 +60,9 @@ getScore = (melds) ->
   baseScore = math.pow(fu,2+fan)
   #Return scored points and yaku + dora + fu in hand
 
+  roundUpToClosestHundred = (inScore) ->
+    if (inScore%100)!=0
+      return (inScore//100+1)*100
+    else
+      inScore
 module.exports = scoreMahjongHand
