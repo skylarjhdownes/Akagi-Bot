@@ -4,6 +4,7 @@ mahjongTiles = require('./akagiTiles.coffee')
 mahjongGame = require('./akagiGame.coffee')
 mahjongPlayer = require('./akagiPlayer.coffee')
 dice = require('./akagiDice.coffee')
+mahjongScoring = require('./akagiScoring.coffee')
 _ = require('./node_modules/lodash/lodash.js')
 Promise = require('promise')
 
@@ -115,6 +116,16 @@ bot.on('message', (message) =>
 
     if(commandArgs[0] == "tiles")
       message.channel.send(mahjongTiles.allTilesGetter())
+
+    if(commandArgs[0] == "score")
+      inputTiles = commandArgs[1..28]
+      fakePile = mahjongTiles.Pile()
+      testHand = mahjongTiles.Hand(fakePile)
+      for x in [0...14]
+        testHand.push(Tile(inputTiles[2*x],inputTiles[2*x+1]))
+      testHand.draw(null,0)
+      console.log(mahjongScoring.getPossibleHands(testHand))
+
 
     #TODO: make game commands work with game objects
   if(exports.mahjongGames.length > 0)
