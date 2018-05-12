@@ -83,7 +83,7 @@ getScore = (melds, winningPlayer) -> # melds will be a TileSet object, the winni
       yaku++
     if selfDraw #Menzen Tsumo - Self draw on concaled hand
       yaku++
-    if #Pinfu - Concealed all chows hand with a valuless pair
+    #if #Pinfu - Concealed all chows hand with a valuless pair
       #todo
     #Iipeikou - Concealed hand with two completely identical chow.
     chowList = meld in melds.hand when meld.type == "Chow"
@@ -95,7 +95,7 @@ getScore = (melds, winningPlayer) -> # melds will be a TileSet object, the winni
     if identicalChow
       yaku++
   #Tanyao Chuu - All simples (no terminals/honors)
-  if _.intersection(melds.hand, ['🀙','🀡','🀐','🀘','🀇','🀏','🀀','🀁','🀂','🀃','🀄','🀅','🀆']).length == 0
+  if _.intersectionWith(melds.hand, ['🀙','🀡','🀐','🀘','🀇','🀏','🀀','🀁','🀂','🀃','🀄','🀅','🀆'], _.isEqual).length == 0
     yaku++
 
 
