@@ -1,12 +1,12 @@
 _ = require('lodash')
 gamePieces = require('./akagiTiles.coffee')
 
-scoreMahjongHand = (hand) ->
+scoreMahjongHand = (hand, winningPlayer) ->
   #Takes a hand of mahajong tiles and finds the highest scoring way it can be interpreted, returning the score, and the melds which lead to that score
   possibleHands = getPossibleHands(hand)
   if possibleHands == []
-    return(0,"Not a Scoring Hand")
-  scores = getScore(x) for x in possibleHands
+    return(0, "Not a Scoring Hand")
+  scores = getScore(hand, winningPlayer) for hand in possibleHands
   maxScore = _.maxBy(scores, (x) -> x[0])
   maxLocation = _.indexOf(scores,maxScore)
   return(maxScore,possibleHands[maxLocation])
@@ -69,21 +69,35 @@ getPossibleHands = (hand) ->
   return possibleHands
 
 
-getScore = (melds) ->
-
-  #Function to round up to the closest hundred
-  roundUp = (inScore) ->
-    if (inScore%100)!=0
-      return (inScore//100+1)*100
-    else
-      inScore
+getScore = (melds, winningPlayer) -> # melds will be a TileSet object, the winning player's hand
   #Takes a set of melds and returns the score of that particular combination of getMelds and the yaku that made up that score
   yakuman = false
   yaku = 0
   dora = 0
   fu = 0
   playerEast = false #Going to have to get this info in somehow.
-  seldDraw = false #Going to have to get this info in somehow.
+  selfDraw = false #Going to have to get this info in somehow.
+
+  if melds.hand.isConcealed()
+    if (melds.discardPile.riichi != 0) # winning player has called riichi
+      yaku++
+    if selfDraw #Menzen Tsumo - Self draw on concaled hand
+      yaku++
+    if #Pinfu - Concealed all chows hand with a valuless pair
+      #todo
+    if #Iipeikou - Concealed hand with two completely identical chow.
+      chowList = meld in melds.hand when meld.type == "Chow"
+      identicalChow = false
+      for chow1, index1 in chowList
+        for chow2, index2 in chowList
+          if chow1 == chow2 && index1 != index2
+            identicalChow = true
+      if identicalChow
+        yaku++
+
+
+
+
   if(melds == "thirteenorphans")
     yakuman = "thirteenorphans"
   #Check for yakuman
@@ -100,5 +114,11 @@ getScore = (melds) ->
 
   baseScore = math.pow(fu,2+fan)
   #Return scored points and yaku + dora + fu in hand
+
+  roundUpToClosestHundred = (inScore) ->
+    if (inScore%100)!=0
+      return (inScore//100+1)*100
+    else
+      inScore
 
 module.exports = scoreMahjongHand
