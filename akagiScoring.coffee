@@ -28,7 +28,7 @@ getPossibleHands = (hand) ->
     if _.every(pairGroup, (x) -> gamePieces.isTileSet(x) == "Pair")
       possibleHands.push(_.map(pairGroup,gamePieces.TileSet)) #I forget how objects work in js. If pairGroup is just a reference, maybe this will cause bugs.
 
-  #Normal Hand Logic Here
+  #Any hands other than pairs/13 orphans
   normalHandFinder = (melds, remaining) =>
     if(remaining.length == 0)
       possibleHands.push(melds)
