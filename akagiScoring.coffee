@@ -34,18 +34,32 @@ getPossibleHands = (hand) ->
 
 getScore = (melds, winningPlayer) -> # melds will be a TileSet object, the winning player's hand
   #Takes a set of melds and returns the score of that particular combination of getMelds and the yaku that made up that score
-
-  if (melds.discardPile.riichi != 0 && melds.hand.isConcealed()) # winning player has called riichi
-
-  else # has not called riichi
-    # stuff
-
   yakuman = false
   yaku = 0
   dora = 0
   fu = 0
   playerEast = false #Going to have to get this info in somehow.
   selfDraw = false #Going to have to get this info in somehow.
+
+  if melds.hand.isConcealed()
+    if (melds.discardPile.riichi != 0) # winning player has called riichi
+      yaku++
+    if selfDraw #Menzen Tsumo - Self draw on concaled hand
+      yaku++
+    if #Pinfu - Concealed all chows hand with a valuless pair
+      #todo
+    if #Iipeikou - Concealed hand with two completely identical chow.
+      chowList = meld in melds.hand when meld.type == "Chow"
+      identicalChow = false
+      for chow1, index1 in chowList
+        for chow2, index2 in chowList
+          if chow1 == chow2 && index1 != index2
+            identicalChow
+      if identicalChow
+        yaku++
+
+
+
   if(melds == "thirteenorphans")
     yakuman = "thirteenorphans"
   #Check for yakuman
