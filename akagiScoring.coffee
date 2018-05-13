@@ -102,7 +102,15 @@ getScore = (melds, winningPlayer) -> # melds will be a TileSet object, the winni
   #Tanyao Chuu - All simples (no terminals/honors)
   if _.intersectionWith(melds.hand, allTerminalsAndHonors, _.isEqual).length == 0
     yaku++
-
+  #Fanpai/Yakuhai - Pung/kong of dragons.
+  for meld in melds.hand when meld.type == "Pung" || meld.type == "Kong"
+    if checkIfMeldIsAllGivenTile(meld, new Tile("dragon", "red")) ||
+      checkIfMeldIsAllGivenTile(meld, new Tile("dragon", "green")) ||
+      checkIfMeldIsAllGivenTile(meld, new Tile("dragon", "white")) ||
+      checkIfMeldIsAllGivenTile(meld, new Tile("wind", playerWind)) ||
+      (playerWind != roundWind && checkIfMeldIsAllGivenTile(meld, new Tile("wind", roundWind)))
+      yaku++
+      break
 
 
   if(melds == "thirteenorphans")
@@ -121,6 +129,14 @@ getScore = (melds, winningPlayer) -> # melds will be a TileSet object, the winni
 
   baseScore = math.pow(fu,2+fan)
   #Return scored points and yaku + dora + fu in hand
+
+  checkIfMeldIsAllGivenTile = (meld, tile) ->
+    allSameTile = true
+    for tile in meld
+      if meld != tile
+        allSameTile = false
+        break
+    return allSameTile
 
   roundUpToClosestHundred = (inScore) ->
     if (inScore%100)!=0
