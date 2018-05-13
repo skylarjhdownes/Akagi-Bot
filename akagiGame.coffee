@@ -1,6 +1,7 @@
 gamePieces = require('./akagiTiles.coffee')
 player = require('./akagiPlayer.coffee')
 Promise = require('promise')
+_ = require('lodash')
 
 class MahjongGame
   #A four player game of Mahjong
@@ -52,6 +53,79 @@ class MahjongGame
     else
       playerToDraw.sendMessage("It is not your turn.")
 
+  ponTile:(playerToPon) ->
+    if(@phase in ["react","draw"] && @turn != playerToPon.playerNumber)
+      for player in @players
+        if(@turn == player.nextPlayer)
+          toPon = player.discardPile.contains[-1..][0]
+          if(_.findIndex(playerToPon.hand.uncalled(),(x)->_.isEqual(toPon,x))!=_.findLastIndex(playerToPon.hand.uncalled(),(x)->_.isEqual(toPon,x)))
+            @phase = ["poning",playerToPon.playerNumber]
+            for player in @players
+              if(player.playerNumber != playerToPon.playerNumber)
+                player.sendMessage("Player #{playerToPon.playerNumber} has declared Pon.")
+              else
+                player.sendMessage("You have declared Pon.")
+            waitTenSeconds = new Promise((resolve,reject) =>
+              setTimeout(->
+                resolve("Time has Passed")
+              ,1000))
+            waitTenSeconds
+              .then((message)=>
+                if(_.isEqual(@phase,["poning",playerToPon.playerNumber]))
+                  @phase = "discard"
+                  for player in @players
+                    if(@turn == player.nextPlayer)
+                      playerToPon.hand.draw(player.discardPile)
+                      playerToPon.hand.calledTileSets.push(new gamePieces.TileSet([toPon,toPon,toPon],player.playerNumber))
+                    if(player.playerNumber == playerToPon.playerNumber)
+                      player.message("Your Pon has completed. Please discard a tile.")
+                    else
+                      player.message("Player #{playerToPon.playerNumber}'s Pon has completed.")
+                  @turn = playerToPon.playerNumber
+              )
+              .catch(console.error)
+          else
+            playerToPon.sendMessage("Don't have correct tiles.")
+    else if(@phase.isArray && @phase[0] == "poning")
+      for player in @players
+        if(@turn == player.nextPlayer)
+          toPon = player.discardPile.contains[-1..][0]
+          if(_.findIndex(playerToPon.hand.uncalled(),(x)->_.isEqual(toPon,x))!=_.findLastIndex(playerToPon.hand.uncalled(),(x)->_.isEqual(toPon,x)))
+            if(player.nextPlayer == playerToPon.playerNumber || playerToPon.nextPlayer == @phase[1])
+              @phase = ["poning",playerToPon.playerNumber]
+              for player in @players
+                if(player.playerNumber != playerToPon.playerNumber)
+                  player.sendMessage("Player #{playerToPon.playerNumber} has declared Pon.")
+                else
+                  player.sendMessage("You have declared Pon.")
+              waitTenSeconds = new Promise((resolve,reject) =>
+                setTimeout(->
+                  resolve("Time has Passed")
+                ,1000))
+              waitTenSeconds
+                .then((message) =>
+                  if(_.isEqual(@phase,["poning",playerToPon.playerNumber]))
+                    @phase = "discard"
+                    for player in @players
+                      if(@turn == player.nextPlayer)
+                        playerToPon.hand.draw(player.discardPile)
+                        playerToPon.hand.calledTileSets.push(new gamePieces.TileSet([toPon,toPon,toPon],player.playerNumber))
+                      if(player.playerNumber == playerToPon.playerNumber)
+                        player.message("Your Pon has completed. Please discard a tile.")
+                      else
+                        player.message("Player #{playerToPon.playerNumber}'s Pon has completed.")
+                    @turn = playerToPon.playerNumber
+                  )
+                  .catch(console.error)
+            else
+              playerToPon.message("Other player's Pon has higher priority.")
+          else
+            playerToPon.sendMessage("Don't have correct tiles.")
+    else
+      playerToPon.sendMessage("Wrong time to Pon.")
+
+
+
   discardTile:(playerToDiscard,tileToDiscard) ->
     if(@turn == playerToDiscard.playerNumber)
       if(@phase == "discard")
@@ -71,10 +145,11 @@ class MahjongGame
             ,1000))
           waitTenSeconds
             .then((message)=>
-              @phase = "draw"
-              for player in @players
-                if(@turn == player.playerNumber)
-                  player.sendMessage("It is your turn.  You may draw a tile."))
+              if(@phase == "react")
+                @phase = "draw"
+                for player in @players
+                  if(@turn == player.playerNumber)
+                    player.sendMessage("It is your turn.  You may draw a tile."))
             .catch(console.error)
         else
           playerToDiscard.sendMessage("You don't have that tile.")

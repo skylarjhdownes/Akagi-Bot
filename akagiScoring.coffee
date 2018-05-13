@@ -60,13 +60,13 @@ getPossibleHands = (hand) ->
 
 
 
-  uncalled = handTiles
-  for x in hand.calledTileSets
-    for y in x
-      remove = uncalled.indexOf(y)
-      uncalled.splice(remove,1)
+  # uncalled = handTiles
+  # for x in hand.calledTileSets
+  #   for y in x
+  #     remove = uncalled.indexOf(y)
+  #     uncalled.splice(remove,1)
 
-  normalHandFinder(hand.calledTileSets,uncalled)
+  normalHandFinder(hand.calledTileSets,hand.uncalled())
 
   return possibleHands
 
