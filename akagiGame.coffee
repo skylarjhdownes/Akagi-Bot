@@ -76,7 +76,7 @@ class MahjongGame
                   for player in @players
                     if(@turn == player.nextPlayer)
                       playerToPon.hand.draw(player.discardPile)
-                      playerToPon.hand.calledTileSets.push(new gamePieces.TileSet([toPon,toPon,toPon],player.playerNumber))
+                      playerToPon.hand.calledMelds.push(new gamePieces.Meld([toPon,toPon,toPon],player.playerNumber))
                     if(player.playerNumber == playerToPon.playerNumber)
                       player.message("Your Pon has completed. Please discard a tile.")
                     else
@@ -109,7 +109,7 @@ class MahjongGame
                     for player in @players
                       if(@turn == player.nextPlayer)
                         playerToPon.hand.draw(player.discardPile)
-                        playerToPon.hand.calledTileSets.push(new gamePieces.TileSet([toPon,toPon,toPon],player.playerNumber))
+                        playerToPon.hand.calledMelds.push(new gamePieces.Meld([toPon,toPon,toPon],player.playerNumber))
                       if(player.playerNumber == playerToPon.playerNumber)
                         player.message("Your Pon has completed. Please discard a tile.")
                       else

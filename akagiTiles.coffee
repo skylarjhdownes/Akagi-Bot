@@ -42,8 +42,8 @@ allTerminalsAndHonorsGetter = ->
     new Tile("wind", "north"),    #🀃
   ]
 
-#returns type of tileset, or false if not a legal set.
-isTileSet = (tiles) ->
+#returns type of meld, or false if not a legal set.
+isMeld = (tiles) ->
   tiles.sort((x,y)->x.value-y.value)
   if(tiles.length == 2)
     if(tiles[0].getTextName() == tiles[1].getTextName())
@@ -144,7 +144,7 @@ class Hand
   #A Hand of tiles
   constructor: (@discardPile) ->
     @contains = []
-    @calledTileSets = {}
+    @calledMelds = {}
     @lastTileDrawn = false
 
   #Draws x tiles from anything with a drawFrom() function, then sorts the hand and returns the drawn tiles
@@ -164,7 +164,7 @@ class Hand
 
   uncalled: ->
     out = @contains[0..]
-    for x in @calledTileSets
+    for x in @calledMelds
       for y in x
         remove = out.findIndex(y,(z)->_.isEqual(y,z))
         out.splice(remove,1)
@@ -188,15 +188,15 @@ class Hand
       return (x.getName(writtenName) for x in @contains)
 
 
-  #returns true if there are no calledTileSets, or if they are all self-called Kongs
+  #returns true if there are no calledMelds, or if they are all self-called Kongs
   isConcealed: ->
-    if(_.isEmpty(@calledTileSets))
+    if(_.isEmpty(@calledMelds))
       return true
     else
-      return _.every(@calledTileSets, (x) -> x.takenFrom == "self" and x.type == "Kong")
+      return _.every(@calledMelds, (x) -> x.takenFrom == "self" and x.type == "Kong")
 
-#This class assumes that a legal tileSet has been passed to it.
-class TileSet
+#This class assumes that a legal meld has been passed to it.
+class Meld
   #A set of two, three or four tiles
   constructor: (@tiles, @takenFrom = "self") ->
     if(@tiles.length == 4)
@@ -208,7 +208,7 @@ class TileSet
     else
       @type = "Chow"
 
-  printTileSet: (writtenName = true) ->
+  printMeld: (writtenName = true) ->
     return (x.getName(writtenName) for x in @tiles)
 
 class Pile
@@ -248,7 +248,7 @@ module.exports.Tile = Tile
 module.exports.Hand = Hand
 module.exports.Wall = Wall
 module.exports.Pile = Pile
-module.exports.TileSet = TileSet
+module.exports.Meld = Meld
 module.exports.allTilesGetter = allTilesGetter
-module.exports.isTileSet = isTileSet
+module.exports.isMeld = isMeld
 module.exports.allTerminalsAndHonorsGetter = allTerminalsAndHonorsGetter

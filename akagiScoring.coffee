@@ -25,8 +25,8 @@ getPossibleHands = (hand) ->
 
   if _.uniqWith(handTiles,_.isEqual).length == 7
     pairGroup = _.chunk(handTiles, 2)
-    if _.every(pairGroup, (x) -> gamePieces.isTileSet(x) == "Pair")
-      possibleHands.push(_.map(pairGroup,(x)-> return new gamePieces.TileSet(x)))
+    if _.every(pairGroup, (x) -> gamePieces.isMeld(x) == "Pair")
+      possibleHands.push(_.map(pairGroup,(x)-> return new gamePieces.Meld(x)))
 
   #Any hands other than pairs/13 orphans
   normalHandFinder = (melds, remaining) =>
@@ -42,10 +42,10 @@ getPossibleHands = (hand) ->
     if(!pairRemaining && remaining.length == 2)
       return "Nope"
     if(pairRemaining && _.isEqual(remaining[0],remaining[1]))
-      normalHandFinder(_.concat(melds,new gamePieces.TileSet([remaining[0],remaining[1]])),remaining[2..])
+      normalHandFinder(_.concat(melds,new gamePieces.Meld([remaining[0],remaining[1]])),remaining[2..])
     if(remaining.length >= 3)
       if(_.isEqual(remaining[0],remaining[1]) && _.isEqual(remaining[1],remaining[2]))
-        normalHandFinder(_.concat(melds,new gamePieces.TileSet([remaining[0],remaining[1],remaining[2]])),remaining[3..])
+        normalHandFinder(_.concat(melds,new gamePieces.Meld([remaining[0],remaining[1],remaining[2]])),remaining[3..])
       nextInRun = new gamePieces.Tile(remaining[0].suit,remaining[0].value+1)
       nextAt = _.findIndex(remaining,(x)->_.isEqual(nextInRun,x))
       afterThat = new gamePieces.Tile(remaining[0].suit,remaining[0].value+2)
@@ -56,22 +56,22 @@ getPossibleHands = (hand) ->
         afterAt = _.findIndex(pruned,(x)->_.isEqual(afterThat,x))
         pruned.splice(afterAt,1)
         pruned = pruned[1..]
-        normalHandFinder(_.concat(melds,new gamePieces.TileSet([remaining[0],nextInRun,afterThat])),pruned)
+        normalHandFinder(_.concat(melds,new gamePieces.Meld([remaining[0],nextInRun,afterThat])),pruned)
 
 
 
   # uncalled = handTiles
-  # for x in hand.calledTileSets
+  # for x in hand.calledMelds
   #   for y in x
   #     remove = uncalled.indexOf(y)
   #     uncalled.splice(remove,1)
 
-  normalHandFinder(hand.calledTileSets,hand.uncalled())
+  normalHandFinder(hand.calledMelds,hand.uncalled())
 
   return possibleHands
 
 
-getScore = (melds, winningPlayer) -> # melds will be a TileSet object, the winning player's hand
+getScore = (melds, winningPlayer) ->
   #Takes a set of melds and returns the score of that particular combination of getMelds and the yaku that made up that score
   yakuman = false
   yaku = 0
