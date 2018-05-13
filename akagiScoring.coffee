@@ -86,6 +86,7 @@ getScore = (melds, winningPlayer) -> # melds will be a TileSet object, the winni
   isConcealedHand = melds.isConcealed()
   allTerminalsAndHonors = gamePieces.allTerminalsAndHonorsGetter()
 
+  #These should probably all be wrapped up into their own functions.
   if isConcealedHand
     if (winningPlayer.hand.discardPile.riichi != 0) # winning player has called riichi
       yaku++
@@ -116,6 +117,13 @@ getScore = (melds, winningPlayer) -> # melds will be a TileSet object, the winni
         (playerWind != roundWind && meldContainsOnlyGivenTile(meld, new Tile("wind", roundWind)))
       yaku++
       break
+  #Chanta - All sets contain terminals or honours, the pair is terminals or honours, and the hand contains at least one chow.
+  if (meld for meld in melds when meld.type == "Chow").length > 0 &&
+      meldContainsTerminalsOrHonors(meld for meld in melds when meld.type == "Pair")
+    #still not entirely sure of my logic here.  Wish we weren't having such trouble getting this into a testing harness...
+    if _.filter((meld for meld in melds when meld.type != "Pair"), meldContainsTerminalsOrHonors).length == 4
+      yaku++
+
 
 
   if(melds == "thirteenorphans")
@@ -135,6 +143,12 @@ getScore = (melds, winningPlayer) -> # melds will be a TileSet object, the winni
 
   baseScore = math.pow(fu,2+fan)
   #Return scored points and yaku + dora + fu in hand
+
+  meldContainsTerminalsOrHonors = (meld) ->
+    for tile in meld.tiles
+      if _.intersectionWith(gamePieces.allTerminalsAndHonorsGetter(), [tile], _.isEqual).length > 0 #This seems like an overly obtuse way to do this.
+        return true
+    return false
 
   meldContainsOnlyGivenTile = (meld, givenTile) ->
     allSameTile = true
