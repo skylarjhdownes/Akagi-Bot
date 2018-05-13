@@ -134,10 +134,10 @@ getScore = (melds, winningPlayer) -> # melds will be a TileSet object, the winni
   baseScore = math.pow(fu,2+fan)
   #Return scored points and yaku + dora + fu in hand
 
-  meldContainsOnlyGivenTile = (meld, tile) ->
+  meldContainsOnlyGivenTile = (meld, givenTile) ->
     allSameTile = true
-    for tile in meld
-      if meld != tile
+    for tile in meld.tiles
+      if tile != givenTile
         allSameTile = false
         break
     return allSameTile
