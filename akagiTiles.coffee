@@ -224,7 +224,7 @@ class Pile
   #Returns the most recent tile, adds that tile to @stolenTiles, and makes next tile riichi if the stolen tile was.
   drawFrom: ->
     out = @contains[@contains.length-1]
-    stolenTiles.push[@contains.length-1]
+    @stolenTiles.push[@contains.length-1]
     if(@riichi == @contains.length-1)
       @riichi+=1
     return out
