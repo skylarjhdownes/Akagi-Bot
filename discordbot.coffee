@@ -46,7 +46,7 @@ bot.on('message', (message) =>
         playersToAddToGame.unshift(message.author)
 
         userPermissions = [
-          {type:'role', id:exports.activeServer.defaultRole.id, deny: Discord.Permissions.FLAGS.VIEW_CHANNEL}
+          {type:'role', id:message.channel.guild.defaultRole.id, deny: Discord.Permissions.FLAGS.VIEW_CHANNEL}
         ]
         for gameObserver,i in playersToAddToGame
           if(i<4)
@@ -54,18 +54,18 @@ bot.on('message', (message) =>
           else
             userPermissions.push({type:'member', id:gameObserver.id, allow: Discord.Permissions.FLAGS.VIEW_CHANNEL})
 
-        chatChannel = exports.activeServer.createChannel(commandArgs[1]+"GroupChat","text",userPermissions)
+        chatChannel = message.channel.guild.createChannel(commandArgs[1]+"GroupChat","text",userPermissions)
           .then((channel) ->
             return channel)
           .catch(console.error)
 
         channelHolder = []
         for i in [0..3]
-          temp = exports.activeServer.createChannel(
+          temp = message.channel.guild.createChannel(
             commandArgs[1]+"Player"+(i+1),
             "text",
             [
-              {type:'role', id:exports.activeServer.defaultRole.id, deny: Discord.Permissions.FLAGS.VIEW_CHANNEL},
+              {type:'role', id:message.channel.guild.defaultRole.id, deny: Discord.Permissions.FLAGS.VIEW_CHANNEL},
               {type:'member', id:playersToAddToGame[i].id, allow: Discord.Permissions.FLAGS.VIEW_CHANNEL+Discord.Permissions.FLAGS.MANAGE_ROLES}
             ]
             )
@@ -88,9 +88,9 @@ bot.on('message', (message) =>
     if(commandArgs[0] == "forge")
       usersMentioned = message.mentions.members
       console.log(usersMentioned.array().length)
-      exports.activeServer.createChannel(commandArgs[1],"text")
+      message.channel.guild.createChannel(commandArgs[1],"text")
         .then((channel) ->
-          channel.overwritePermissions(exports.activeServer.defaultRole, {READ_MESSAGES: false})
+          channel.overwritePermissions(message.channel.guild.defaultRole, {READ_MESSAGES: false})
             .then(console.log("Hidden!!"))
             .catch(console.error)
           channel.overwritePermissions(message, {READ_MESSAGES: true, MANAGE_CHANNELS: true})
