@@ -1,3 +1,4 @@
+_ = require('lodash')
 #Returns the unicode for a given tile
 unicodeTileGetter = (suit,value) ->
   if(suit == "pin")
@@ -160,6 +161,14 @@ class Hand
   #Draws 13 tiles, the normal starting hand size
   startDraw: (drawSource) ->
     @draw(drawSource, 13)
+
+  uncalled: ->
+    out = @contains[0..]
+    for x in @calledTileSets
+      for y in x
+        remove = out.findIndex(y,(z)->_.isEqual(y,z))
+        out.splice(remove,1)
+    return out
 
   #discards a specific card from the hand
   discard: (whichTile) ->

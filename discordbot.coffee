@@ -165,6 +165,8 @@ bot.on('message', (message) =>
         fromGame.drawTile(fromPlayer)
       if(commandArgs[0] == "discard" and channelType == "player")
         fromGame.discardTile(fromPlayer,commandArgs[1]+" "+commandArgs[2])
+      if(commandArgs[0] == "pon" and channelType == "player")
+        fromGame.ponTile(fromPlayer)
       if(commandArgs[0] == "pile")
         if(commandArgs.length == 1 and channelType == "player")
           fromPlayer.sendMessage("You have discarded #{fromPlayer.hand.discardPile.printDiscard(fromPlayer.namedTiles)}.")
