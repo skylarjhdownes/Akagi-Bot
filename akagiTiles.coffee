@@ -239,5 +239,7 @@ module.exports.Tile = Tile
 module.exports.Hand = Hand
 module.exports.Wall = Wall
 module.exports.Pile = Pile
+module.exports.TileSet = TileSet
 module.exports.allTilesGetter = allTilesGetter
 module.exports.isTileSet = isTileSet
+module.exports.allTerminalsAndHonorsGetter = allTerminalsAndHonorsGetter
