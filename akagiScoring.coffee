@@ -103,7 +103,7 @@ getScore = (melds, winningPlayer) -> # melds will be a TileSet object, the winni
     if identicalChow
       yaku++
   #Tanyao Chuu - All simples (no terminals/honors)
-  if _.intersectionWith(melds.hand, allTerminalsAndHonors, _.isEqual).length == 0
+  if _.intersectionWith(melds, allTerminalsAndHonors, _.isEqual).length == 0
     yaku++
   #Fanpai/Yakuhai - Pung/kong of dragons, round wind, or player wind.
     # Can likely be drastically simplified since we know each pung/kong is 3/4 of a kind already
