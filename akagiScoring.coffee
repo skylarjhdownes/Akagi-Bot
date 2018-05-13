@@ -5,33 +5,34 @@ scoreMahjongHand = (hand, winningPlayer) ->
   #Takes a hand of mahajong tiles and finds the highest scoring way it can be interpreted, returning the score, and the melds which lead to that score
   possibleHands = getPossibleHands(hand)
   if possibleHands == []
-    return(0, "Not a Scoring Hand")
+    return([0, "Not a Scoring Hand"])
   scores = getScore(hand, winningPlayer) for hand in possibleHands
   maxScore = _.maxBy(scores, (x) -> x[0])
   maxLocation = _.indexOf(scores,maxScore)
-  return(maxScore,possibleHands[maxLocation])
+  return([maxScore,possibleHands[maxLocation]])
 
 getPossibleHands = (hand) ->
   #Takes a hand of mahjong tiles and finds every possible way the hand could be interpreted to be a winning hand, returning each different meld combination
   possibleHands = []
   allTerminalsAndHonors = gamePieces.allTerminalsAndHonorsGetter()
   handTiles = hand.contains
-  if _.intersection(handTiles, allTerminalsAndHonors).length == 13 && _.xor(hand, allTerminalsAndHonors).length == 0
-    drawLocation = _.indexOf(handTiles,hand.lastTileDrawn)
-    if(drawLocation == 13 || handTiles[drawLocation] != handTiles[drawLocation+1])
+  if _.intersectionWith(handTiles, allTerminalsAndHonors,_.isEqual).length == 13 && _.xorWith(handTiles, allTerminalsAndHonors,_.isEqual).length == 0
+    drawLocation = _.findIndex(handTiles,(x)->_.isEqual(hand.lastTileDrawn,x))
+    if(drawLocation == 13 || !_.isEqual(handTiles[drawLocation],handTiles[drawLocation+1]))
       possibleHands.push("thirteenorphans") #Normal 13 orphans
     else
       possibleHands.push("thirteenorphans+") #13 way wait, 13 orphans
 
-  if _.uniq(handTiles).length == 7
+  if _.uniqWith(handTiles,_.isEqual).length == 7
     pairGroup = _.chunk(handTiles, 2)
     if _.every(pairGroup, (x) -> gamePieces.isTileSet(x) == "Pair")
-      possibleHands.push(_.map(pairGroup,gamePieces.TileSet)) #I forget how objects work in js. If pairGroup is just a reference, maybe this will cause bugs.
+      possibleHands.push(_.map(pairGroup,(x)-> return new gamePieces.TileSet(x)))
 
   #Any hands other than pairs/13 orphans
   normalHandFinder = (melds, remaining) =>
-    if(remaining.length == 0)
+    if(!remaining || remaining.length == 0)
       possibleHands.push(melds)
+      return "Yep"
     else if(remaining.length == 1)
       return "Nope"
     pairRemaining = true
@@ -40,21 +41,22 @@ getPossibleHands = (hand) ->
         pairRemaining = false
     if(!pairRemaining && remaining.length == 2)
       return "Nope"
-    if(pairRemaining && remaining[0]==remaining[1])
-      normalHandFinder(_.concat(melds,gamePieces.TileSet([remaining[0],remaining[1]])),remaining[2..])
-    if(remaining[0]==remaining[1] && remaining[1]==remaining[2])
-      normalHandFinder(_.concat(melds,gamePieces.TileSet([remaining[0],remaining[1],remaining[2]])),remaining[3..])
-    nextInRun = gamePieces.Tile(remaining[0].type,remaining[0].value+1)
-    nextAt = remaining.indexOf(nextInRun)
-    afterThat = gamePieces.Tile(remaining[0].type,remaining[0].value+2)
-    afterAt = remaining.indexOf(afterThat)
-    if(nextAt != -1 && afterAt != -1)
-      pruned = remaining.slice[0]
-      pruned.splice(nextAt,1)
-      afterAt = remaining.indexOf(afterThat)
-      pruned.splice(afterAt,1)
-      pruned = pruned.slice[1]
-      normalHandFinder(_.concat(melds,remaining[0],nextInRun,afterThat),pruned)
+    if(pairRemaining && _.isEqual(remaining[0],remaining[1]))
+      normalHandFinder(_.concat(melds,new gamePieces.TileSet([remaining[0],remaining[1]])),remaining[2..])
+    if(remaining.length >= 3)
+      if(_.isEqual(remaining[0],remaining[1]) && _.isEqual(remaining[1],remaining[2]))
+        normalHandFinder(_.concat(melds,new gamePieces.TileSet([remaining[0],remaining[1],remaining[2]])),remaining[3..])
+      nextInRun = new gamePieces.Tile(remaining[0].suit,remaining[0].value+1)
+      nextAt = _.findIndex(remaining,(x)->_.isEqual(nextInRun,x))
+      afterThat = new gamePieces.Tile(remaining[0].suit,remaining[0].value+2)
+      afterAt = _.findIndex(remaining,(x)->_.isEqual(afterThat,x))
+      if(nextAt != -1 && afterAt != -1)
+        pruned = remaining[0..]
+        pruned.splice(nextAt,1)
+        afterAt = _.findIndex(pruned,(x)->_.isEqual(afterThat,x))
+        pruned.splice(afterAt,1)
+        pruned = pruned[1..]
+        normalHandFinder(_.concat(melds,new gamePieces.TileSet([remaining[0],nextInRun,afterThat])),pruned)
 
 
 
@@ -116,10 +118,10 @@ getScore = (melds, winningPlayer) -> # melds will be a TileSet object, the winni
   if(melds == "thirteenorphans")
     yakuman = "thirteenorphans"
   #Check for yakuman
-  if(yakuman)
+  #if(yakuman)
     #Return yakuman score and name of isYakuman
   #Check for yaku
-  if(yaku == 0)
+  #if(yaku == 0)
     #Return 0 and "Not a winning hand, no Yaku"
   #Check for dora
   fan = yaku+dora
@@ -145,3 +147,4 @@ getScore = (melds, winningPlayer) -> # melds will be a TileSet object, the winni
       inScore
 
 module.exports = scoreMahjongHand
+module.exports.getPossibleHands = getPossibleHands

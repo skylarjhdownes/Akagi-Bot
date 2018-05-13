@@ -71,6 +71,8 @@ class Tile
   #An individual tile in a game of mahjong
   constructor: (@suit, @value) ->
     #Generates a number that can be used for sorting in hands later on
+    if(@value in ["1","2","3","4","5","6","7","8","9"])
+      @value = [null,"1","2","3","4","5","6","7","8","9"].indexOf(@value)
     @sortValue = ["pin","sou","wan","wind","dragon"].indexOf(@suit)*16
     @sortValue += [1,2,3,4,5,6,7,8,9,"east","south","west","north","red","green","white"].indexOf(@value)
     @unicode = unicodeTileGetter(@suit,@value)
@@ -237,5 +239,7 @@ module.exports.Tile = Tile
 module.exports.Hand = Hand
 module.exports.Wall = Wall
 module.exports.Pile = Pile
+module.exports.TileSet = TileSet
 module.exports.allTilesGetter = allTilesGetter
 module.exports.isTileSet = isTileSet
+module.exports.allTerminalsAndHonorsGetter = allTerminalsAndHonorsGetter
