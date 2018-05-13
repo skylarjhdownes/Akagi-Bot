@@ -77,18 +77,24 @@ getScore = (melds, winningPlayer) -> # melds will be a TileSet object, the winni
   yaku = 0
   dora = 0
   fu = 0
-  playerEast = false #Going to have to get this info in somehow.
-  selfDraw = false #Going to have to get this info in somehow.
 
-  if melds.hand.isConcealed()
-    if (melds.discardPile.riichi != 0) # winning player has called riichi
+  #Going to have to get this info in somehow.
+  roundWind = ""
+  playerWind = ""
+  selfDraw = false
+
+  isConcealedHand = melds.isConcealed()
+  allTerminalsAndHonors = gamePieces.allTerminalsAndHonorsGetter()
+
+  if isConcealedHand
+    if (winningPlayer.hand.discardPile.riichi != 0) # winning player has called riichi
       yaku++
     if selfDraw #Menzen Tsumo - Self draw on concaled hand
       yaku++
     #if #Pinfu - Concealed all chows hand with a valuless pair
       #todo
     #Iipeikou - Concealed hand with two completely identical chow.
-    chowList = meld in melds.hand when meld.type == "Chow"
+    chowList = (meld for meld in melds when meld.type == "Chow")
     identicalChow = false
     for chow1, index1 in chowList
       for chow2, index2 in chowList
@@ -97,9 +103,19 @@ getScore = (melds, winningPlayer) -> # melds will be a TileSet object, the winni
     if identicalChow
       yaku++
   #Tanyao Chuu - All simples (no terminals/honors)
-  if _.intersectionWith(melds.hand, ['🀙','🀡','🀐','🀘','🀇','🀏','🀀','🀁','🀂','🀃','🀄','🀅','🀆'], _.isEqual).length == 0
+  if _.intersectionWith(melds.hand, allTerminalsAndHonors, _.isEqual).length == 0
     yaku++
-
+  #Fanpai/Yakuhai - Pung/kong of dragons, round wind, or player wind.
+    # Can likely be drastically simplified since we know each pung/kong is 3/4 of a kind already
+    # Will also need to be taken into account for higher value hands, 3 dragons etc.
+  for meld in melds when meld.type == "Pung" || meld.type == "Kong"
+    if meldContainsOnlyGivenTile(meld, new Tile("dragon", "red")) ||
+        meldContainsOnlyGivenTile(meld, new Tile("dragon", "green")) ||
+        meldContainsOnlyGivenTile(meld, new Tile("dragon", "white")) ||
+        meldContainsOnlyGivenTile(meld, new Tile("wind", playerWind)) ||
+        (playerWind != roundWind && meldContainsOnlyGivenTile(meld, new Tile("wind", roundWind)))
+      yaku++
+      break
 
 
   if(melds == "thirteenorphans")
@@ -112,12 +128,21 @@ getScore = (melds, winningPlayer) -> # melds will be a TileSet object, the winni
     #Return 0 and "Not a winning hand, no Yaku"
   #Check for dora
   fan = yaku+dora
-  if(fan>=5)
+  if fan >= 5
+    console.log("not implemented yet.")
     #Return scored points and yaku plus dora in hand
   #Check for fu
 
   baseScore = math.pow(fu,2+fan)
   #Return scored points and yaku + dora + fu in hand
+
+  meldContainsOnlyGivenTile = (meld, givenTile) ->
+    allSameTile = true
+    for tile in meld.tiles
+      if tile != givenTile
+        allSameTile = false
+        break
+    return allSameTile
 
   roundUpToClosestHundred = (inScore) ->
     if (inScore%100)!=0
