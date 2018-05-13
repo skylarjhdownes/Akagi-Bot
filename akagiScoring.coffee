@@ -28,7 +28,7 @@ getPossibleHands = (hand) ->
     if _.every(pairGroup, (x) -> gamePieces.isTileSet(x) == "Pair")
       possibleHands.push(_.map(pairGroup,(x)-> return new gamePieces.TileSet(x)))
 
-  #Normal Hand Logic Here
+  #Any hands other than pairs/13 orphans
   normalHandFinder = (melds, remaining) =>
     if(!remaining || remaining.length == 0)
       possibleHands.push(melds)
@@ -87,16 +87,18 @@ getScore = (melds, winningPlayer) -> # melds will be a TileSet object, the winni
       yaku++
     #if #Pinfu - Concealed all chows hand with a valuless pair
       #todo
-    #if #Iipeikou - Concealed hand with two completely identical chow.
-      chowList = meld in melds.hand when meld.type == "Chow"
-      identicalChow = false
-      for chow1, index1 in chowList
-        for chow2, index2 in chowList
-          if chow1 == chow2 && index1 != index2
-            identicalChow = true
-      if identicalChow
-        yaku++
-
+    #Iipeikou - Concealed hand with two completely identical chow.
+    chowList = meld in melds.hand when meld.type == "Chow"
+    identicalChow = false
+    for chow1, index1 in chowList
+      for chow2, index2 in chowList
+        if chow1 == chow2 && index1 != index2
+          identicalChow = true
+    if identicalChow
+      yaku++
+  #Tanyao Chuu - All simples (no terminals/honors)
+  if _.intersectionWith(melds.hand, ['🀙','🀡','🀐','🀘','🀇','🀏','🀀','🀁','🀂','🀃','🀄','🀅','🀆'], _.isEqual).length == 0
+    yaku++
 
 
 
