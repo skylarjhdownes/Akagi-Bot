@@ -144,7 +144,7 @@ class Hand
   #A Hand of tiles
   constructor: (@discardPile) ->
     @contains = []
-    @calledMelds = {}
+    @calledMelds = []
     @lastTileDrawn = false
 
   #Draws x tiles from anything with a drawFrom() function, then sorts the hand and returns the drawn tiles
