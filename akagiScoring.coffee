@@ -107,10 +107,10 @@ getScore = (melds, winningPlayer) -> # melds will be a TileSet object, the winni
   #Fanpai/Yakuhai - Pung/kong of dragons.
   for meld in melds.hand when meld.type == "Pung" || meld.type == "Kong"
     if checkIfMeldIsAllGivenTile(meld, new Tile("dragon", "red")) ||
-      checkIfMeldIsAllGivenTile(meld, new Tile("dragon", "green")) ||
-      checkIfMeldIsAllGivenTile(meld, new Tile("dragon", "white")) ||
-      checkIfMeldIsAllGivenTile(meld, new Tile("wind", playerWind)) ||
-      (playerWind != roundWind && checkIfMeldIsAllGivenTile(meld, new Tile("wind", roundWind)))
+        checkIfMeldIsAllGivenTile(meld, new Tile("dragon", "green")) ||
+        checkIfMeldIsAllGivenTile(meld, new Tile("dragon", "white")) ||
+        checkIfMeldIsAllGivenTile(meld, new Tile("wind", playerWind)) ||
+        (playerWind != roundWind && checkIfMeldIsAllGivenTile(meld, new Tile("wind", roundWind)))
       yaku++
       break
 
@@ -125,7 +125,8 @@ getScore = (melds, winningPlayer) -> # melds will be a TileSet object, the winni
     #Return 0 and "Not a winning hand, no Yaku"
   #Check for dora
   fan = yaku+dora
-  if(fan>=5)
+  if fan >= 5
+    console.log("not implemented yet.")
     #Return scored points and yaku plus dora in hand
   #Check for fu
 
