@@ -81,6 +81,8 @@ getScore = (melds, winningPlayer) -> # melds will be a TileSet object, the winni
   playerWind = ""
   selfDraw = false
 
+  allTerminalsAndHonors = gamePieces.allTerminalsAndHonorsGetter()
+
   if melds.hand.isConcealed()
     if (winningPlayer.hand.discardPile.riichi != 0) # winning player has called riichi
       yaku++
@@ -98,7 +100,7 @@ getScore = (melds, winningPlayer) -> # melds will be a TileSet object, the winni
     if identicalChow
       yaku++
   #Tanyao Chuu - All simples (no terminals/honors)
-  if _.intersectionWith(melds.hand, ['🀙','🀡','🀐','🀘','🀇','🀏','🀀','🀁','🀂','🀃','🀄','🀅','🀆'], _.isEqual).length == 0
+  if _.intersectionWith(melds.hand, allTerminalsAndHonors, _.isEqual).length == 0
     yaku++
 
 
