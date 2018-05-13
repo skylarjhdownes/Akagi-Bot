@@ -54,7 +54,7 @@ class MahjongGame
       playerToDraw.sendMessage("It is not your turn.")
 
   ponTile:(playerToPon) ->
-    if(@phase in ["react","draw"] && @turn != playerToPon.playerNumber)
+    if(@phase in ["react","draw"] && @turn != playerToPon.nextPlayer)
       for player in @players
         if(@turn == player.nextPlayer)
           toPon = player.discardPile.contains[-1..][0]
@@ -78,9 +78,9 @@ class MahjongGame
                       playerToPon.hand.draw(player.discardPile)
                       playerToPon.hand.calledMelds.push(new gamePieces.Meld([toPon,toPon,toPon],player.playerNumber))
                     if(player.playerNumber == playerToPon.playerNumber)
-                      player.message("Your Pon has completed. Please discard a tile.")
+                      player.sendMessage("Your Pon has completed. Please discard a tile.")
                     else
-                      player.message("Player #{playerToPon.playerNumber}'s Pon has completed.")
+                      player.sendMessage("Player #{playerToPon.playerNumber}'s Pon has completed.")
                   @turn = playerToPon.playerNumber
               )
               .catch(console.error)
@@ -111,14 +111,14 @@ class MahjongGame
                         playerToPon.hand.draw(player.discardPile)
                         playerToPon.hand.calledMelds.push(new gamePieces.Meld([toPon,toPon,toPon],player.playerNumber))
                       if(player.playerNumber == playerToPon.playerNumber)
-                        player.message("Your Pon has completed. Please discard a tile.")
+                        player.sendMessage("Your Pon has completed. Please discard a tile.")
                       else
-                        player.message("Player #{playerToPon.playerNumber}'s Pon has completed.")
+                        player.sendMessage("Player #{playerToPon.playerNumber}'s Pon has completed.")
                     @turn = playerToPon.playerNumber
                   )
                   .catch(console.error)
             else
-              playerToPon.message("Other player's Pon has higher priority.")
+              playerToPon.sendMessage("Other player's Pon has higher priority.")
           else
             playerToPon.sendMessage("Don't have correct tiles.")
     else
