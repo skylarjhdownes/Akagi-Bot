@@ -83,9 +83,10 @@ getScore = (melds, winningPlayer) -> # melds will be a TileSet object, the winni
   playerWind = ""
   selfDraw = false
 
+  isConcealedHand = melds.isConcealed()
   allTerminalsAndHonors = gamePieces.allTerminalsAndHonorsGetter()
 
-  if melds.hand.isConcealed()
+  if isConcealedHand
     if (winningPlayer.hand.discardPile.riichi != 0) # winning player has called riichi
       yaku++
     if selfDraw #Menzen Tsumo - Self draw on concaled hand
@@ -93,7 +94,7 @@ getScore = (melds, winningPlayer) -> # melds will be a TileSet object, the winni
     #if #Pinfu - Concealed all chows hand with a valuless pair
       #todo
     #Iipeikou - Concealed hand with two completely identical chow.
-    chowList = (meld for meld in melds.hand when meld.type == "Chow")
+    chowList = (meld for meld in melds when meld.type == "Chow")
     identicalChow = false
     for chow1, index1 in chowList
       for chow2, index2 in chowList
@@ -105,12 +106,12 @@ getScore = (melds, winningPlayer) -> # melds will be a TileSet object, the winni
   if _.intersectionWith(melds.hand, allTerminalsAndHonors, _.isEqual).length == 0
     yaku++
   #Fanpai/Yakuhai - Pung/kong of dragons.
-  for meld in melds.hand when meld.type == "Pung" || meld.type == "Kong"
-    if checkIfMeldIsAllGivenTile(meld, new Tile("dragon", "red")) ||
-        checkIfMeldIsAllGivenTile(meld, new Tile("dragon", "green")) ||
-        checkIfMeldIsAllGivenTile(meld, new Tile("dragon", "white")) ||
-        checkIfMeldIsAllGivenTile(meld, new Tile("wind", playerWind)) ||
-        (playerWind != roundWind && checkIfMeldIsAllGivenTile(meld, new Tile("wind", roundWind)))
+  for meld in melds when meld.type == "Pung" || meld.type == "Kong"
+    if meldContainsOnlyGivenTile(meld, new Tile("dragon", "red")) ||
+        meldContainsOnlyGivenTile(meld, new Tile("dragon", "green")) ||
+        meldContainsOnlyGivenTile(meld, new Tile("dragon", "white")) ||
+        meldContainsOnlyGivenTile(meld, new Tile("wind", playerWind)) ||
+        (playerWind != roundWind && meldContainsOnlyGivenTile(meld, new Tile("wind", roundWind)))
       yaku++
       break
 
@@ -133,7 +134,7 @@ getScore = (melds, winningPlayer) -> # melds will be a TileSet object, the winni
   baseScore = math.pow(fu,2+fan)
   #Return scored points and yaku + dora + fu in hand
 
-  checkIfMeldIsAllGivenTile = (meld, tile) ->
+  meldContainsOnlyGivenTile = (meld, tile) ->
     allSameTile = true
     for tile in meld
       if meld != tile
