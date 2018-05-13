@@ -82,14 +82,14 @@ getScore = (melds, winningPlayer) -> # melds will be a TileSet object, the winni
   selfDraw = false
 
   if melds.hand.isConcealed()
-    if (melds.discardPile.riichi != 0) # winning player has called riichi
+    if (winningPlayer.hand.discardPile.riichi != 0) # winning player has called riichi
       yaku++
     if selfDraw #Menzen Tsumo - Self draw on concaled hand
       yaku++
     #if #Pinfu - Concealed all chows hand with a valuless pair
       #todo
     #Iipeikou - Concealed hand with two completely identical chow.
-    chowList = meld in melds.hand when meld.type == "Chow"
+    chowList = (meld for meld in melds.hand when meld.type == "Chow")
     identicalChow = false
     for chow1, index1 in chowList
       for chow2, index2 in chowList
