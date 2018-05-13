@@ -65,7 +65,7 @@ class MahjongGame
                 player.sendMessage("Player #{playerToPon.playerNumber} has declared Pon.")
               else
                 player.sendMessage("You have declared Pon.")
-            waitTenSeconds = new Promise((resolve,reject)) =>
+            waitTenSeconds = new Promise((resolve,reject) =>
               setTimeout(->
                 resolve("Time has Passed")
               ,1000))
@@ -98,12 +98,12 @@ class MahjongGame
                   player.sendMessage("Player #{playerToPon.playerNumber} has declared Pon.")
                 else
                   player.sendMessage("You have declared Pon.")
-              waitTenSeconds = new Promise((resolve,reject)) =>
+              waitTenSeconds = new Promise((resolve,reject) =>
                 setTimeout(->
                   resolve("Time has Passed")
                 ,1000))
               waitTenSeconds
-                .then((message)=>
+                .then((message) =>
                   if(_.isEqual(@phase,["poning",playerToPon.playerNumber]))
                     @phase = "discard"
                     for player in @players
@@ -115,10 +115,10 @@ class MahjongGame
                       else
                         player.message("Player #{playerToPon.playerNumber}'s Pon has completed.")
                     @turn = playerToPon.playerNumber
-                )
-                .catch(console.error)
-              else
-                playerToPon.message("Other player's Pon has higher priority.")
+                  )
+                  .catch(console.error)
+            else
+              playerToPon.message("Other player's Pon has higher priority.")
           else
             playerToPon.sendMessage("Don't have correct tiles.")
     else

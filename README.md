@@ -1,4 +1,4 @@
-# Akagi-Bot
+﻿# Akagi-Bot
 赤木
 
 A Discord bot that runs a game of riichi mahjong.
@@ -23,6 +23,8 @@ Currently contains the following commands:
 
 ~abort game - Currently does nothing, but claims the game is over
 
+~pon - Allows one to Pon players discards. Untested.
+
 !tiles - Displays a picture of each tile.
 
 ~dora - Displays all current dora indicators.
@@ -40,5 +42,7 @@ Currently contains the following commands:
 !yell - Takes any number of arguments.  Outputs those arguments to all forged channels.
 
 !ragnarok - Deletes all forged channels.  
+
+!score - Gives a list of ways of interpreting a hand of mahjong.  Takes 28 arguments.
 
 !roll - Rolls dice in the XdY+AdB-V-CdD sorta format
