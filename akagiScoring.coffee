@@ -75,8 +75,11 @@ getScore = (melds, winningPlayer) -> # melds will be a TileSet object, the winni
   yaku = 0
   dora = 0
   fu = 0
-  playerEast = false #Going to have to get this info in somehow.
-  selfDraw = false #Going to have to get this info in somehow.
+
+  #Going to have to get this info in somehow.
+  roundWind = ""
+  playerWind = ""
+  selfDraw = false
 
   if melds.hand.isConcealed()
     if (melds.discardPile.riichi != 0) # winning player has called riichi
