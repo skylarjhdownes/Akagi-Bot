@@ -24,8 +24,9 @@ sendID = (placeOfSending, toPrint) ->
 bot.on('ready', =>
   console.log('Logged in as %s - %s\n', bot.user.username, bot.user.id)
   console.log('I am ready!')
-  exports.activeServer = bot.guilds.first()  #TODO: track which server commands are coming from
-  console.log(exports.activeServer.name)
+  exports.activeServers = bot.guilds.array()
+  for value in exports.activeServers
+    console.log(value.name)
   exports.mahjongGames = []
   exports.parlors = [] #Created channels
 )
