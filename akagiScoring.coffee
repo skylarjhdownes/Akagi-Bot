@@ -86,14 +86,19 @@ getScore = (melds, winningPlayer) ->
   isConcealedHand = melds.isConcealed()
   allTerminalsAndHonors = gamePieces.allTerminalsAndHonorsGetter()
 
+  yakuModifiers = []  #I think it could be more useful to calc out all of the yaku names,
+                      #and then generate a score from that.  Plus we could print them all for the player.
+                      #I'm going to start with just the romaji names.  TODO: Making an object for storing
+                      #English equivalents could be useful.
+
   #These should probably all be wrapped up into their own functions.
   if isConcealedHand
     if (winningPlayer.hand.discardPile.riichi != 0) # winning player has called riichi
-      yaku++
+      yakuModifiers.push("Riichi")
     if selfDraw #Menzen Tsumo - Self draw on concaled hand
-      yaku++
+      yakuModifiers.push("Menzen Tsumo")
     #if #Pinfu - Concealed all chows hand with a valuless pair
-      #todo
+      #TODO
     #Iipeikou - Concealed hand with two completely identical chow.
     chowList = (meld for meld in melds when meld.type == "Chow")
     identicalChow = false
@@ -102,27 +107,26 @@ getScore = (melds, winningPlayer) ->
         if chow1 == chow2 && index1 != index2
           identicalChow = true
     if identicalChow
-      yaku++
+      yakuModifiers.push("Iipeikou")
   #Tanyao Chuu - All simples (no terminals/honors)
   if _.intersectionWith(melds, allTerminalsAndHonors, _.isEqual).length == 0
-    yaku++
+    yakuModifiers.push("Tanyao Chuu")
   #Fanpai/Yakuhai - Pung/kong of dragons, round wind, or player wind.
     # Can likely be drastically simplified since we know each pung/kong is 3/4 of a kind already
     # Will also need to be taken into account for higher value hands, 3 dragons etc.
   for meld in melds when meld.type == "Pung" || meld.type == "Kong"
-    if meldContainsOnlyGivenTile(meld, new Tile("dragon", "red")) ||
-        meldContainsOnlyGivenTile(meld, new Tile("dragon", "green")) ||
-        meldContainsOnlyGivenTile(meld, new Tile("dragon", "white")) ||
-        meldContainsOnlyGivenTile(meld, new Tile("wind", playerWind)) ||
-        (playerWind != roundWind && meldContainsOnlyGivenTile(meld, new Tile("wind", roundWind)))
-      yaku++
+    if _meldContainsOnlyGivenTile(meld, new Tile("dragon", "red")) ||
+        _meldContainsOnlyGivenTile(meld, new Tile("dragon", "green")) ||
+        _meldContainsOnlyGivenTile(meld, new Tile("dragon", "white")) ||
+        _meldContainsOnlyGivenTile(meld, new Tile("wind", playerWind)) ||
+        (playerWind != roundWind && _meldContainsOnlyGivenTile(meld, new Tile("wind", roundWind)))
+      yakuModifiers.push("Fanpai/Yakuhai")
       break
   #Chanta - All sets contain terminals or honours, the pair is terminals or honours, and the hand contains at least one chow.
   if (meld for meld in melds when meld.type == "Chow").length > 0 &&
-      meldContainsTerminalsOrHonors(meld for meld in melds when meld.type == "Pair")
-    #still not entirely sure of my logic here.  Wish we weren't having such trouble getting this into a testing harness...
-    if _.filter((meld for meld in melds when meld.type != "Pair"), meldContainsTerminalsOrHonors).length == 4
-      yaku++
+      meldContainsOnlyTerminalsOrHonors(meld for meld in melds when meld.type == "Pair")
+    if _.filter((meld for meld in melds when meld.type != "Pair"), _meldContainsAtLeastOneTerminalOrHonor).length == 4
+      yakuModifiers.push("Fanpai/Yakuhai")
 
 
 
@@ -144,25 +148,25 @@ getScore = (melds, winningPlayer) ->
   baseScore = math.pow(fu,2+fan)
   #Return scored points and yaku + dora + fu in hand
 
-  meldContainsTerminalsOrHonors = (meld) ->
-    for tile in meld.tiles
-      if _.intersectionWith(gamePieces.allTerminalsAndHonorsGetter(), [tile], _.isEqual).length > 0 #This seems like an overly obtuse way to do this.
-        return true
-    return false
+_meldContainsAtLeastOneTerminalOrHonor = (meld) ->
+  for tile in meld.tiles
+    if tile.isHonor() || tile.isTerminal()
+      return true
+  return false
 
-  meldContainsOnlyGivenTile = (meld, givenTile) ->
-    allSameTile = true
-    for tile in meld.tiles
-      if tile != givenTile
-        allSameTile = false
-        break
-    return allSameTile
+_meldContainsOnlyGivenTile = (meld, givenTile) ->
+  allSameTile = true
+  for tile in meld.tiles
+    if tile != givenTile
+      allSameTile = false
+      break
+  return allSameTile
 
-  roundUpToClosestHundred = (inScore) ->
-    if (inScore%100)!=0
-      return (inScore//100+1)*100
-    else
-      inScore
+_roundUpToClosestHundred = (inScore) ->
+  if (inScore%100)!=0
+    return (inScore//100+1)*100
+  else
+    inScore
 
 module.exports = scoreMahjongHand
 module.exports.getPossibleHands = getPossibleHands
