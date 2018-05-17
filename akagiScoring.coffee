@@ -110,19 +110,20 @@ getScore = (melds, winningPlayer) ->
     # Can likely be drastically simplified since we know each pung/kong is 3/4 of a kind already
     # Will also need to be taken into account for higher value hands, 3 dragons etc.
   for meld in melds when meld.type == "Pung" || meld.type == "Kong"
-    if meldContainsOnlyGivenTile(meld, new Tile("dragon", "red")) ||
-        meldContainsOnlyGivenTile(meld, new Tile("dragon", "green")) ||
-        meldContainsOnlyGivenTile(meld, new Tile("dragon", "white")) ||
-        meldContainsOnlyGivenTile(meld, new Tile("wind", playerWind)) ||
-        (playerWind != roundWind && meldContainsOnlyGivenTile(meld, new Tile("wind", roundWind)))
+    if _meldContainsOnlyGivenTile(meld, new Tile("dragon", "red")) ||
+        _meldContainsOnlyGivenTile(meld, new Tile("dragon", "green")) ||
+        _meldContainsOnlyGivenTile(meld, new Tile("dragon", "white")) ||
+        _meldContainsOnlyGivenTile(meld, new Tile("wind", playerWind)) ||
+        (playerWind != roundWind && _meldContainsOnlyGivenTile(meld, new Tile("wind", roundWind)))
       yaku++
       break
   #Chanta - All sets contain terminals or honours, the pair is terminals or honours, and the hand contains at least one chow.
   if (meld for meld in melds when meld.type == "Chow").length > 0 &&
       meldContainsOnlyTerminalsOrHonors(meld for meld in melds when meld.type == "Pair")
-    #still not entirely sure of my logic here.  Wish we weren't having such trouble getting this into a testing harness...
-    if _.filter((meld for meld in melds when meld.type != "Pair"), meldContainsAtLeastOneTerminalOrHonor).length == 4
+    if _.filter((meld for meld in melds when meld.type != "Pair"), _meldContainsAtLeastOneTerminalOrHonor).length == 4
       yaku++
+      if isConcealedHand
+        yaku++
 
 
 
@@ -144,25 +145,25 @@ getScore = (melds, winningPlayer) ->
   baseScore = math.pow(fu,2+fan)
   #Return scored points and yaku + dora + fu in hand
 
-  meldContainsAtLeastOneTerminalOrHonor = (meld) ->
-    for tile in meld.tiles
-      if tile.isHonor() || tile.isTerminal()
-        return true
-    return false
+_meldContainsAtLeastOneTerminalOrHonor = (meld) ->
+  for tile in meld.tiles
+    if tile.isHonor() || tile.isTerminal()
+      return true
+  return false
 
-  meldContainsOnlyGivenTile = (meld, givenTile) ->
-    allSameTile = true
-    for tile in meld.tiles
-      if tile != givenTile
-        allSameTile = false
-        break
-    return allSameTile
+_meldContainsOnlyGivenTile = (meld, givenTile) ->
+  allSameTile = true
+  for tile in meld.tiles
+    if tile != givenTile
+      allSameTile = false
+      break
+  return allSameTile
 
-  roundUpToClosestHundred = (inScore) ->
-    if (inScore%100)!=0
-      return (inScore//100+1)*100
-    else
-      inScore
+_roundUpToClosestHundred = (inScore) ->
+  if (inScore%100)!=0
+    return (inScore//100+1)*100
+  else
+    inScore
 
 module.exports = scoreMahjongHand
 module.exports.getPossibleHands = getPossibleHands
