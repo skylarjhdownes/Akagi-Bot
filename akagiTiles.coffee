@@ -226,6 +226,12 @@ class Meld
   suit: ->
     return @tiles[0].suit
 
+  value: ->
+    if(@type == "Chow")
+      return("#{@tiles[0].value} - #{@tiles[1]} - #{@tiles[2]}")
+    else
+      return @tiles[0].value
+
 class Pile
   #The tiles discarded by a given hand
   constructor: ->
