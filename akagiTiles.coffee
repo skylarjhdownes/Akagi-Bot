@@ -199,6 +199,7 @@ class Hand
 class Meld
   #A set of two, three or four tiles
   constructor: (@tiles, @takenFrom = "self") ->
+    @lastDrawnTile = false
     if(@tiles.length == 4)
       @type = "Kong"
     else if(@tiles.length == 2)
@@ -210,6 +211,17 @@ class Meld
 
   printMeld: (writtenName = true) ->
     return (x.getName(writtenName) for x in @tiles)
+
+  makeKong: ->
+    if(@type == "Pung")
+      @type = "Kong"
+      @tiles.push(@tiles[0])
+
+  containsTile: (tileToCheck) ->
+    for x in @tiles
+      if(tileToCheck.getTextName()==x.getTextName())
+        return true
+    return false
 
 class Pile
   #The tiles discarded by a given hand
