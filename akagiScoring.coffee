@@ -119,9 +119,9 @@ getScore = (melds, winningPlayer) ->
       break
   #Chanta - All sets contain terminals or honours, the pair is terminals or honours, and the hand contains at least one chow.
   if (meld for meld in melds when meld.type == "Chow").length > 0 &&
-      meldContainsTerminalsOrHonors(meld for meld in melds when meld.type == "Pair")
+      meldContainsOnlyTerminalsOrHonors(meld for meld in melds when meld.type == "Pair")
     #still not entirely sure of my logic here.  Wish we weren't having such trouble getting this into a testing harness...
-    if _.filter((meld for meld in melds when meld.type != "Pair"), meldContainsTerminalsOrHonors).length == 4
+    if _.filter((meld for meld in melds when meld.type != "Pair"), meldContainsAtLeastOneTerminalOrHonor).length == 4
       yaku++
 
 
@@ -144,9 +144,9 @@ getScore = (melds, winningPlayer) ->
   baseScore = math.pow(fu,2+fan)
   #Return scored points and yaku + dora + fu in hand
 
-  meldContainsTerminalsOrHonors = (meld) ->
+  meldContainsAtLeastOneTerminalOrHonor = (meld) ->
     for tile in meld.tiles
-      if _.intersectionWith(gamePieces.allTerminalsAndHonorsGetter(), [tile], _.isEqual).length > 0 #This seems like an overly obtuse way to do this.
+      if tile.isHonor() || tile.isTerminal()
         return true
     return false
 
