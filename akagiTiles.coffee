@@ -223,6 +223,9 @@ class Meld
         return true
     return false
 
+  suit: ->
+    return @tiles[0].suit
+
 class Pile
   #The tiles discarded by a given hand
   constructor: ->
