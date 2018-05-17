@@ -86,14 +86,19 @@ getScore = (melds, winningPlayer) ->
   isConcealedHand = melds.isConcealed()
   allTerminalsAndHonors = gamePieces.allTerminalsAndHonorsGetter()
 
+  yakuModifiers = []  #I think it could be more useful to calc out all of the yaku names,
+                      #and then generate a score from that.  Plus we could print them all for the player.
+                      #I'm going to start with just the romaji names.  TODO: Making an object for storing
+                      #English equivalents could be useful.
+
   #These should probably all be wrapped up into their own functions.
   if isConcealedHand
     if (winningPlayer.hand.discardPile.riichi != 0) # winning player has called riichi
-      yaku++
+      yakuModifiers.push("Riichi")
     if selfDraw #Menzen Tsumo - Self draw on concaled hand
-      yaku++
+      yakuModifiers.push("Menzen Tsumo")
     #if #Pinfu - Concealed all chows hand with a valuless pair
-      #todo
+      #TODO
     #Iipeikou - Concealed hand with two completely identical chow.
     chowList = (meld for meld in melds when meld.type == "Chow")
     identicalChow = false
@@ -102,10 +107,10 @@ getScore = (melds, winningPlayer) ->
         if chow1 == chow2 && index1 != index2
           identicalChow = true
     if identicalChow
-      yaku++
+      yakuModifiers.push("Iipeikou")
   #Tanyao Chuu - All simples (no terminals/honors)
   if _.intersectionWith(melds, allTerminalsAndHonors, _.isEqual).length == 0
-    yaku++
+    yakuModifiers.push("Tanyao Chuu")
   #Fanpai/Yakuhai - Pung/kong of dragons, round wind, or player wind.
     # Can likely be drastically simplified since we know each pung/kong is 3/4 of a kind already
     # Will also need to be taken into account for higher value hands, 3 dragons etc.
@@ -115,15 +120,13 @@ getScore = (melds, winningPlayer) ->
         _meldContainsOnlyGivenTile(meld, new Tile("dragon", "white")) ||
         _meldContainsOnlyGivenTile(meld, new Tile("wind", playerWind)) ||
         (playerWind != roundWind && _meldContainsOnlyGivenTile(meld, new Tile("wind", roundWind)))
-      yaku++
+      yakuModifiers.push("Fanpai/Yakuhai")
       break
   #Chanta - All sets contain terminals or honours, the pair is terminals or honours, and the hand contains at least one chow.
   if (meld for meld in melds when meld.type == "Chow").length > 0 &&
       meldContainsOnlyTerminalsOrHonors(meld for meld in melds when meld.type == "Pair")
     if _.filter((meld for meld in melds when meld.type != "Pair"), _meldContainsAtLeastOneTerminalOrHonor).length == 4
-      yaku++
-      if isConcealedHand
-        yaku++
+      yakuModifiers.push("Fanpai/Yakuhai")
 
 
 
