@@ -1,6 +1,9 @@
 _ = require('lodash')
 gamePieces = require('./akagiTiles.coffee')
 
+japaneseYaku = ["Riichi","Ippatsu","Daburu Riichi","Menzen Tsumo","Pinfu","Iipeikou","Tanyao Chuu","San Shoku Doujun","Itsu","Dragon Fanpai/Yakuhai","Seat Fanpai/Yakuhai","Prevelent Fanpai/Yakuhai","Chanta","Rinshan Kaihou","Chan Kan","Haitei","Houtai","Chi Toitsu","San Shoku Dokou","San Ankou","San Kan Tsu","Toi-Toi Hou","Honitsu","Shou Sangen","Honroutou","Junchan","Ryan Peikou","Chinitsu","Renho","Kokushi Musou","Chuuren Pooto","Tenho","Chiho","Suu Ankou","Suu Kan Tsu", "Ryuu Iisou","Chinrouto","Tsuu Iisou","Dai Sangen","Shou Suushii","Dai Suushii"]
+englishYaku = ["Riichi","Quick Riichi","Double Riichi","Fully Concealed Hand","Pinfu","Pure Double Chow","All Simples","Mixed Triple Chow","Pure Straight","Dragon Point","Seat Point","Prevelent Point","Outside Hand","After a Kong","Under the Sea","Underer the Sea","Seven Pairs","Triple Pung","Three Concealed Pungs","Three Kongs","All Pungs","Half Flush","Little Three Dragons","All Terminals and Honors","Terminals in All Sets","Twice Pure Double Chows","Full Flush","Blessing of Man","Thirteen Orphans","Nine Gates","Blessing of Heaven","Blessing of Earth","Four Concealed Pungs","Four Kongs","All Green","All Terminals","All Honors","Big Three Dragons","Little Four Winds","Big Four Winds"]
+
 scoreMahjongHand = (hand, winningPlayer) ->
   #Takes a hand of mahajong tiles and finds the highest scoring way it can be interpreted, returning the score, and the melds which lead to that score
   possibleHands = getPossibleHands(hand)
@@ -98,8 +101,7 @@ getScore = (melds, winningPlayer) ->
 
   yakuModifiers = []  #I think it could be more useful to calc out all of the yaku names,
                       #and then generate a score from that.  Plus we could print them all for the player.
-                      #I'm going to start with just the romaji names.  TODO: Making an object for storing
-                      #English equivalents could be useful.
+                      #Romanji names used in the code, but output can use either romanji or english using translation lists up above.
 
   #These should probably all be wrapped up into their own functions.
   if isConcealedHand
@@ -127,16 +129,18 @@ getScore = (melds, winningPlayer) ->
   for meld in melds when meld.type == "Pung" || meld.type == "Kong"
     if _meldContainsOnlyGivenTile(meld, new Tile("dragon", "red")) ||
         _meldContainsOnlyGivenTile(meld, new Tile("dragon", "green")) ||
-        _meldContainsOnlyGivenTile(meld, new Tile("dragon", "white")) ||
-        _meldContainsOnlyGivenTile(meld, new Tile("wind", playerWind)) ||
-        (playerWind != roundWind && _meldContainsOnlyGivenTile(meld, new Tile("wind", roundWind)))
-      yakuModifiers.push("Fanpai/Yakuhai")
-      break
+        _meldContainsOnlyGivenTile(meld, new Tile("dragon", "white"))
+      yakuModifiers.push("Dragon Fanpai/Yahuhai")
+    if _meldContainsOnlyGivenTile(meld, new Tile("wind", playerWind))
+      yakuModifiers.push("Seat Fanpai/Yakuhai")
+    if _meldContainsOnlyGivenTile(meld, new Tile("wind", roundWind)))
+      yakuModifiers.push("Prevelent Fanpai/Yakuhai")
+
   #Chanta - All sets contain terminals or honours, the pair is terminals or honours, and the hand contains at least one chow.
   if (meld for meld in melds when meld.type == "Chow").length > 0 &&
       meldContainsOnlyTerminalsOrHonors(meld for meld in melds when meld.type == "Pair")
     if _.filter((meld for meld in melds when meld.type != "Pair"), _meldContainsAtLeastOneTerminalOrHonor).length == 4
-      yakuModifiers.push("Fanpai/Yakuhai")
+      yakuModifiers.push("Chanta")
 
 
 
