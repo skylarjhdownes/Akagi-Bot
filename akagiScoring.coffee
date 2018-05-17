@@ -133,7 +133,7 @@ getScore = (melds, winningPlayer) ->
       yakuModifiers.push("Dragon Fanpai/Yahuhai")
     if _meldContainsOnlyGivenTile(meld, new Tile("wind", playerWind))
       yakuModifiers.push("Seat Fanpai/Yakuhai")
-    if _meldContainsOnlyGivenTile(meld, new Tile("wind", roundWind)))
+    if _meldContainsOnlyGivenTile(meld, new Tile("wind", roundWind))
       yakuModifiers.push("Prevailing Fanpai/Yakuhai")
 
   #Chanta - All sets contain terminals or honours, the pair is terminals or honours, and the hand contains at least one chow.
