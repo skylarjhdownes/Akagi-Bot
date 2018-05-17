@@ -14,24 +14,25 @@ scoreMahjongHand = (hand, winningPlayer) ->
 getPossibleHands = (hand) ->
   #Takes a hand of mahjong tiles and finds every possible way the hand could be interpreted to be a winning hand, returning each different meld combination
   possibleHands = []
+  possiblePatterns = []
   allTerminalsAndHonors = gamePieces.allTerminalsAndHonorsGetter()
   handTiles = hand.contains
   if _.intersectionWith(handTiles, allTerminalsAndHonors,_.isEqual).length == 13 && _.xorWith(handTiles, allTerminalsAndHonors,_.isEqual).length == 0
     drawLocation = _.findIndex(handTiles,(x)->_.isEqual(hand.lastTileDrawn,x))
     if(drawLocation == 13 || !_.isEqual(handTiles[drawLocation],handTiles[drawLocation+1]))
-      possibleHands.push("thirteenorphans") #Normal 13 orphans
+      return(["thirteenorphans"]) #Normal 13 orphans
     else
-      possibleHands.push("thirteenorphans+") #13 way wait, 13 orphans
+      return(["thirteenorphans+"]) #13 way wait, 13 orphans
 
   if _.uniqWith(handTiles,_.isEqual).length == 7
     pairGroup = _.chunk(handTiles, 2)
     if _.every(pairGroup, (x) -> gamePieces.isMeld(x) == "Pair")
-      possibleHands.push(_.map(pairGroup,(x)-> return new gamePieces.Meld(x)))
+      possiblePatterns.push(_.map(pairGroup,(x)-> return new gamePieces.Meld(x)))
 
   #Any hands other than pairs/13 orphans
-  normalHandFinder = (melds, remaining) =>
+  _normalHandFinder = (melds, remaining) =>
     if(!remaining || remaining.length == 0)
-      possibleHands.push(melds)
+      possiblePatterns.push(melds)
       return "Yep"
     else if(remaining.length == 1)
       return "Nope"
@@ -58,7 +59,15 @@ getPossibleHands = (hand) ->
         pruned = pruned[1..]
         normalHandFinder(_.concat(melds,new gamePieces.Meld([remaining[0],nextInRun,afterThat])),pruned)
 
-
+  _drawnTilePlacer = () =>
+    for pattern in possiblePatterns
+      for meld, i in pattern
+        if(meld.containsTile(hand.lastTileDrawn))
+          chosenOne = _.deepCopy(meld)
+          chosenOne.lastTileDrawn = _.copy(hand.lastTileDrawn)
+          existingHand = _.deepCopy(pattern)
+          existingHand[i] = chosenOne
+          possibleHands.push(existingHand)
 
   # uncalled = handTiles
   # for x in hand.calledMelds
@@ -66,7 +75,8 @@ getPossibleHands = (hand) ->
   #     remove = uncalled.indexOf(y)
   #     uncalled.splice(remove,1)
 
-  normalHandFinder(hand.calledMelds,hand.uncalled())
+  _normalHandFinder(hand.calledMelds,hand.uncalled())
+  _drawnTilePlacer()
 
   return possibleHands
 
