@@ -112,14 +112,22 @@ getScore = (melds, winningPlayer) ->
     #if #Pinfu - Concealed all chows hand with a valuless pair
       #TODO
     #Iipeikou - Concealed hand with two completely identical chow.
+    #Ryan Peikou - Concealed hand with two sets of two identical chows
     chowList = (meld for meld in melds when meld.type == "Chow")
-    identicalChow = false
+    identicalChow = 0
     for chow1, index1 in chowList
       for chow2, index2 in chowList
-        if chow1 == chow2 && index1 != index2
-          identicalChow = true
-    if identicalChow
+        if _.isEqual(chow1,chow2) && index1 != index2
+          identicalChow += 1
+    if identicalChow == 2
       yakuModifiers.push("Iipeikou")
+    if identicalChow == 4
+      yakumodifiers.push("Ryan Peikou")
+
+    #Chii Toitsu - Concealed hand with 7 pairs
+    if melds.length == 7
+      yakuModifiers.push("Chii Toitsu")
+
   #Tanyao Chuu - All simples (no terminals/honors)
   if _.intersectionWith(melds, allTerminalsAndHonors, _.isEqual).length == 0
     yakuModifiers.push("Tanyao Chuu")
