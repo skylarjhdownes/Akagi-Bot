@@ -105,7 +105,7 @@ getScore = (melds, winningPlayer) ->
 
   #These should probably all be wrapped up into their own functions.
   if isConcealedHand
-    if (winningPlayer.hand.discardPile.riichi != 0) # winning player has called riichi
+    if (winningPlayer.hand.discardPile.riichi != -1) # winning player has called riichi
       yakuModifiers.push("Riichi")
     if selfDraw #Menzen Tsumo - Self draw on concaled hand
       yakuModifiers.push("Menzen Tsumo")
@@ -127,9 +127,7 @@ getScore = (melds, winningPlayer) ->
     # Can likely be drastically simplified since we know each pung/kong is 3/4 of a kind already
     # Will also need to be taken into account for higher value hands, 3 dragons etc.
   for meld in melds when meld.type == "Pung" || meld.type == "Kong"
-    if _meldContainsOnlyGivenTile(meld, new Tile("dragon", "red")) ||
-        _meldContainsOnlyGivenTile(meld, new Tile("dragon", "green")) ||
-        _meldContainsOnlyGivenTile(meld, new Tile("dragon", "white"))
+    if meld.suit() == "dragon"
       yakuModifiers.push("Dragon Fanpai/Yahuhai")
     if _meldContainsOnlyGivenTile(meld, new Tile("wind", playerWind))
       yakuModifiers.push("Seat Fanpai/Yakuhai")
