@@ -103,25 +103,26 @@ getScore = (melds, winningPlayer) ->
                       #and then generate a score from that.  Plus we could print them all for the player.
                       #Romanji names used in the code, but output can use either romanji or english using translation lists up above.
 
+  suitList = (meld.suit() for meld in melds)
   chowList = (meld for meld in melds when meld.type == "Chow")
   identicalChow = 0 #Used for Iipeikou and Ryan Peikou
   similarChow = {} #Used for San Shaku Doujin
   possibleStaight = {} #Used for Itsu
   for chow1, index1 in chowList
-    if(chow1.value in ["1 - 2 - 3","4 - 5 - 6","7 - 8 - 9"])
-      if chow1.suit of possibleStraight
-        possibleStraight[chow1.suit].push(chow1.value)
+    if(chow1.value() in ["1 - 2 - 3","4 - 5 - 6","7 - 8 - 9"])
+      if chow1.suit() of possibleStraight
+        possibleStraight[chow1.suit()].push(chow1.value())
       else
-        possibleStraight[chow1.suit] = [chow1.value]
+        possibleStraight[chow1.suit()] = [chow1.value()]
     for chow2, index2 in chowList
       if(index1 != index2)
         if _.isEqual(chow1,chow2)
           identicalChow += 1
-        else if(chow1.value == chow2.value)
-          if chow1.value of similarChow
-            similarChow[chow1.value].push(chow1.suit)
+        else if(chow1.value() == chow2.value())
+          if chow1.value() of similarChow
+            similarChow[chow1.value()].push(chow1.suit())
           else
-            similarChow[chow1.value] = [chow1.suit]
+            similarChow[chow1.value()] = [chow1.suit()]
 
   #These should probably all be wrapped up into their own functions.
   if isConcealedHand
@@ -185,7 +186,19 @@ getScore = (melds, winningPlayer) ->
       else
         yakuModifiers.push("Chanta")
 
+  #Honitsu - Half Flush - One suit plus honors
+  if(_.intersection(suitList,["dragon","wind"]).length > 0 && _.xor(suitList,["dragon","wind"]).length == 1)
+    if(isConcealed)
+      yakuModifiers.push("Concealed Honitsu")
+    else
+      yakuModifiers.push("Honitsu")
 
+  #Chinitsu - Full Flush - One Suit, no honors
+  if(_.uniq(suitList).length == 1 and suitList[0] not in ["dragon", "wind"])
+    if(isConcealed)
+      yakuModifiers.push("Concealed Chinitsu")
+    else
+      yakuModifiers.push("Chinitsu")
 
   if(melds == "thirteenorphans")
     yakuman = "thirteenorphans"
