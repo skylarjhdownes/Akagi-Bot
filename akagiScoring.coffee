@@ -1,8 +1,8 @@
 _ = require('lodash')
 gamePieces = require('./akagiTiles.coffee')
 
-japaneseYaku = ["Riichi","Ippatsu","Daburu Riichi","Menzen Tsumo","Pinfu","Iipeikou","Tanyao Chuu","San Shoku Doujun","Itsu","Dragon Fanpai/Yakuhai","Seat Fanpai/Yakuhai","Prevailing Fanpai/Yakuhai","Chanta","Rinshan Kaihou","Chan Kan","Haitei","Houtai","Chi Toitsu","San Shoku Dokou","San Ankou","San Kan Tsu","Toi-Toi Hou","Honitsu","Shou Sangen","Honroutou","Junchan","Ryan Peikou","Chinitsu","Renho","Kokushi Musou","Chuuren Pooto","Tenho","Chiho","Suu Ankou","Suu Kan Tsu", "Ryuu Iisou","Chinrouto","Tsuu Iisou","Dai Sangen","Shou Suushii","Dai Suushii"]
-englishYaku = ["Riichi","Quick Riichi","Double Riichi","Fully Concealed Hand","Pinfu","Pure Double Chow","All Simples","Mixed Triple Chow","Pure Straight","Dragon Point","Seat Point","Prevailing Point","Outside Hand","After a Kong","Under the Sea","Underer the Sea","Seven Pairs","Triple Pung","Three Concealed Pungs","Three Kongs","All Pungs","Half Flush","Little Three Dragons","All Terminals and Honors","Terminals in All Sets","Twice Pure Double Chows","Full Flush","Blessing of Man","Thirteen Orphans","Nine Gates","Blessing of Heaven","Blessing of Earth","Four Concealed Pungs","Four Kongs","All Green","All Terminals","All Honors","Big Three Dragons","Little Four Winds","Big Four Winds"]
+japaneseYaku = ["Riichi","Ippatsu","Daburu Riichi","Menzen Tsumo","Pinfu","Iipeikou","Tanyao Chuu","San Shoku Doujun","Concealed San Shoku Doujin","Itsu","Concealed Itsu","Dragon Fanpai/Yakuhai","Seat Fanpai/Yakuhai","Prevailing Fanpai/Yakuhai","Chanta","Concealed Chanta","Rinshan Kaihou","Chan Kan","Haitei","Houtai","Chi Toitsu","San Shoku Dokou","San Ankou","San Kan Tsu","Toi-Toi Hou","Honitsu","Concealed Honitsu","Shou Sangen","Honroutou","Junchan","Concealed Junchan","Ryan Peikou","Chinitsu","Concealed Chinitsu","Renho","Kokushi Musou","Chuuren Pooto","Tenho","Chiho","Suu Ankou","Suu Kan Tsu", "Ryuu Iisou","Chinrouto","Tsuu Iisou","Dai Sangen","Shou Suushii","Dai Suushii"]
+englishYaku = ["Riichi","Quick Riichi","Double Riichi","Fully Concealed Hand","Pinfu","Pure Double Chow","All Simples","Mixed Triple Chow","Concealed Mixed Triple Chow","Pure Straight","Concealed Pure Straight","Dragon Point","Seat Point","Prevailing Point","Outside Hand","Concealed Outside Hand","After a Kong","Under the Sea","Underer the Sea","Seven Pairs","Triple Pung","Three Concealed Pungs","Three Kongs","All Pungs","Half Flush","Concealed Half Flush","Little Three Dragons","All Terminals and Honors","Terminals in All Sets","Concealed Terminals in All Sets","Twice Pure Double Chows","Full Flush","Concealed Full Flush","Blessing of Man","Thirteen Orphans","Nine Gates","Blessing of Heaven","Blessing of Earth","Four Concealed Pungs","Four Kongs","All Green","All Terminals","All Honors","Big Three Dragons","Little Four Winds","Big Four Winds"]
 
 scoreMahjongHand = (hand, winningPlayer) ->
   #Takes a hand of mahajong tiles and finds the highest scoring way it can be interpreted, returning the score, and the melds which lead to that score
@@ -103,24 +103,35 @@ getScore = (melds, winningPlayer) ->
                       #and then generate a score from that.  Plus we could print them all for the player.
                       #Romanji names used in the code, but output can use either romanji or english using translation lists up above.
 
+  chowList = (meld for meld in melds when meld.type == "Chow")
+  identicalChow = 0
+  similarChow = {}
+  for chow1, index1 in chowList
+    for chow2, index2 in chowList
+      if(index1 != index2)
+        if _.isEqual(chow1,chow2)
+          identicalChow += 1
+        else if(chow1.value == chow2.value)
+          if chow1.value of similarChow
+            similarChow[chow1.value].push(chow1.suit)
+          else
+            similarChow[chow1.value] = [chow1.suit]
+
   #These should probably all be wrapped up into their own functions.
   if isConcealedHand
     if (winningPlayer.hand.discardPile.riichi != -1) # winning player has called riichi
       yakuModifiers.push("Riichi")
     if selfDraw #Menzen Tsumo - Self draw on concaled hand
       yakuModifiers.push("Menzen Tsumo")
+
     #if #Pinfu - Concealed all chows hand with a valuless pair
       #TODO
+
     #Iipeikou - Concealed hand with two completely identical chow.
-    #Ryan Peikou - Concealed hand with two sets of two identical chows
-    chowList = (meld for meld in melds when meld.type == "Chow")
-    identicalChow = 0
-    for chow1, index1 in chowList
-      for chow2, index2 in chowList
-        if _.isEqual(chow1,chow2) && index1 != index2
-          identicalChow += 1
     if identicalChow == 2
       yakuModifiers.push("Iipeikou")
+
+    #Ryan Peikou - Concealed hand with two sets of two identical chows
     if identicalChow == 4
       yakumodifiers.push("Ryan Peikou")
 
@@ -131,6 +142,15 @@ getScore = (melds, winningPlayer) ->
   #Tanyao Chuu - All simples (no terminals/honors)
   if _.intersectionWith(melds, allTerminalsAndHonors, _.isEqual).length == 0
     yakuModifiers.push("Tanyao Chuu")
+
+  #San Shoku Doujin - Mixed Triple Chow
+  for value,suit of similarChow
+    if(_.uniq(suit).length == 3)
+      if(isConcealed)
+        yakuModifiers.push("Concealed San Shoku Doujin")
+      else
+        yakuModifiers.push("San Shoku Doujin")
+
   #Fanpai/Yakuhai - Pung/kong of dragons, round wind, or player wind.
     # Can likely be drastically simplified since we know each pung/kong is 3/4 of a kind already
     # Will also need to be taken into account for higher value hands, 3 dragons etc.
@@ -146,7 +166,10 @@ getScore = (melds, winningPlayer) ->
   if (meld for meld in melds when meld.type == "Chow").length > 0 &&
       meldContainsOnlyTerminalsOrHonors(meld for meld in melds when meld.type == "Pair")
     if _.filter((meld for meld in melds when meld.type != "Pair"), _meldContainsAtLeastOneTerminalOrHonor).length == 4
-      yakuModifiers.push("Chanta")
+      if(isConcealedHand)
+        yakuModifiers.push("Concealed Chanta")
+      else
+        yakuModifiers.push("Chanta")
 
 
 
