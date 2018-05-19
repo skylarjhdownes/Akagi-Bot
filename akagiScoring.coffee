@@ -104,9 +104,15 @@ getScore = (melds, winningPlayer) ->
                       #Romanji names used in the code, but output can use either romanji or english using translation lists up above.
 
   chowList = (meld for meld in melds when meld.type == "Chow")
-  identicalChow = 0
-  similarChow = {}
+  identicalChow = 0 #Used for Iipeikou and Ryan Peikou
+  similarChow = {} #Used for San Shaku Doujin
+  possibleStaight = {} #Used for Itsu
   for chow1, index1 in chowList
+    if(chow1.value in ["1 - 2 - 3","4 - 5 - 6","7 - 8 - 9"])
+      if chow1.suit of possibleStraight
+        possibleStraight[chow1.suit].push(chow1.value)
+      else
+        possibleStraight[chow1.suit] = [chow1.value]
     for chow2, index2 in chowList
       if(index1 != index2)
         if _.isEqual(chow1,chow2)
@@ -150,6 +156,14 @@ getScore = (melds, winningPlayer) ->
         yakuModifiers.push("Concealed San Shoku Doujin")
       else
         yakuModifiers.push("San Shoku Doujin")
+
+  #Itsu - Pure Straight
+  for suit,value of possibleStaight
+    if(_.uniq(value).length == 3)
+      if(isConcealed)
+        yakuModifiers.push("Concealed Itsu")
+      else
+        yakuModifiers.push("Itsu")
 
   #Fanpai/Yakuhai - Pung/kong of dragons, round wind, or player wind.
     # Can likely be drastically simplified since we know each pung/kong is 3/4 of a kind already
