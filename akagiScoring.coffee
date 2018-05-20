@@ -221,6 +221,13 @@ getScore = (melds, winningPlayer) ->
   if(_.intersection(suitList,["dragon","wind"]).length > 0 && _.xor(suitList,["dragon","wind"]).length > 0)
     if (meld for meld in melds when (meld.suit() in ["dragon","wind"] || meld.value() in [1,9])).length == melds.length
       yakuModifiers.push("Honroutou")
+
+  #Junchan - Terminals in All Sets, but at least one Chow
+  if(chowList.length > 0 && _.every(meld, _meldContainsAtLeastOneTerminalOrHonor))
+    if(isConcealed)
+      yakuModifiers.push("Concealed Junchan")
+    else
+      yakuModifiers.push("Junchan")
       
   #Honitsu - Half Flush - One suit plus honors
   if(_.intersection(suitList,["dragon","wind"]).length > 0 && _.xor(suitList,["dragon","wind"]).length == 1)
