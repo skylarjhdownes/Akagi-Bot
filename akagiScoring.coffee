@@ -212,6 +212,16 @@ getScore = (melds, winningPlayer) ->
       else
         yakuModifiers.push("Chanta")
 
+  #Shou Sangen - Little Three Dragons, two pungs/kongs and a pair of Dragons
+  if((pung for pung in pungList when pung.suit()=="dragon").length == 2)
+    if((suit for suit in suitList when suit == "dragon").length == 3)
+      yakuModifiers.push("Shou Sangen")
+
+  #Honroutou - All Terminals and Honors
+  if(_.intersection(suitList,["dragon","wind"]).length > 0 && _.xor(suitList,["dragon","wind"]).length > 0)
+    if (meld for meld in melds when (meld.suit() in ["dragon","wind"] || meld.value() in [1,9])).length == melds.length
+      yakuModifiers.push("Honroutou")
+      
   #Honitsu - Half Flush - One suit plus honors
   if(_.intersection(suitList,["dragon","wind"]).length > 0 && _.xor(suitList,["dragon","wind"]).length == 1)
     if(isConcealed)
