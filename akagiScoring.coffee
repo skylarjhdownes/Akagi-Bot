@@ -107,6 +107,7 @@ getScore = (melds, winningPlayer) ->
   chowList = (meld for meld in melds when meld.type == "Chow")
   pungList = (meld for meld in melds when meld.type in ["Pung","Kong"])
   kongList = (meld for meld in melds when meld.type == "Kong")
+  concealedPungs = 0 #Used for San Ankou
   identicalChow = 0 #Used for Iipeikou and Ryan Peikou
   similarChow = {} #Used for San Shoku Doujin
   similarPung = {} #Used for San Shoku Dokou
@@ -133,6 +134,8 @@ getScore = (melds, winningPlayer) ->
         similarPung[pung.value()].push(pung.suit())
       else
         similarPung[pung.value()] = [pung.suit()]
+    if(pung.takenFrom == "self")
+      concealedPungs += 1
 
   #These should probably all be wrapped up into their own functions.
   if isConcealedHand
@@ -176,6 +179,10 @@ getScore = (melds, winningPlayer) ->
   #San Kan Tsu - Three Kongs
   if(kongList.length == 3)
     yakuModifiers.push("San Kan Tsu")
+
+  #San Ankou
+  if(concealedPungs == 3)
+    yakuModifiers.push("San Ankou")
 
   #Itsu - Pure Straight
   for suit,value of possibleStaight
