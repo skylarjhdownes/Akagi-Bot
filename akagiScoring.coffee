@@ -180,7 +180,7 @@ getScore = (melds, winningPlayer) ->
   if(kongList.length == 3)
     yakuModifiers.push("San Kan Tsu")
 
-  #San Ankou
+  #San Ankou - 3 Concealed Pungs
   if(concealedPungs == 3)
     yakuModifiers.push("San Ankou")
 
@@ -228,7 +228,7 @@ getScore = (melds, winningPlayer) ->
       yakuModifiers.push("Concealed Junchan")
     else
       yakuModifiers.push("Junchan")
-      
+
   #Honitsu - Half Flush - One suit plus honors
   if(_.intersection(suitList,["dragon","wind"]).length > 0 && _.xor(suitList,["dragon","wind"]).length == 1)
     if(isConcealed)
@@ -243,14 +243,50 @@ getScore = (melds, winningPlayer) ->
     else
       yakuModifiers.push("Chinitsu")
 
+
+  #Yakuman
+
+  #Kokushi Musou - 13 Orphans
   if(melds == "thirteenorphans")
-    yakuman = "thirteenorphans"
-  #Check for yakuman
-  #if(yakuman)
-    #Return yakuman score and name of isYakuman
-  #Check for yaku
-  #if(yaku == 0)
-    #Return 0 and "Not a winning hand, no Yaku"
+    yakuModifiers.push("Kokushi Musou")
+
+  #Chuuren Pooto - Nine Gates
+
+  #Suu Ankou - Four Concealed Pungs
+  if(concealedPungs == 4)
+    yakuModifiers.push("Suu Ankou")
+
+  #Suu Kan Tsu - Four Kongs
+  if(kongList.length == 4)
+    yakuModifiers.push("Suu Kan Tsu")
+
+  #Ryuu Iisou - All Green
+  if(_.every(meld,_meldIsGreen))
+    yakuModifiers.push("Ryuu Iisou")
+
+  #Chinrouto - All Terminals
+  if(_.every(meld,(x) -> meld.value() in [1,9]))
+    yakuModifiers.push("Chinrouto")
+
+  #Tsuu Iisou - All Honors
+  if(_.every(meld,(x) -> meld.suit() in ["dragon", "wind"]))
+    yakuModifiers.push("Tsuu Iisou")
+
+  #Dai Sangan - Big Three Dragons
+  if((pung for pung in pungList when pung.suit()=="dragon").length == 3)
+    yakuModifiers.push("Dai Sangan")
+
+  #Shou Suushii - Little Four Winds
+  if((suit for suit in suitList when suit == "wind").length == 4)
+    if((pung for pung in pungList when pung.suit() == "wind").length == 3)
+      yakuModifiers.push("Shou Suushii")
+
+  #Dai Suushii - Big Four Winds
+  if((pung for pung in pungList when pung.suit() == "wind").length == 4)
+    yakuModifiers.push("Dai Suushii")
+
+    
+  #Score the yakuModifier list
   #Check for dora
   fan = yaku+dora
   if fan >= 5
@@ -266,6 +302,12 @@ _meldContainsAtLeastOneTerminalOrHonor = (meld) ->
     if tile.isHonor() || tile.isTerminal()
       return true
   return false
+
+_meldIsGreen = (meld) ->
+  for tile in meld.tiles
+    if !tile.isGreen()
+      return false
+  return true
 
 _meldContainsOnlyGivenTile = (meld, givenTile) ->
   allSameTile = true
