@@ -4,12 +4,12 @@ gamePieces = require('./akagiTiles.coffee')
 japaneseYaku = ["Riichi","Ippatsu","Daburu Riichi","Menzen Tsumo","Pinfu","Iipeikou","Tanyao Chuu","San Shoku Doujun","Concealed San Shoku Doujin","Itsu","Concealed Itsu","Dragon Fanpai/Yakuhai","Seat Fanpai/Yakuhai","Prevailing Fanpai/Yakuhai","Chanta","Concealed Chanta","Rinshan Kaihou","Chan Kan","Haitei","Houtai","Chi Toitsu","San Shoku Dokou","San Ankou","San Kan Tsu","Toi-Toi Hou","Honitsu","Concealed Honitsu","Shou Sangen","Honroutou","Junchan","Concealed Junchan","Ryan Peikou","Chinitsu","Concealed Chinitsu","Renho","Kokushi Musou","Chuuren Pooto","Tenho","Chiho","Suu Ankou","Suu Kan Tsu", "Ryuu Iisou","Chinrouto","Tsuu Iisou","Dai Sangen","Shou Suushii","Dai Suushii"]
 englishYaku = ["Riichi","Quick Riichi","Double Riichi","Fully Concealed Hand","Pinfu","Pure Double Chow","All Simples","Mixed Triple Chow","Concealed Mixed Triple Chow","Pure Straight","Concealed Pure Straight","Dragon Point","Seat Point","Prevailing Point","Outside Hand","Concealed Outside Hand","After a Kong","Under the Sea","Underer the Sea","Seven Pairs","Triple Pung","Three Concealed Pungs","Three Kongs","All Pungs","Half Flush","Concealed Half Flush","Little Three Dragons","All Terminals and Honors","Terminals in All Sets","Concealed Terminals in All Sets","Twice Pure Double Chows","Full Flush","Concealed Full Flush","Blessing of Man","Thirteen Orphans","Nine Gates","Blessing of Heaven","Blessing of Earth","Four Concealed Pungs","Four Kongs","All Green","All Terminals","All Honors","Big Three Dragons","Little Four Winds","Big Four Winds"]
 
-scoreMahjongHand = (hand, winningPlayer) ->
+scoreMahjongHand = (hand, winningPlayer, gameDataFlags) ->
   #Takes a hand of mahajong tiles and finds the highest scoring way it can be interpreted, returning the score, and the melds which lead to that score
   possibleHands = getPossibleHands(hand)
   if possibleHands == []
     return([0, "Not a Scoring Hand"])
-  scores = getScore(hand, winningPlayer) for hand in possibleHands
+  scores = getScore(hand, winningPlayer, gameDataFlags) for hand in possibleHands
   maxScore = _.maxBy(scores, (x) -> x[0])
   maxLocation = _.indexOf(scores,maxScore)
   return([maxScore,possibleHands[maxLocation]])
@@ -85,22 +85,16 @@ getPossibleHands = (hand) ->
   return possibleHands
 
 
-getScore = (melds, winningPlayer) ->
+getScore = (melds, winningPlayer, gameDataFlags) ->
   #Takes a set of melds and returns the score of that particular combination of getMelds and the yaku that made up that score
-
-  #Going to have to get this info in somehow.
-  roundWind = ""
-  playerWind = ""
-  selfDraw = false
-
-  isConcealedHand = melds.isConcealed()
-  allTerminalsAndHonors = gamePieces.allTerminalsAndHonorsGetter()
+  #gameDataFlags should contain roundWind, playerWind, selfDraw, ...?
 
   yakuman = false
   yaku = 0
   dora = 0
-  fu = _calculateFu(melds, isConcealedHand, selfDraw, playerWind, roundWind)
-
+  fu = _calculateFu(melds, gameDataFlags)
+  isConcealedHand = melds.isConcealed()
+  allTerminalsAndHonors = gamePieces.allTerminalsAndHonorsGetter()
 
   yakuModifiers = []  #I think it could be more useful to calc out all of the yaku names,
                       #and then generate a score from that.  Plus we could print them all for the player.
@@ -144,7 +138,7 @@ getScore = (melds, winningPlayer) ->
   if isConcealedHand
     if (winningPlayer.hand.discardPile.riichi != -1) # winning player has called riichi
       yakuModifiers.push("Riichi")
-    if selfDraw #Menzen Tsumo - Self draw on concaled hand
+    if gameDataFlags.selfDraw #Menzen Tsumo - Self draw on concaled hand
       yakuModifiers.push("Menzen Tsumo")
 
     #Pinfu - Concealed all chows hand with a valuless pair
@@ -202,9 +196,9 @@ getScore = (melds, winningPlayer) ->
   for meld in melds when meld.type == "Pung" || meld.type == "Kong"
     if meld.suit() == "dragon"
       yakuModifiers.push("Dragon Fanpai/Yahuhai")
-    if _meldContainsOnlyGivenTile(meld, new Tile("wind", playerWind))
+    if _meldContainsOnlyGivenTile(meld, new Tile("wind", gameDataFlags.playerWind))
       yakuModifiers.push("Seat Fanpai/Yakuhai")
-    if _meldContainsOnlyGivenTile(meld, new Tile("wind", roundWind))
+    if _meldContainsOnlyGivenTile(meld, new Tile("wind", gameDataFlags.roundWind))
       yakuModifiers.push("Prevailing Fanpai/Yakuhai")
 
   #Chanta - All sets contain terminals or honours, the pair is terminals or honours, and the hand contains at least one chow.
@@ -307,11 +301,13 @@ getScore = (melds, winningPlayer) ->
   baseScore = math.pow(fu,2+fan)
   #Return scored points and yaku + dora + fu in hand
 
-  _calculateFu = (melds, isConcealedHand, selfDraw, playerWind, roundWind) ->
+  _calculateFu = (melds, gameDataFlags) ->
+    isConcealedHand = melds.isConcealed()
+
     baseFu = 0
     if(melds.length == 7)
       baseFu = 25
-    else if(isConcealedHand && !selfDraw)
+    else if(isConcealedHand && !gameDataFlags.selfDraw)
       baseFu = 30
     else
       baseFu = 20
@@ -345,9 +341,9 @@ getScore = (melds, winningPlayer) ->
           if(meld.suit() == "dragon")
             meldFu += 2
           else if(meld.suit() == "wind")
-            if(meld.value() == playerWind)
+            if(meld.value() == gameDataFlags.playerWind)
               meldFu += 2
-            if(meld.value() == roundWind)
+            if(meld.value() == gameDataFlags.roundWind)
               meldFu += 2
           if(meld.lastDrawnTile)
             meldFu += 2
@@ -359,7 +355,7 @@ getScore = (melds, winningPlayer) ->
               meldFu += 2
             if(meld.value() == "7 - 8 - 9" && meld.lastDrawnTile.value == 7)
               meldFu += 2
-      if(!(meldFu == 0 && isConcealedHand) && selfDraw)
+      if(!(meldFu == 0 && isConcealedHand) && gameDataFlags.selfDraw)
         meldFu += 2
       if(meldFu == 0 && !isConcealedHand)
         meldFu += 2
