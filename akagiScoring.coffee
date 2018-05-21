@@ -87,10 +87,6 @@ getPossibleHands = (hand) ->
 
 getScore = (melds, winningPlayer) ->
   #Takes a set of melds and returns the score of that particular combination of getMelds and the yaku that made up that score
-  yakuman = false
-  yaku = 0
-  dora = 0
-  fu = 0
 
   #Going to have to get this info in somehow.
   roundWind = ""
@@ -100,67 +96,11 @@ getScore = (melds, winningPlayer) ->
   isConcealedHand = melds.isConcealed()
   allTerminalsAndHonors = gamePieces.allTerminalsAndHonorsGetter()
 
+  yakuman = false
+  yaku = 0
+  dora = 0
+  fu = _calculateFu(melds, isConcealedHand, selfDraw, playerWind, roundWind)
 
-  #Fu calculations
-  baseFu = 0
-  if(melds.length == 7)
-    baseFu = 25
-  else if(isConcealedHand && !selfDraw)
-    baseFu = 30
-  else
-    baseFu = 20
-
-  meldFu = 0
-  if(melds.length != 7)
-    for meld in melds
-      if(meld.type == "Pung")
-        if(meld.suit() in ["dragon","wind"] || meld.value() in [1,9])
-          if(meld.takenFrom == "self")
-            meldFu += 8
-          else
-            meldFu += 4
-        else
-          if(meld.takenFrom == "self")
-            meldFu += 4
-          else
-            meldFu += 2
-      if(meld.type == "Kong")
-        if(meld.suit() in ["dragon","wind"] || meld.value() in [1,9])
-          if(meld.takenFrom == "self")
-            meldFu += 32
-          else
-            meldFu += 16
-        else
-          if(meld.takenFrom == "self")
-            meldFu += 16
-          else
-            meldFu += 8
-      if(meld.type == "Pair")
-        if(meld.suit() == "dragon")
-          meldFu += 2
-        else if(meld.suit() == "wind")
-          if(meld.value() == playerWind)
-            meldFu += 2
-          if(meld.value() == roundWind)
-            meldFu += 2
-        if(meld.lastDrawnTile)
-          meldFu += 2
-      if(meld.type == "Chow")
-        if(meld.lastDrawnTile)
-          if(meld.lastDrawnTile.value == (meld.tiles[0].value+meld.tiles[1].value+meld.tiles[2].value)/3)
-            meldFu += 2
-          if(meld.value() == "1 - 2 - 3" && meld.lastDrawnTile.value == 3)
-            meldFu += 2
-          if(meld.value() == "7 - 8 - 9" && meld.lastDrawnTile.value == 7)
-            meldFu += 2
-    if(!(meldFu == 0 && isConcealedHand) && selfDraw)
-      meldFu += 2
-    if(meldFu == 0 && !isConcealedHand)
-      meldFu += 2
-
-  fu = baseFu + meldFu
-  if(fu != 25)
-    fu = _roundUpToClosestHundred(fu)
 
   yakuModifiers = []  #I think it could be more useful to calc out all of the yaku names,
                       #and then generate a score from that.  Plus we could print them all for the player.
@@ -366,6 +306,69 @@ getScore = (melds, winningPlayer) ->
 
   baseScore = math.pow(fu,2+fan)
   #Return scored points and yaku + dora + fu in hand
+
+_calculateFu = (melds, isConcealedHand, selfDraw, playerWind, roundWind) ->
+  baseFu = 0
+  if(melds.length == 7)
+    baseFu = 25
+  else if(isConcealedHand && !selfDraw)
+    baseFu = 30
+  else
+    baseFu = 20
+
+  meldFu = 0
+  if(melds.length != 7)
+    for meld in melds
+      if(meld.type == "Pung")
+        if(meld.suit() in ["dragon","wind"] || meld.value() in [1,9])
+          if(meld.takenFrom == "self")
+            meldFu += 8
+          else
+            meldFu += 4
+        else
+          if(meld.takenFrom == "self")
+            meldFu += 4
+          else
+            meldFu += 2
+      if(meld.type == "Kong")
+        if(meld.suit() in ["dragon","wind"] || meld.value() in [1,9])
+          if(meld.takenFrom == "self")
+            meldFu += 32
+          else
+            meldFu += 16
+        else
+          if(meld.takenFrom == "self")
+            meldFu += 16
+          else
+            meldFu += 8
+      if(meld.type == "Pair")
+        if(meld.suit() == "dragon")
+          meldFu += 2
+        else if(meld.suit() == "wind")
+          if(meld.value() == playerWind)
+            meldFu += 2
+          if(meld.value() == roundWind)
+            meldFu += 2
+        if(meld.lastDrawnTile)
+          meldFu += 2
+      if(meld.type == "Chow")
+        if(meld.lastDrawnTile)
+          if(meld.lastDrawnTile.value == (meld.tiles[0].value+meld.tiles[1].value+meld.tiles[2].value)/3)
+            meldFu += 2
+          if(meld.value() == "1 - 2 - 3" && meld.lastDrawnTile.value == 3)
+            meldFu += 2
+          if(meld.value() == "7 - 8 - 9" && meld.lastDrawnTile.value == 7)
+            meldFu += 2
+    if(!(meldFu == 0 && isConcealedHand) && selfDraw)
+      meldFu += 2
+    if(meldFu == 0 && !isConcealedHand)
+      meldFu += 2
+
+  fu = baseFu + meldFu
+  if(fu != 25)
+    fu = _roundUpToClosestHundred(fu)
+  return fu
+
 
 _meldContainsAtLeastOneTerminalOrHonor = (meld) ->
   for tile in meld.tiles
