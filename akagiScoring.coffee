@@ -315,7 +315,13 @@ getScore = (melds, winningPlayer) ->
     yakuModifiers.push("Kokushi Musou")
 
   #Chuuren Pooto - Nine Gates
-
+  if("Concealed Chinitsu" in yakuModifiers)
+    if(kongList.length == 0)
+      valuePattern = _.flattenDeep((meld.tiles for meld in melds))
+      valuePattern = _.map(valuePattern, (x) -> x.value)
+      stringPattern = _.join(valuePattern, "")
+      if stringPattern in ["11112345678999","11122345678999","11123345678999","11123445678999","11123455678999","11123456678999","11123456778999","11123456788999","11123456789999"]
+        yakuModifiers.push("Chuuren Pooto")
   #Suu Ankou - Four Concealed Pungs
   if(concealedPungs == 4)
     yakuModifiers.push("Suu Ankou")
