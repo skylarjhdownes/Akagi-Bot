@@ -9,7 +9,7 @@ scoreMahjongHand = (hand, winningPlayer, gameDataFlags) ->
   possibleHands = getPossibleHands(hand)
   if possibleHands == []
     return([0, "Not a Scoring Hand"])
-  scores = getScore(hand, winningPlayer, gameDataFlags) for hand in possibleHands
+  scores = getScore(hand, gameDataFlags) for hand in possibleHands
   maxScore = _.maxBy(scores, (x) -> x[0])
   maxLocation = _.indexOf(scores,maxScore)
   return([maxScore,possibleHands[maxLocation]])
@@ -85,14 +85,16 @@ getPossibleHands = (hand) ->
   return possibleHands
 
 
-getScore = (melds, winningPlayer, gameDataFlags) ->
+getScore = (melds, gameDataFlags) ->
   #Takes a set of melds and returns the score of that particular combination of getMelds and the yaku that made up that score
   #gameDataFlags should contain roundWind, playerWind, selfDraw, ...?
 
   yakuman = false
   yaku = 0
   dora = 0
-  fu = _calculateFu(melds, gameDataFlags)
+  fuArray = _calculateFu(melds, gameDataFlags)
+  fu = fuArray[0]
+  meldFu = fuArray[1]
   isConcealedHand = melds.isConcealed()
   allTerminalsAndHonors = gamePieces.allTerminalsAndHonorsGetter()
 
@@ -136,7 +138,7 @@ getScore = (melds, winningPlayer, gameDataFlags) ->
 
   #These should probably all be wrapped up into their own functions.
   if isConcealedHand
-    if (winningPlayer.hand.discardPile.riichi != -1) # winning player has called riichi
+    if (gameDataFlags.riichi) # winning player has called riichi
       yakuModifiers.push("Riichi")
     if gameDataFlags.selfDraw #Menzen Tsumo - Self draw on concaled hand
       yakuModifiers.push("Menzen Tsumo")
@@ -363,7 +365,7 @@ getScore = (melds, winningPlayer, gameDataFlags) ->
     fu = baseFu + meldFu
     if(fu != 25)
       fu = _roundUpToClosestHundred(fu)
-    return fu
+    return [fu, meldFu]
 
 
 _meldContainsAtLeastOneTerminalOrHonor = (meld) ->
