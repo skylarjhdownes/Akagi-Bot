@@ -100,6 +100,68 @@ getScore = (melds, winningPlayer) ->
   isConcealedHand = melds.isConcealed()
   allTerminalsAndHonors = gamePieces.allTerminalsAndHonorsGetter()
 
+
+  #Fu calculations
+  baseFu = 0
+  if(melds.length == 7)
+    baseFu = 25
+  else if(isConcealedHand && !selfDraw)
+    baseFu = 30
+  else
+    baseFu = 20
+
+  meldFu = 0
+  if(melds.length != 7)
+    for meld in melds
+      if(meld.type == "Pung")
+        if(meld.suit() in ["dragon","wind"] || meld.value() in [1,9])
+          if(meld.takenFrom == "self")
+            meldFu += 8
+          else
+            meldFu += 4
+        else
+          if(meld.takenFrom == "self")
+            meldFu += 4
+          else
+            meldFu += 2
+      if(meld.type == "Kong")
+        if(meld.suit() in ["dragon","wind"] || meld.value() in [1,9])
+          if(meld.takenFrom == "self")
+            meldFu += 32
+          else
+            meldFu += 16
+        else
+          if(meld.takenFrom == "self")
+            meldFu += 16
+          else
+            meldFu += 8
+      if(meld.type == "Pair")
+        if(meld.suit() == "dragon")
+          meldFu += 2
+        else if(meld.suit() == "wind")
+          if(meld.value() == playerWind)
+            meldFu += 2
+          if(meld.value() == roundWind)
+            meldFu += 2
+        if(meld.lastDrawnTile)
+          meldFu += 2
+      if(meld.type == "Chow")
+        if(meld.lastDrawnTile)
+          if(meld.lastDrawnTile.value == (meld.tiles[0].value+meld.tiles[1].value+meld.tiles[2].value)/3)
+            meldFu += 2
+          if(meld.value() == "1 - 2 - 3" && meld.lastDrawnTile.value == 3)
+            meldFu += 2
+          if(meld.value() == "7 - 8 - 9" && meld.lastDrawnTile.value == 7)
+            meldFu += 2
+    if(!(meldFu == 0 && isConcealedHand) && selfDraw)
+      meldFu += 2
+    if(meldFu == 0 && !isConcealedHand)
+      meldFu += 2
+
+  fu = baseFu + meldFu
+  if(fu != 25)
+    fu = _roundUpToClosestHundred(fu)
+
   yakuModifiers = []  #I think it could be more useful to calc out all of the yaku names,
                       #and then generate a score from that.  Plus we could print them all for the player.
                       #Romanji names used in the code, but output can use either romanji or english using translation lists up above.
@@ -145,8 +207,9 @@ getScore = (melds, winningPlayer) ->
     if selfDraw #Menzen Tsumo - Self draw on concaled hand
       yakuModifiers.push("Menzen Tsumo")
 
-    #if #Pinfu - Concealed all chows hand with a valuless pair
-      #TODO
+    #Pinfu - Concealed all chows hand with a valuless pair
+    if(fu != 25 && meldFu == 0)
+      yakuModifiers.push("Pinfu")
 
     #Iipeikou - Concealed hand with two completely identical chow.
     if identicalChow == 2
@@ -161,7 +224,7 @@ getScore = (melds, winningPlayer) ->
       yakuModifiers.push("Chii Toitsu")
 
   #Tanyao Chuu - All simples (no terminals/honors)
-  if _.intersectionWith(melds, allTerminalsAndHonors, _.isEqual).length == 0
+  if (_.every(meld, (x) -> !_meldContainsAtLeastOneTerminalOrHonor(x)))
     yakuModifiers.push("Tanyao Chuu")
 
   #San Shoku Doujin - Mixed Triple Chow
