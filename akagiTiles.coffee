@@ -146,6 +146,7 @@ class Hand
     @contains = []
     @calledMelds = []
     @lastTileDrawn = false
+    @lastTileFrom = "self"
 
   #Draws x tiles from anything with a drawFrom() function, then sorts the hand and returns the drawn tiles
   draw: (drawSource, x=1) ->

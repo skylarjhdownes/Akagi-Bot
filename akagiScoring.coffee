@@ -68,6 +68,7 @@ getPossibleHands = (hand) ->
         if(meld.containsTile(hand.lastTileDrawn))
           chosenOne = _.deepCopy(meld)
           chosenOne.lastTileDrawn = _.copy(hand.lastTileDrawn)
+          chosenOne.takenFrom = hand.lastTileFrom
           existingHand = _.deepCopy(pattern)
           existingHand[i] = chosenOne
           possibleHands.push(existingHand)
@@ -285,7 +286,7 @@ getScore = (melds, winningPlayer) ->
   if((pung for pung in pungList when pung.suit() == "wind").length == 4)
     yakuModifiers.push("Dai Suushii")
 
-    
+
   #Score the yakuModifier list
   #Check for dora
   fan = yaku+dora
