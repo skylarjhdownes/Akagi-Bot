@@ -109,11 +109,14 @@ bot.on('message', (message) =>
         x.send(commandArgs[1..])
 
     if(commandArgs[0] == "ragnarok")
-      message.channel.send("Let's Ragnarok!!!!!")
-      for x in exports.parlors
-        x.delete()
-      exports.parlors = []
-      exports.mahjongGames = []
+      if message.channel.type == "text"
+        message.channel.send("Let's Ragnarok!!!!!")
+        for x in exports.parlors when x.guild.id == message.guild.id
+          x.delete()
+        exports.parlors = []
+        exports.mahjongGames = []
+      else
+        message.channel.send("Can't Ragnarok outside a server.  :(")
 
     if(commandArgs[0] == "tiles")
       message.channel.send(mahjongTiles.allTilesGetter())
