@@ -113,8 +113,8 @@ bot.on('message', (message) =>
         message.channel.send("Let's Ragnarok!!!!!")
         for x in exports.parlors when x.guild.id == message.guild.id
           x.delete()
-        exports.parlors = []
-        exports.mahjongGames = []
+        exports.parlors = (parlor for parlor in exports.parlors when parlor.guild.id != message.guild.id)
+        exports.mahjongGames = (game for game in exports.mahjongGames when game.gameObservationChannel.guild.id != message.guild.id)
       else
         message.channel.send("Can't Ragnarok outside a server.  :(")
 
