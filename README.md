@@ -41,7 +41,7 @@ Currently contains the following commands:
 
 !yell - Takes any number of arguments.  Outputs those arguments to all forged channels.
 
-!ragnarok - Deletes all forged channels.  
+!ragnarok - Deletes all forged channels that exist in server where the command is issued
 
 !score - Gives a list of ways of interpreting a hand of mahjong.  Takes 28 arguments.
 
