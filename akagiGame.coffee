@@ -1,5 +1,5 @@
 gamePieces = require('./akagiTiles.coffee')
-player = require('./akagiPlayer.coffee')
+playerObject = require('./akagiPlayer.coffee')
 Promise = require('promise')
 _ = require('lodash')
 
@@ -8,10 +8,10 @@ class MahjongGame
   constructor: (playerChannels, server, gameSettings) ->
     @wall = new gamePieces.Wall()
     @players = [
-      new player(playerChannels[1],1),
-      new player(playerChannels[2],2),
-      new player(playerChannels[3],3),
-      new player(playerChannels[4],4)
+      new playerObject(playerChannels[1],1),
+      new playerObject(playerChannels[2],2),
+      new playerObject(playerChannels[3],3),
+      new playerObject(playerChannels[4],4)
     ]
     @gameObservationChannel = playerChannels[0]
     @startRoundOne()
