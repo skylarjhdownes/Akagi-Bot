@@ -306,9 +306,9 @@ getScore = (melds, gameDataFlags) ->
     if(gameDataFlags.chiho)
       yakuModifiers.push("Chiho")
 
-    #Suu Ankou - Four Concealed Pungs
-    if(concealedPungs == 4)
-      yakuModifiers.push("Suu Ankou")
+  #Suu Ankou - Four Concealed Pungs
+  if(concealedPungs == 4)
+    yakuModifiers.push("Suu Ankou")
 
   #Suu Kan Tsu - Four Kongs
   if(kongList.length == 4)
