@@ -2,7 +2,7 @@ _ = require('lodash')
 gamePieces = require('./akagiTiles.coffee')
 
 japaneseYaku = ["Riichi","Ippatsu","Daburu Riichi","Menzen Tsumo","Pinfu","Iipeikou","Tanyao Chuu","San Shoku Doujun","Concealed San Shoku Doujin","Itsu","Concealed Itsu","Dragon Fanpai/Yakuhai","Seat Fanpai/Yakuhai","Prevailing Fanpai/Yakuhai","Chanta","Concealed Chanta","Rinshan Kaihou","Chan Kan","Haitei","Houtei","Chi Toitsu","San Shoku Dokou","San Ankou","San Kan Tsu","Toi-Toi Hou","Honitsu","Concealed Honitsu","Shou Sangen","Honroutou","Junchan","Concealed Junchan","Ryan Peikou","Chinitsu","Concealed Chinitsu","Renho","Kokushi Musou","Chuuren Pooto","Tenho","Chiho","Suu Ankou","Suu Kan Tsu", "Ryuu Iisou","Chinrouto","Tsuu Iisou","Dai Sangen","Shou Suushii","Dai Suushii"]
-englishYaku = ["Riichi","Quick Riichi","Double Riichi","Fully Concealed Hand","Pinfu","Pure Double Chow","All Simples","Mixed Triple Chow","Concealed Mixed Triple Chow","Pure Straight","Concealed Pure Straight","Dragon Point","Seat Point","Prevailing Point","Outside Hand","Concealed Outside Hand","After a Kong","Under the Sea","Underer the Sea","Seven Pairs","Triple Pung","Three Concealed Pungs","Three Kongs","All Pungs","Half Flush","Concealed Half Flush","Little Three Dragons","All Terminals and Honors","Terminals in All Sets","Concealed Terminals in All Sets","Twice Pure Double Chows","Full Flush","Concealed Full Flush","Blessing of Man","Thirteen Orphans","Nine Gates","Blessing of Heaven","Blessing of Earth","Four Concealed Pungs","Four Kongs","All Green","All Terminals","All Honors","Big Three Dragons","Little Four Winds","Big Four Winds"]
+englishYaku = ["Riichi","Ippatsu","Double Riichi","Fully Concealed Hand","Pinfu","Pure Double Chow","All Simples","Mixed Triple Chow","Concealed Mixed Triple Chow","Pure Straight","Concealed Pure Straight","Dragon Point","Seat Point","Prevailing Point","Outside Hand","Concealed Outside Hand","After a Kong","Under the Sea","Underer the Sea","Seven Pairs","Triple Pung","Three Concealed Pungs","Three Kongs","All Pungs","Half Flush","Concealed Half Flush","Little Three Dragons","All Terminals and Honors","Terminals in All Sets","Concealed Terminals in All Sets","Twice Pure Double Chows","Full Flush","Concealed Full Flush","Blessing of Man","Thirteen Orphans","Nine Gates","Blessing of Heaven","Blessing of Earth","Four Concealed Pungs","Four Kongs","All Green","All Terminals","All Honors","Big Three Dragons","Little Four Winds","Big Four Winds"]
 
 #Class used to send data about game state into scorer
 class gameFlags
@@ -23,7 +23,7 @@ scoreMahjongHand = (hand, winningPlayer, gameDataFlags) ->
   possibleHands = getPossibleHands(hand)
   if possibleHands == []
     return([0, "Not a Scoring Hand"])
-  scores = getScore(hand, gameDataFlags) for hand in possibleHands
+  scores = getScore(hand, new gameFlags(playerWind,roundWind)) for hand in possibleHands
   maxScore = _.maxBy(scores, (x) -> x[0])
   maxLocation = _.indexOf(scores,maxScore)
   return([maxScore,possibleHands[maxLocation]])
@@ -95,7 +95,6 @@ getPossibleHands = (hand) ->
 
 getScore = (melds, gameDataFlags) ->
   #Takes a set of melds and returns the score of that particular combination of getMelds and the yaku that made up that score
-  #gameDataFlags should contain roundWind, playerWind, selfDraw, ...?
 
   yakuman = false
   yaku = 0
@@ -114,8 +113,6 @@ getScore = (melds, gameDataFlags) ->
   for meld in melds
     if(!meld.lastTileDrawn && meld.takenFrom != "self")
       isConcealedHand = false
-
-  allTerminalsAndHonors = gamePieces.allTerminalsAndHonorsGetter()
 
   yakuModifiers = []  #I think it could be more useful to calc out all of the yaku names,
                       #and then generate a score from that.  Plus we could print them all for the player.
@@ -289,7 +286,7 @@ getScore = (melds, gameDataFlags) ->
   #Yakuman
   if(isConcealedHand)
     #Kokushi Musou - 13 Orphans
-    if(melds == "thirteenorphans")
+    if(melds in ["thirteenorphans","thirteenorphans+"])
       yakuModifiers.push("Kokushi Musou")
 
     #Chuuren Pooto - Nine Gates
