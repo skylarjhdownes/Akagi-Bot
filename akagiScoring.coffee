@@ -172,11 +172,11 @@ getScore = (melds, gameDataFlags) ->
       yakuModifiers.push("Pinfu")
 
     #Iipeikou - Concealed hand with two completely identical chow.
-    if identicalChow == 2
+    if identicalChow in [2,6]
       yakuModifiers.push("Iipeikou")
 
     #Ryan Peikou - Concealed hand with two sets of two identical chows
-    if identicalChow == 4
+    if identicalChow in [4,12]
       yakumodifiers.push("Ryan Peikou")
 
     #Chii Toitsu - Concealed hand with 7 pairs
@@ -343,16 +343,40 @@ getScore = (melds, gameDataFlags) ->
     yakuModifiers.push("Dai Suushii")
 
 
-  #Score the yakuModifier list
+  #Score the yakuModifiers list
   #Check for dora
   fan = yaku+dora
-  if fan >= 5
-    console.log("not implemented yet.")
-    #Return scored points and yaku plus dora in hand
-  #Check for fu
 
-  baseScore = math.pow(fu,2+fan)
-  #Return scored points and yaku + dora + fu in hand
+  #Gives Base Score
+  if yakuman
+    baseScore = 8000
+  else if fan >= 5
+    if(fan == 5)
+      baseScore = 2000
+    else if(fan <= 7)
+      baseScore = 3000
+    else if(fan <= 10)
+      baseScore = 4000
+    else
+      baseScore = 5000
+  else
+    baseScore = fu * math.pow(2,2+fan)
+    if baseScore > 2000
+      baseScore = 2000
+
+  #Takes base Score and multiplies it depending on seat wind and whether ron or tsumo
+  if(gameDataFlags.playerWind == "east")
+    if(selfDraw)
+      score = _roundUpToClosestHundred(baseScore * 2)
+    else
+      score = _roundUpToClosestHundred(baseScore * 6)
+  else
+    if(selfDraw)
+      score = [_roundUpToClosestHundred(baseScore), _roundUpToClosestHundred(baseScore*2)]
+    else
+      score = _roundUpToClosestHundred(baseScore * 4)
+
+  return [score,yakuModifiers]
 
   _calculateFu = (melds, selfDraw, gameDataFlags) ->
     isConcealedHand = melds.isConcealed()
