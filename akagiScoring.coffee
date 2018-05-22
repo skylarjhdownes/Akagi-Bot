@@ -4,6 +4,20 @@ gamePieces = require('./akagiTiles.coffee')
 japaneseYaku = ["Riichi","Ippatsu","Daburu Riichi","Menzen Tsumo","Pinfu","Iipeikou","Tanyao Chuu","San Shoku Doujun","Concealed San Shoku Doujin","Itsu","Concealed Itsu","Dragon Fanpai/Yakuhai","Seat Fanpai/Yakuhai","Prevailing Fanpai/Yakuhai","Chanta","Concealed Chanta","Rinshan Kaihou","Chan Kan","Haitei","Houtai","Chi Toitsu","San Shoku Dokou","San Ankou","San Kan Tsu","Toi-Toi Hou","Honitsu","Concealed Honitsu","Shou Sangen","Honroutou","Junchan","Concealed Junchan","Ryan Peikou","Chinitsu","Concealed Chinitsu","Renho","Kokushi Musou","Chuuren Pooto","Tenho","Chiho","Suu Ankou","Suu Kan Tsu", "Ryuu Iisou","Chinrouto","Tsuu Iisou","Dai Sangen","Shou Suushii","Dai Suushii"]
 englishYaku = ["Riichi","Quick Riichi","Double Riichi","Fully Concealed Hand","Pinfu","Pure Double Chow","All Simples","Mixed Triple Chow","Concealed Mixed Triple Chow","Pure Straight","Concealed Pure Straight","Dragon Point","Seat Point","Prevailing Point","Outside Hand","Concealed Outside Hand","After a Kong","Under the Sea","Underer the Sea","Seven Pairs","Triple Pung","Three Concealed Pungs","Three Kongs","All Pungs","Half Flush","Concealed Half Flush","Little Three Dragons","All Terminals and Honors","Terminals in All Sets","Concealed Terminals in All Sets","Twice Pure Double Chows","Full Flush","Concealed Full Flush","Blessing of Man","Thirteen Orphans","Nine Gates","Blessing of Heaven","Blessing of Earth","Four Concealed Pungs","Four Kongs","All Green","All Terminals","All Honors","Big Three Dragons","Little Four Winds","Big Four Winds"]
 
+#Class used to send data about game state into scorer
+class gameFlags
+  constructor: (@playerWind, @roundWind, @flags = []) ->
+    @riichi = "Riichi" in @flags
+    @ippatsu = "Ippatsu" in @flags
+    @daburuRiichi = "Daburu Riichi" in @flags
+    @houtai = "Houtai" in @flags
+    @haitai = "Haitai" in @flags
+    @chanKan = "Chan Kan" in @flags
+    @rinshanKaihou = "Rinshan Kaihou" in @flags
+    @tenho = "Tenho" in @flags
+    @chiho = "Chiho" in @flags
+    @renho = "Renho" in @flags
+
 scoreMahjongHand = (hand, winningPlayer, gameDataFlags) ->
   #Takes a hand of mahajong tiles and finds the highest scoring way it can be interpreted, returning the score, and the melds which lead to that score
   possibleHands = getPossibleHands(hand)
@@ -73,12 +87,6 @@ getPossibleHands = (hand) ->
           existingHand[i] = chosenOne
           possibleHands.push(existingHand)
 
-  # uncalled = handTiles
-  # for x in hand.calledMelds
-  #   for y in x
-  #     remove = uncalled.indexOf(y)
-  #     uncalled.splice(remove,1)
-
   _normalHandFinder(hand.calledMelds,hand.uncalled())
   _drawnTilePlacer()
 
@@ -92,10 +100,21 @@ getScore = (melds, gameDataFlags) ->
   yakuman = false
   yaku = 0
   dora = 0
-  fuArray = _calculateFu(melds, gameDataFlags)
+
+  selfDraw = false
+  for meld in melds
+    if meld.lastDrawnTile
+      selfDraw = meld.lastTileFrom
+
+  fuArray = _calculateFu(melds, selfDraw, gameDataFlags)
   fu = fuArray[0]
   meldFu = fuArray[1]
-  isConcealedHand = melds.isConcealed()
+
+  isConcealedHand = true
+  for meld in melds
+    if(!meld.lastTileDrawn && meld.takenFrom != "self")
+      isConcealedHand = false
+
   allTerminalsAndHonors = gamePieces.allTerminalsAndHonorsGetter()
 
   yakuModifiers = []  #I think it could be more useful to calc out all of the yaku names,
@@ -140,7 +159,12 @@ getScore = (melds, gameDataFlags) ->
   if isConcealedHand
     if (gameDataFlags.riichi) # winning player has called riichi
       yakuModifiers.push("Riichi")
-    if gameDataFlags.selfDraw #Menzen Tsumo - Self draw on concaled hand
+      if(gameDataFlags.ippatsu)
+        yakuModifiers.push("Ippatsu") #Winning on first round after declaring riichi
+      if(gameDataFlags.daburuRiichi)
+        yakuModifiers.push("Daburu Riichi") #Calling riichi on first turn of game
+
+    if selfDraw #Menzen Tsumo - Self draw on concaled hand
       yakuModifiers.push("Menzen Tsumo")
 
     #Pinfu - Concealed all chows hand with a valuless pair
@@ -159,9 +183,29 @@ getScore = (melds, gameDataFlags) ->
     if melds.length == 7
       yakuModifiers.push("Chii Toitsu")
 
+    #Renho - Blessing of Man, Win in first go round on discard
+    if(gameDataFlags.renho)
+      yakuModifiers.push("Renho")
+
   #Tanyao Chuu - All simples (no terminals/honors)
   if (_.every(meld, (x) -> !_meldContainsAtLeastOneTerminalOrHonor(x)))
     yakuModifiers.push("Tanyao Chuu")
+
+  #Rinshan Kaihou - Mahjong declared on replacementTile from Kong
+  if(gameDataFlags.rinshanKaihou)
+    yakuModifiers.push("Rinshan Kaihou")
+
+  #Chan Kan - Robbing the Kong, Mahjong when pung is extended to kong
+  if(gameDataFlags.chanKan)
+    yakuModifiers.push("Chan Kan")
+
+  #Houtai - Winning off last drawn tile of wall
+  if(gameDataFlags.houtai)
+    yakuModifiers.push("Houtai")
+
+  #Haitai - Winning off last tile discard in game
+  if(gameDataFlags.haitai)
+    yakuModifiers.push("Haitai")
 
   #San Shoku Doujin - Mixed Triple Chow
   for value,suit of similarChow
@@ -193,14 +237,12 @@ getScore = (melds, gameDataFlags) ->
         yakuModifiers.push("Itsu")
 
   #Fanpai/Yakuhai - Pung/kong of dragons, round wind, or player wind.
-    # Can likely be drastically simplified since we know each pung/kong is 3/4 of a kind already
-    # Will also need to be taken into account for higher value hands, 3 dragons etc.
-  for meld in melds when meld.type == "Pung" || meld.type == "Kong"
+  for meld in pungList
     if meld.suit() == "dragon"
       yakuModifiers.push("Dragon Fanpai/Yahuhai")
-    if _meldContainsOnlyGivenTile(meld, new Tile("wind", gameDataFlags.playerWind))
+    if meld.value() == gameDataFlags.playerWind
       yakuModifiers.push("Seat Fanpai/Yakuhai")
-    if _meldContainsOnlyGivenTile(meld, new Tile("wind", gameDataFlags.roundWind))
+    if meld.value() == gameDataFlags.roundWind
       yakuModifiers.push("Prevailing Fanpai/Yakuhai")
 
   #Chanta - All sets contain terminals or honours, the pair is terminals or honours, and the hand contains at least one chow.
@@ -245,22 +287,31 @@ getScore = (melds, gameDataFlags) ->
 
 
   #Yakuman
+  if(isConcealedHand)
+    #Kokushi Musou - 13 Orphans
+    if(melds == "thirteenorphans")
+      yakuModifiers.push("Kokushi Musou")
 
-  #Kokushi Musou - 13 Orphans
-  if(melds == "thirteenorphans")
-    yakuModifiers.push("Kokushi Musou")
+    #Chuuren Pooto - Nine Gates
+    if("Concealed Chinitsu" in yakuModifiers)
+      if(kongList.length == 0)
+        valuePattern = _.flattenDeep((meld.tiles for meld in melds))
+        valuePattern = _.map(valuePattern, (x) -> x.value)
+        stringPattern = _.join(valuePattern, "")
+        if stringPattern in ["11112345678999","11122345678999","11123345678999","11123445678999","11123455678999","11123456678999","11123456778999","11123456788999","11123456789999"]
+          yakuModifiers.push("Chuuren Pooto")
 
-  #Chuuren Pooto - Nine Gates
-  if("Concealed Chinitsu" in yakuModifiers)
-    if(kongList.length == 0)
-      valuePattern = _.flattenDeep((meld.tiles for meld in melds))
-      valuePattern = _.map(valuePattern, (x) -> x.value)
-      stringPattern = _.join(valuePattern, "")
-      if stringPattern in ["11112345678999","11122345678999","11123345678999","11123445678999","11123455678999","11123456678999","11123456778999","11123456788999","11123456789999"]
-        yakuModifiers.push("Chuuren Pooto")
-  #Suu Ankou - Four Concealed Pungs
-  if(concealedPungs == 4)
-    yakuModifiers.push("Suu Ankou")
+    #Tenho - Blessing of Heaven, mahjong on starting hand
+    if(gameDataFlags.tenho)
+      yakuModifiers.push("Tenho")
+
+    #Chiho - Blessing of Earth, mahjong on first draw
+    if(gameDataFlags.chiho)
+      yakuModifiers.push("Chiho")
+
+    #Suu Ankou - Four Concealed Pungs
+    if(concealedPungs == 4)
+      yakuModifiers.push("Suu Ankou")
 
   #Suu Kan Tsu - Four Kongs
   if(kongList.length == 4)
@@ -303,13 +354,13 @@ getScore = (melds, gameDataFlags) ->
   baseScore = math.pow(fu,2+fan)
   #Return scored points and yaku + dora + fu in hand
 
-  _calculateFu = (melds, gameDataFlags) ->
+  _calculateFu = (melds, selfDraw, gameDataFlags) ->
     isConcealedHand = melds.isConcealed()
 
     baseFu = 0
     if(melds.length == 7)
       baseFu = 25
-    else if(isConcealedHand && !gameDataFlags.selfDraw)
+    else if(isConcealedHand && !selfDraw)
       baseFu = 30
     else
       baseFu = 20
@@ -351,13 +402,13 @@ getScore = (melds, gameDataFlags) ->
             meldFu += 2
         if(meld.type == "Chow")
           if(meld.lastDrawnTile)
-            if(meld.lastDrawnTile.value == (meld.tiles[0].value+meld.tiles[1].value+meld.tiles[2].value)/3)
+            if(meld.lastDrawnTile.value*3 == meld.tiles[0].value+meld.tiles[1].value+meld.tiles[2].value)
               meldFu += 2
             if(meld.value() == "1 - 2 - 3" && meld.lastDrawnTile.value == 3)
               meldFu += 2
             if(meld.value() == "7 - 8 - 9" && meld.lastDrawnTile.value == 7)
               meldFu += 2
-      if(!(meldFu == 0 && isConcealedHand) && gameDataFlags.selfDraw)
+      if(!(meldFu == 0 && isConcealedHand) && selfDraw)
         meldFu += 2
       if(meldFu == 0 && !isConcealedHand)
         meldFu += 2
