@@ -1,54 +1,55 @@
 _ = require('lodash')
 gamePieces = require('./akagiTiles.coffee')
 
-yakuList = [{jpn: "Riichi",eng: "Riichi",score: 1},
-            {jpn: "Ippatsu",eng: "Ippatsu",score: 1},
-            {jpn: "Daburu Riichi",eng: "Double Riichi",score: 1},
-            {jpn: "Menzen Tsumo",eng: "Fully Concealed Hand",score: 1},
-            {jpn: "Pinfu",eng: "Pinfu",score: 1},
-            {jpn: "Iipeikou",eng: "Pure Double Chow",score: 1},
-            {jpn: "Tanyao Chuu",eng: "All Simples",score: 1},
-            {jpn: "San Shoku Doujin",eng: "Mixed Triple Chow",score: 1},
-            {jpn: "Concealed San Shoku Doujin",eng: "Concealed Mixed Triple Chow",score: 2},
-            {jpn: "Itsu",eng: "Pure Straight",score: 1},
-            {jpn: "Concealed Itsu",eng: "Concealed Pure Straight",score: 2},
-            {jpn: "Dragon Fanpai/Yakuhai",eng: "Dragon Pung/Kong",score: 1},
-            {jpn: "Seat Fanpai/Yakuhai",eng: "Seat Pung/Kong",score: 1},
-            {jpn: "Prevailing Fanpai/Yakuhai",eng: "Prevailing Pung/Kong",score: 1},
-            {jpn: "Chanta",eng: "Outside Hand",score: 1},
-            {jpn: "Concealed Chanta",eng: "Concealed Outside Hand",score: 2},
-            {jpn: "Rinshan Kaihou",eng: "After a Kong",score: 1},
-            {jpn: "Chan Kan",eng: "Robbing a Kong",score: 1},
-            {jpn: "Haitei",eng: "Under the Sea",score: 1},
-            {jpn: "Houtei",eng: "Bottom of the Sea",score: 1},
-            {jpn: "Chi Toitsu",eng: "Seven Pairs",score: 2},
-            {jpn: "San Shoku Dokou",eng: "Triple Pung",score: 2},
-            {jpn: "San Ankou",eng: "Three Concealed Pungs",score: 2},
-            {jpn: "San Kan Tsu",eng: "Three Kongs",score: 2},
-            {jpn: "Toitoi Hou",eng: "All Pungs",score: 2},
-            {jpn: "Honitsu",eng: "Half Flush",score: 2},
-            {jpn: "Concealed Honitsu",eng: "Concealed Half Flush",score: 3},
-            {jpn: "Shou Sangen",eng: "Little Three Dragons",score: 2},
-            {jpn: "Honroutou",eng: "All Terminals and Honours",score: 2},
-            {jpn: "Junchan",eng: "Terminals in All Sets",score: 2},
-            {jpn: "Concealed Junchan",eng: "Concealed Terminals in All Sets",score: 3},
-            {jpn: "Ryan Peikou",eng: "Twice Pure Double Chow",score: 3},
-            {jpn: "Chinitsu",eng: "Full Flush",score: 5},
-            {jpn: "Concealed Chinitsu",eng: "Concealed Full Flush",score: 6},
-            {jpn: "Renho",eng: "Blessing of Man",score: 5},
-            {jpn: "Kokushi Musou",eng: "Thirteen Orphans",score: "Y"},
-            {jpn: "Chuuren Pooto",eng: "Nine Gates",score: "Y"},
-            {jpn: "Tenho",eng: "Blessing of Heaven",score: "Y"},
-            {jpn: "Chiho",eng: "Blessing of Earth",score: "Y"},
-            {jpn: "Suu Ankou",eng: "Four Concealed Pungs",score: "Y"},
-            {jpn: "Suu Kan Tsu",eng: "Four Kongs",score: "Y"},
-            {jpn: "Ryuu Iisou",eng: "All Green",score: "Y"},
-            {jpn: "Chinrouto",eng: "All Terminals",score: "Y"},
-            {jpn: "Tsuu Iisou",eng: "All Honours",score: "Y"},
-            {jpn: "Dai Sangen",eng: "Big Three Winds",score: "Y"},
-            {jpn: "Shou Suushi",eng: "Little Four Winds",score: "Y"},
-            {jpn: "Dai Suushi",eng: "Big Four Winds",score: "Y"}
-          ]
+yakuList = {
+            "Riichi":                       {jpn: "Riichi",eng: "Riichi",score: 1},
+            "Ippatsu":                      {jpn: "Ippatsu",eng: "Ippatsu",score: 1},
+            "Daburu Riichi":                {jpn: "Daburu Riichi",eng: "Double Riichi",score: 1},
+            "Menzen Tsumo":                 {jpn: "Menzen Tsumo",eng: "Fully Concealed Hand",score: 1},
+            "Pinfu":                        {jpn: "Pinfu",eng: "Pinfu",score: 1},
+            "Iipeikou":                     {jpn: "Iipeikou",eng: "Pure Double Chow",score: 1},
+            "Tanyao Chuu":                  {jpn: "Tanyao Chuu",eng: "All Simples",score: 1},
+            "San Shoku Doujin":             {jpn: "San Shoku Doujin",eng: "Mixed Triple Chow",score: 1},
+            "Concealed San Shoku Doujin":   {jpn: "Concealed San Shoku Doujin",eng: "Concealed Mixed Triple Chow",score: 2},
+            "Itsu":                         {jpn: "Itsu",eng: "Pure Straight",score: 1},
+            "Concealed Itsu":               {jpn: "Concealed Itsu",eng: "Concealed Pure Straight",score: 2},
+            "Dragon Fanpai/Yakuhai":        {jpn: "Dragon Fanpai/Yakuhai",eng: "Dragon Pung/Kong",score: 1},
+            "Seat Fanpai/Yakuhai":          {jpn: "Seat Fanpai/Yakuhai",eng: "Seat Pung/Kong",score: 1},
+            "Prevailing Fanpai/Yakuhai":    {jpn: "Prevailing Fanpai/Yakuhai",eng: "Prevailing Pung/Kong",score: 1},
+            "Chanta":                       {jpn: "Chanta",eng: "Outside Hand",score: 1},
+            "Concealed Chanta":             {jpn: "Concealed Chanta",eng: "Concealed Outside Hand",score: 2},
+            "Rinshan Kaihou":               {jpn: "Rinshan Kaihou",eng: "After a Kong",score: 1},
+            "Chan Kan":                     {jpn: "Chan Kan",eng: "Robbing a Kong",score: 1},
+            "Haitei":                       {jpn: "Haitei",eng: "Under the Sea",score: 1},
+            "Houtei":                       {jpn: "Houtei",eng: "Bottom of the Sea",score: 1},
+            "Chi Toitsu",:                  {jpn: "Chi Toitsu",eng: "Seven Pairs",score: 2},
+            "San Shoku Dokou":              {jpn: "San Shoku Dokou",eng: "Triple Pung",score: 2},
+            "San Ankou":                    {jpn: "San Ankou",eng: "Three Concealed Pungs",score: 2},
+            "San Kan Tsu":                  {jpn: "San Kan Tsu",eng: "Three Kongs",score: 2},
+            "Toitoi Hou":                   {jpn: "Toitoi Hou",eng: "All Pungs",score: 2},
+            "Honitsu":                      {jpn: "Honitsu",eng: "Half Flush",score: 2},
+            "Concealed Honitsu":            {jpn: "Concealed Honitsu",eng: "Concealed Half Flush",score: 3},
+            "Shou Sangen":                  {jpn: "Shou Sangen",eng: "Little Three Dragons",score: 2},
+            "Honroutou":                    {jpn: "Honroutou",eng: "All Terminals and Honours",score: 2},
+            "Junchan":                      {jpn: "Junchan",eng: "Terminals in All Sets",score: 2},
+            "Concealed Junchan":            {jpn: "Concealed Junchan",eng: "Concealed Terminals in All Sets",score: 3},
+            "Ryan Peikou":                  {jpn: "Ryan Peikou",eng: "Twice Pure Double Chow",score: 3},
+            "Chinitsu":                     {jpn: "Chinitsu",eng: "Full Flush",score: 5},
+            "Concealed Chinitsu":           {jpn: "Concealed Chinitsu",eng: "Concealed Full Flush",score: 6},
+            "Renho":                        {jpn: "Renho",eng: "Blessing of Man",score: 5},
+            "Kokushi Musou":                {jpn: "Kokushi Musou",eng: "Thirteen Orphans",score: "Y"},
+            "Chuuren Pooto":                {jpn: "Chuuren Pooto",eng: "Nine Gates",score: "Y"},
+            "Tenho":                        {jpn: "Tenho",eng: "Blessing of Heaven",score: "Y"},
+            "Chiho":                        {jpn: "Chiho",eng: "Blessing of Earth",score: "Y"},
+            "Suu Ankou":                    {jpn: "Suu Ankou",eng: "Four Concealed Pungs",score: "Y"},
+            "Suu Kan Tsu":                  {jpn: "Suu Kan Tsu",eng: "Four Kongs",score: "Y"},
+            "Ryuu Iisou":                   {jpn: "Ryuu Iisou",eng: "All Green",score: "Y"},
+            "Chinrouto":                    {jpn: "Chinrouto",eng: "All Terminals",score: "Y"},
+            "Tsuu Iisou":                   {jpn: "Tsuu Iisou",eng: "All Honours",score: "Y"},
+            "Dai Sangen":                   {jpn: "Dai Sangen",eng: "Big Three Winds",score: "Y"},
+            "Shou Suushi":                  {jpn: "Shou Suushi",eng: "Little Four Winds",score: "Y"},
+            "Dai Suushi":                   {jpn: "Dai Suushi",eng: "Big Four Winds",score: "Y"}
+          }
 
 
 
@@ -72,7 +73,7 @@ scoreMahjongHand = (hand, winningPlayer, gameDataFlags) ->
   possibleHands = getPossibleHands(hand)
   if possibleHands == []
     return([0, "Not a Scoring Hand"])
-  scores = getScore(hand, new gameFlags(playerWind,roundWind)) for hand in possibleHands
+  scores = getScore(getYaku(hand, new gameFlags(playerWind,roundWind)), doraPoints) for hand in possibleHands
   maxScore = _.maxBy(scores, (x) -> x[0])
   maxLocation = _.indexOf(scores,maxScore)
   return([maxScore,possibleHands[maxLocation]])
@@ -142,12 +143,11 @@ getPossibleHands = (hand) ->
   return possibleHands
 
 
-getScore = (melds, gameDataFlags) ->
-  #Takes a set of melds and returns the score of that particular combination of getMelds and the yaku that made up that score
+getYaku = (melds, gameDataFlags) ->
+  #Takes a set of melds and returns the yaku that made up that score
 
-  yakuman = false
-  yaku = 0
-  dora = 0
+  if(melds in ["thirteenorphans","thirteenorphans+"])
+    return({yaku:["Kokushi Musou"],fu:0,flags:gameDataFlags})
 
   selfDraw = false
   for meld in melds
@@ -389,40 +389,34 @@ getScore = (melds, gameDataFlags) ->
     yakuModifiers.push("Dai Suushii")
 
 
-  #Score the yakuModifiers list
-  #Check for dora
-  fan = yaku+dora
 
-  #Gives Base Score
-  if yakuman
-    baseScore = 8000
-  else if fan >= 5
-    if(fan == 5)
-      baseScore = 2000
-    else if(fan <= 7)
-      baseScore = 3000
-    else if(fan <= 10)
-      baseScore = 4000
-    else
-      baseScore = 5000
-  else
-    baseScore = fu * math.pow(2,2+fan)
-    if baseScore > 2000
-      baseScore = 2000
+  return({yaku:yakuModifiers,fu:fu,flags:gameDataFlags})
 
-  #Takes base Score and multiplies it depending on seat wind and whether ron or tsumo
-  if(gameDataFlags.playerWind == "east")
-    if(selfDraw)
-      score = _roundUpToClosestHundred(baseScore * 2)
-    else
-      score = _roundUpToClosestHundred(baseScore * 6)
-  else
-    if(selfDraw)
-      score = [_roundUpToClosestHundred(baseScore), _roundUpToClosestHundred(baseScore*2)]
-    else
-      score = _roundUpToClosestHundred(baseScore * 4)
+  _meldContainsAtLeastOneTerminalOrHonor = (meld) ->
+    for tile in meld.tiles
+      if tile.isHonor() || tile.isTerminal()
+        return true
+    return false
 
-  return [score,yakuModifiers]
+  _meldIsGreen = (meld) ->
+    for tile in meld.tiles
+      if !tile.isGreen()
+        return false
+    return true
+
+  _meldContainsOnlyGivenTile = (meld, givenTile) ->
+    allSameTile = true
+    for tile in meld.tiles
+      if tile != givenTile
+        allSameTile = false
+        break
+    return allSameTile
+
+  _roundUpToClosestHundred = (inScore) ->
+    if (inScore%100)!=0
+      return (inScore//100+1)*100
+    else
+      inScore
 
   _calculateFu = (melds, selfDraw, gameDataFlags) ->
     isConcealedHand = melds.isConcealed()
@@ -488,32 +482,69 @@ getScore = (melds, gameDataFlags) ->
       fu = _roundUpToClosestHundred(fu)
     return [fu, meldFu]
 
+getScore(values, dora) ->
+  if(values.yaku.length == 0)
+    return(0,["No Yaku"])
+  #Score the yakuModifiers list
+  yakuman = false
+  yakuPoints = 0
+  printedYaku = []
+  for yaku in values.yaku
+    if(yakuList[yaku].score == "Y")
+      yakuman = true
+    else if(yaku != "Renho")
+      yakuPoints += yakuList[yaku].score
 
-_meldContainsAtLeastOneTerminalOrHonor = (meld) ->
-  for tile in meld.tiles
-    if tile.isHonor() || tile.isTerminal()
-      return true
-  return false
-
-_meldIsGreen = (meld) ->
-  for tile in meld.tiles
-    if !tile.isGreen()
-      return false
-  return true
-
-_meldContainsOnlyGivenTile = (meld, givenTile) ->
-  allSameTile = true
-  for tile in meld.tiles
-    if tile != givenTile
-      allSameTile = false
-      break
-  return allSameTile
-
-_roundUpToClosestHundred = (inScore) ->
-  if (inScore%100)!=0
-    return (inScore//100+1)*100
+  if(yakuman)
+    printedYaku = (yaku for yaku in values.yaku when yakuList[yaku].score == "Y")
+  else if("Renho" in values.yaku)
+    if(yakuPoints > 0 && yakuPoints + dora > 5)
+      printedYaku = (yaku for yaku in values.yaku when yaku != "Renho")
+      fan = yakuPoints + dora
+    else
+      printedYaku = ["Renho"]
+      fan = 5
   else
-    inScore
+    printedYaku = values.yaku
+    fan = yakuPoints + dora
+
+  #Gives Base Score
+  if yakuman
+    baseScore = 8000
+  else if fan >= 5
+    if(fan == 5)
+      baseScore = 2000
+    else if(fan <= 7)
+      baseScore = 3000
+    else if(fan <= 10)
+      baseScore = 4000
+    else
+      baseScore = 5000
+  else
+    baseScore = fu * math.pow(2,2+fan)
+    if baseScore > 2000
+      baseScore = 2000
+
+  #Takes base Score and multiplies it depending on seat wind and whether ron or tsumo
+  if(values.flags.playerWind == "east")
+    if(selfDraw)
+      score = _roundUpToClosestHundred(baseScore * 2)
+    else
+      score = _roundUpToClosestHundred(baseScore * 6)
+  else
+    if(selfDraw)
+      score = [_roundUpToClosestHundred(baseScore), _roundUpToClosestHundred(baseScore*2)]
+    else
+      score = _roundUpToClosestHundred(baseScore * 4)
+
+  return [score,printedYaku]
+
+
+  _roundUpToClosestHundred = (inScore) ->
+    if (inScore%100)!=0
+      return (inScore//100+1)*100
+    else
+      inScore
 
 module.exports = scoreMahjongHand
 module.exports.getPossibleHands = getPossibleHands
