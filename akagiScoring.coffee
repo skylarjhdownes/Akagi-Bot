@@ -1,8 +1,57 @@
 _ = require('lodash')
 gamePieces = require('./akagiTiles.coffee')
 
-japaneseYaku = ["Riichi","Ippatsu","Daburu Riichi","Menzen Tsumo","Pinfu","Iipeikou","Tanyao Chuu","San Shoku Doujun","Concealed San Shoku Doujin","Itsu","Concealed Itsu","Dragon Fanpai/Yakuhai","Seat Fanpai/Yakuhai","Prevailing Fanpai/Yakuhai","Chanta","Concealed Chanta","Rinshan Kaihou","Chan Kan","Haitei","Houtei","Chi Toitsu","San Shoku Dokou","San Ankou","San Kan Tsu","Toi-Toi Hou","Honitsu","Concealed Honitsu","Shou Sangen","Honroutou","Junchan","Concealed Junchan","Ryan Peikou","Chinitsu","Concealed Chinitsu","Renho","Kokushi Musou","Chuuren Pooto","Tenho","Chiho","Suu Ankou","Suu Kan Tsu", "Ryuu Iisou","Chinrouto","Tsuu Iisou","Dai Sangen","Shou Suushii","Dai Suushii"]
-englishYaku = ["Riichi","Ippatsu","Double Riichi","Fully Concealed Hand","Pinfu","Pure Double Chow","All Simples","Mixed Triple Chow","Concealed Mixed Triple Chow","Pure Straight","Concealed Pure Straight","Dragon Point","Seat Point","Prevailing Point","Outside Hand","Concealed Outside Hand","After a Kong","Under the Sea","Underer the Sea","Seven Pairs","Triple Pung","Three Concealed Pungs","Three Kongs","All Pungs","Half Flush","Concealed Half Flush","Little Three Dragons","All Terminals and Honors","Terminals in All Sets","Concealed Terminals in All Sets","Twice Pure Double Chows","Full Flush","Concealed Full Flush","Blessing of Man","Thirteen Orphans","Nine Gates","Blessing of Heaven","Blessing of Earth","Four Concealed Pungs","Four Kongs","All Green","All Terminals","All Honors","Big Three Dragons","Little Four Winds","Big Four Winds"]
+yakuList = [{jpn: "Riichi",eng: "Riichi",score: 1},
+            {jpn: "Ippatsu",eng: "Ippatsu",score: 1},
+            {jpn: "Daburu Riichi",eng: "Double Riichi",score: 1},
+            {jpn: "Menzen Tsumo",eng: "Fully Concealed Hand",score: 1},
+            {jpn: "Pinfu",eng: "Pinfu",score: 1},
+            {jpn: "Iipeikou",eng: "Pure Double Chow",score: 1},
+            {jpn: "Tanyao Chuu",eng: "All Simples",score: 1},
+            {jpn: "San Shoku Doujin",eng: "Mixed Triple Chow",score: 1},
+            {jpn: "Concealed San Shoku Doujin",eng: "Concealed Mixed Triple Chow",score: 2},
+            {jpn: "Itsu",eng: "Pure Straight",score: 1},
+            {jpn: "Concealed Itsu",eng: "Concealed Pure Straight",score: 2},
+            {jpn: "Dragon Fanpai/Yakuhai",eng: "Dragon Pung/Kong",score: 1},
+            {jpn: "Seat Fanpai/Yakuhai",eng: "Seat Pung/Kong",score: 1},
+            {jpn: "Prevailing Fanpai/Yakuhai",eng: "Prevailing Pung/Kong",score: 1},
+            {jpn: "Chanta",eng: "Outside Hand",score: 1},
+            {jpn: "Concealed Chanta",eng: "Concealed Outside Hand",score: 2},
+            {jpn: "Rinshan Kaihou",eng: "After a Kong",score: 1},
+            {jpn: "Chan Kan",eng: "Robbing a Kong",score: 1},
+            {jpn: "Haitei",eng: "Under the Sea",score: 1},
+            {jpn: "Houtei",eng: "Bottom of the Sea",score: 1},
+            {jpn: "Chi Toitsu",eng: "Seven Pairs",score: 2},
+            {jpn: "San Shoku Dokou",eng: "Triple Pung",score: 2},
+            {jpn: "San Ankou",eng: "Three Concealed Pungs",score: 2},
+            {jpn: "San Kan Tsu",eng: "Three Kongs",score: 2},
+            {jpn: "Toitoi Hou",eng: "All Pungs",score: 2},
+            {jpn: "Honitsu",eng: "Half Flush",score: 2},
+            {jpn: "Concealed Honitsu",eng: "Concealed Half Flush",score: 3},
+            {jpn: "Shou Sangen",eng: "Little Three Dragons",score: 2},
+            {jpn: "Honroutou",eng: "All Terminals and Honours",score: 2},
+            {jpn: "Junchan",eng: "Terminals in All Sets",score: 2},
+            {jpn: "Concealed Junchan",eng: "Concealed Terminals in All Sets",score: 3},
+            {jpn: "Ryan Peikou",eng: "Twice Pure Double Chow",score: 3},
+            {jpn: "Chinitsu",eng: "Full Flush",score: 5},
+            {jpn: "Concealed Chinitsu",eng: "Concealed Full Flush",score: 6},
+            {jpn: "Renho",eng: "Blessing of Man",score: 5},
+            {jpn: "Kokushi Musou",eng: "Thirteen Orphans",score: "Y"},
+            {jpn: "Chuuren Pooto",eng: "Nine Gates",score: "Y"},
+            {jpn: "Tenho",eng: "Blessing of Heaven",score: "Y"},
+            {jpn: "Chiho",eng: "Blessing of Earth",score: "Y"},
+            {jpn: "Suu Ankou",eng: "Four Concealed Pungs",score: "Y"},
+            {jpn: "Suu Kan Tsu",eng: "Four Kongs",score: "Y"},
+            {jpn: "Ryuu Iisou",eng: "All Green",score: "Y"},
+            {jpn: "Chinrouto",eng: "All Terminals",score: "Y"},
+            {jpn: "Tsuu Iisou",eng: "All Honours",score: "Y"},
+            {jpn: "Dai Sangen",eng: "Big Three Winds",score: "Y"},
+            {jpn: "Shou Suushi",eng: "Little Four Winds",score: "Y"},
+            {jpn: "Dai Suushi",eng: "Big Four Winds",score: "Y"}
+          ]
+
+
+
 
 #Class used to send data about game state into scorer
 class gameFlags
