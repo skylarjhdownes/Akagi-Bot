@@ -484,7 +484,7 @@ getYaku = (melds, gameDataFlags) ->
 
 getScore(values, dora) ->
   if(values.yaku.length == 0)
-    return(0,["No Yaku"])
+    return([0,["No Yaku"]])
   #Score the yakuModifiers list
   yakuman = false
   yakuPoints = 0
