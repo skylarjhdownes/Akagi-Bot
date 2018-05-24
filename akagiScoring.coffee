@@ -482,7 +482,7 @@ getYaku = (melds, gameDataFlags) ->
       fu = _roundUpToClosestHundred(fu)
     return [fu, meldFu]
 
-getScore(values, dora) ->
+getScore = (values, dora) ->
   if(values.yaku.length == 0)
     return([0,["No Yaku"]])
   #Score the yakuModifiers list
