@@ -22,7 +22,7 @@ yakuList = {
             "Chan Kan":                     {jpn: "Chan Kan",eng: "Robbing a Kong",score: 1},
             "Haitei":                       {jpn: "Haitei",eng: "Under the Sea",score: 1},
             "Houtei":                       {jpn: "Houtei",eng: "Bottom of the Sea",score: 1},
-            "Chi Toitsu":                  {jpn: "Chi Toitsu",eng: "Seven Pairs",score: 2},
+            "Chi Toitsu":                   {jpn: "Chi Toitsu",eng: "Seven Pairs",score: 2},
             "San Shoku Dokou":              {jpn: "San Shoku Dokou",eng: "Triple Pung",score: 2},
             "San Ankou":                    {jpn: "San Ankou",eng: "Three Concealed Pungs",score: 2},
             "San Kan Tsu":                  {jpn: "San Kan Tsu",eng: "Three Kongs",score: 2},
