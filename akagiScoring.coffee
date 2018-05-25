@@ -3,7 +3,7 @@ gamePieces = require('./akagiTiles.coffee')
 
 yakuList = {
             "Riichi":                       {jpn: "Riichi",eng: "Riichi",score: 1},
-            "Ippatsu":                      {jpn: "Ippatsu",eng: "Ippatsu",score: 1},
+            "Ippatsu":                      {jpn: "Ippatsu",eng: "One Shot",score: 1},
             "Daburu Riichi":                {jpn: "Daburu Riichi",eng: "Double Riichi",score: 1},
             "Menzen Tsumo":                 {jpn: "Menzen Tsumo",eng: "Fully Concealed Hand",score: 1},
             "Pinfu":                        {jpn: "Pinfu",eng: "Pinfu",score: 1},
