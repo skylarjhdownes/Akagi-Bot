@@ -59,6 +59,18 @@ class MahjongGame
     else
       playerToDraw.sendMessage("It is not your turn.")
 
+  chiTile:(playerToChi, tile1, tile2) ->
+    if(@phase == "draw")
+      if(@playerToChi.playerNumber == @turn)
+        #Chi Logic Here
+        return(true)
+      else
+        playerToChi.sendMessage("May only Chi when you are next in turn order.")
+    else if(@phase.isArray)
+      playerToChi.sendMessage("Chi has lower priority than Pon and Ron.")
+    else
+      playerToChi.sendMessage("Wrong time to Chi")
+
   ponTile:(playerToPon) ->
     if(@phase in ["react","draw"] && @turn != playerToPon.nextPlayer)
       for player in @players
@@ -127,6 +139,8 @@ class MahjongGame
               playerToPon.sendMessage("Can't pon if you already called chi.")
           else
             playerToPon.sendMessage("Don't have correct tiles.")
+    else if(@phase.isArray && @phase[0] == "roning")
+      playerToPon.sendMessage("Pon has lower priorty than Ron.")
     else
       playerToPon.sendMessage("Wrong time to Pon.")
 

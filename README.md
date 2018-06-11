@@ -31,6 +31,8 @@ Currently contains the following commands:
 
 ~prevailing - Displays prevailing wind
 
+~seat - If given a number, returns the seat wind of that player.  Without an argument, it returns one's own seat wind.
+
 ~turn - Displays who's turn it is.
 
 ~phase - Displays what phase it is.
