@@ -176,6 +176,13 @@ bot.on('message', (message) =>
         fromGame.discardTile(fromPlayer,commandArgs[1]+" "+commandArgs[2])
       if(commandArgs[0] == "pon" and channelType == "player")
         fromGame.ponTile(fromPlayer)
+      if(commandArgs[0] == "chi" and channelType == "player")
+        if(commandArgs.length != 5)
+          message.channel.send("Must specify which two tiles are to be used for meld.")
+        else
+          tile1 = new mahjongTiles.Tile(commandArgs[2],commandArgs[1])
+          tile2 = new mahjongTIles.Tile(commandArgs[4],commandArgs[3])
+          fromGame.chiTile(fromPlayer,tile1,tile2)
       if(commandArgs[0] == "pile")
         if(commandArgs.length == 1 and channelType == "player")
           fromPlayer.sendMessage("You have discarded #{fromPlayer.hand.discardPile.printDiscard(fromPlayer.namedTiles)}.")

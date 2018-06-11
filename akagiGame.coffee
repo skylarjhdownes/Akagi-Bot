@@ -62,8 +62,49 @@ class MahjongGame
   chiTile:(playerToChi, tile1, tile2) ->
     if(@phase == "draw")
       if(@playerToChi.playerNumber == @turn)
-        #Chi Logic Here
-        return(true)
+        if(_.findIndex(playerToChi.hand.uncalled(),(x) -> _.isEqual(tile1, x)) != -1 && _.findIndex(playerToChi.hand.uncalled(),(x) -> _.isEqual(tile2, x)) != -1)
+          for discarder in @players
+            if(@turn == discarder.nextPlayer)
+              toChi = discarder.discardPile.contains[-1..][0]
+              _chiable:(t1,t2,t3) ->
+                if(t1.suit!=t2.suit || t2.suit!=t3.suit)
+                  return false
+                sortedValues = [t1.value,t2.value,t3.value].sort()
+                if(sortedValues[0]+1 == sortedValues[1] && sortedValues[1]+1 == sortedValues[2])
+                  return true
+                else
+                  return false
+              if(_chiable(toChi,tile1,tile2))
+                @phase = ["chiing",playerToChi.playerNumber]
+                for player in @players
+                  if(player.playerNumber != playerToChi.playerNumber)
+                    player.sendMessage("Player #{playerToChi.playerNumber} has declared Chi.")
+                  else
+                    player.sendMessage("You have declared Chi.")
+                chiAfterTen = new Promise((resolve,reject) =>
+                  setTimeout(->
+                    resolve("Time has Passed")
+                  ,1000))
+                chiAfterTen
+                  .then((message)=>
+                    if(_.isEqual(@phase,["chiing",playerToChi.playerNumber]))
+                      @phase = "discard"
+                      for player in @players
+                        if(@turn == player.nextPlayer)
+                          playerToChi.hand.draw(player.discardPile)
+                          playerToChi.hand.calledMelds.push(new gamePieces.Meld([toChi,tile1,tile2],player.playerNumber))
+                          player.sendMessage("Player #{playerToChi.playerNumber}'s Chi has completed.'")
+                        else if(player.playerNumber == playerToChi.playerNumber)
+                          player.sendMessage("Your Chi has completed.  Please discard a tile.")
+                        else
+                          player.sendMessage("Player #{playerToChi.playerNumber}'s Chi has completed.'")
+                  )
+                  .catch(console.error)              
+              else
+                playerToChi.sendMessage("Tiles specified do not create a legal meld.")
+        else
+          playerToChi.sendMessage("Hand doesn't contain tiles specified.")
+
       else
         playerToChi.sendMessage("May only Chi when you are next in turn order.")
     else if(@phase.isArray)
@@ -95,6 +136,7 @@ class MahjongGame
                     if(@turn == player.nextPlayer)
                       playerToPon.hand.draw(player.discardPile)
                       playerToPon.hand.calledMelds.push(new gamePieces.Meld([toPon,toPon,toPon],player.playerNumber))
+                      player.sendMessage("Player #{playerToPon.playerNumber}'s Pon has completed.")
                     if(player.playerNumber == playerToPon.playerNumber)
                       player.sendMessage("Your Pon has completed. Please discard a tile.")
                     else

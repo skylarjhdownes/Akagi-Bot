@@ -23,7 +23,9 @@ Currently contains the following commands:
 
 ~abort game - Currently does nothing, but claims the game is over
 
-~pon - Allows one to Pon players discards. Untested.
+~pon - Allows one to Pon players discards.
+
+~chi - Allows one to Chi.  Takes 4 arguments, the two tiles you are forming the meld with from your hand.
 
 !tiles - Displays a picture of each tile.
 
