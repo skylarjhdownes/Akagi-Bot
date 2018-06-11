@@ -173,7 +173,7 @@ class Hand
 
   #discards a specific card from the hand
   discard: (whichTile) ->
-    for x,i in @contains
+    for x,i in @uncalled()
       if(x.getTextName()==whichTile)
         out = @contains.splice(i,1)
         console.log(out[0])
