@@ -66,7 +66,7 @@ class MahjongGame
           for discarder in @players
             if(@turn == discarder.nextPlayer)
               toChi = discarder.discardPile.contains[-1..][0]
-              _chiable:(t1,t2,t3) ->
+              _chiable = (t1,t2,t3) ->
                 if(t1.suit!=t2.suit || t2.suit!=t3.suit)
                   return false
                 sortedValues = [t1.value,t2.value,t3.value].sort()
