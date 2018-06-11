@@ -9,6 +9,7 @@ class Player
     @namedTiles = true
   roundStart: ->
     @playerChannel.send("New Round Start")
+    @playerChannel.send("Seat Wind: #{@wind}")
     @playerChannel.send("Starting Hand : "+@hand.printHand())
   sendMessage:(message) ->
     @playerChannel.send(message)
@@ -25,6 +26,11 @@ class Player
     @playerChannel.send(tileDrawn[0].getName(@namedTiles))
   setNextPlayer:(nextPlayerNumber)->
     @nextPlayer = nextPlayerNumber
+  setWind:(wind)->
+    @wind = wind
+  rotateWind: ->
+    winds = ["East","South","West","North"]
+    @wind = winds[(winds.indexOf(@wind)+1)%4]
   discardTile:(tileToDiscard)->
     return @hand.discard(tileToDiscard)
 

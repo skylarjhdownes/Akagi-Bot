@@ -23,6 +23,12 @@ class MahjongGame
     @westPlayer = @players[2]
     @northPlayer = @players[3]
 
+    #Make player know own winds
+    @eastPlayer.setWind("East")
+    @southPlayer.setWind("South")
+    @westPlayer.setWind("West")
+    @northPlayer.setWind("North")
+
     #Makes sure we know who plays after who
     @eastPlayer.setNextPlayer(@southPlayer.playerNumber)
     @southPlayer.setNextPlayer(@westPlayer.playerNumber)
@@ -86,12 +92,12 @@ class MahjongGame
               .catch(console.error)
           else
             playerToPon.sendMessage("Don't have correct tiles.")
-    else if(@phase.isArray && @phase[0] == "poning")
+    else if(@phase.isArray && @phase[0] == "chiing")
       for player in @players
         if(@turn == player.nextPlayer)
           toPon = player.discardPile.contains[-1..][0]
           if(_.findIndex(playerToPon.hand.uncalled(),(x)->_.isEqual(toPon,x))!=_.findLastIndex(playerToPon.hand.uncalled(),(x)->_.isEqual(toPon,x)))
-            if(player.nextPlayer == playerToPon.playerNumber || playerToPon.nextPlayer == @phase[1])
+            if(@playerToPon.playerNumber != @phase[1])
               @phase = ["poning",playerToPon.playerNumber]
               for player in @players
                 if(player.playerNumber != playerToPon.playerNumber)
@@ -118,7 +124,7 @@ class MahjongGame
                   )
                   .catch(console.error)
             else
-              playerToPon.sendMessage("Other player's Pon has higher priority.")
+              playerToPon.sendMessage("Can't pon if you already called chi.")
           else
             playerToPon.sendMessage("Don't have correct tiles.")
     else
