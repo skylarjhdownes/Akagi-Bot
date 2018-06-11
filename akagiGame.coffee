@@ -61,7 +61,7 @@ class MahjongGame
 
   chiTile:(playerToChi, tile1, tile2) ->
     if(@phase == "draw")
-      if(@playerToChi.playerNumber == @turn)
+      if(playerToChi.playerNumber == @turn)
         if(_.findIndex(playerToChi.hand.uncalled(),(x) -> _.isEqual(tile1, x)) != -1 && _.findIndex(playerToChi.hand.uncalled(),(x) -> _.isEqual(tile2, x)) != -1)
           for discarder in @players
             if(@turn == discarder.nextPlayer)
@@ -99,7 +99,7 @@ class MahjongGame
                         else
                           player.sendMessage("Player #{playerToChi.playerNumber}'s Chi has completed.'")
                   )
-                  .catch(console.error)              
+                  .catch(console.error)
               else
                 playerToChi.sendMessage("Tiles specified do not create a legal meld.")
         else
