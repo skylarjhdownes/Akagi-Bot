@@ -176,6 +176,13 @@ bot.on('message', (message) =>
         fromGame.discardTile(fromPlayer,commandArgs[1]+" "+commandArgs[2])
       if(commandArgs[0] == "pon" and channelType == "player")
         fromGame.ponTile(fromPlayer)
+      if(commandArgs[0] == "kan" and channelType == "player")
+        if(fromGame.phase != "discard")
+          fromGame.openKanTiles(fromPlayer)
+        else if(fromGame.phase == "discard" && commandArgs.length == 3)
+          fromGame.selfKanTiles(fromPlayer,new mahjongTiles.Tile(commandArgs[2],commandArgs[1]))
+        else
+          fromPlayer.sendMessage("Please specify which tile to Kan.")
       if(commandArgs[0] == "chi" and channelType == "player")
         if(commandArgs.length != 5)
           message.channel.send("Must specify which two tiles are to be used for meld.")

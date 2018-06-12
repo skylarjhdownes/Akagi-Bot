@@ -108,9 +108,55 @@ class MahjongGame
       else
         playerToChi.sendMessage("May only Chi when you are next in turn order.")
     else if(@phase.isArray)
-      playerToChi.sendMessage("Chi has lower priority than Pon and Ron.")
+      playerToChi.sendMessage("Chi has lower priority than Pon, Kan, and Ron.")
     else
       playerToChi.sendMessage("Wrong time to Chi")
+
+  #Not Yet Implemented
+  selfKanTiles(playerToKan,tileToKan)
+    return true
+
+  openKanTiles:(playerToKan) ->
+    if(@phase.isArray && @phase[0] == "roning")
+      playerToKan.sendMessage("Kan has lower priority than Ron.")
+    else if(@phase.isArray && @phase[0] == "chiing" && playerToPon.playerNumber == @phase[1])
+      playerToKan.sendMessage("One cannot Kan if one has already declared Chi.")
+    else if((@phase.isArray && @phase[0] == "chiing") || @phase in ["react","draw"])
+      discarder = _.find(@players,(x)-> @turn == x.nextPlayer)
+      toKan = discarder.discardPile.contains[-1..][0]
+      if(_.filter(playerToKan.hand.uncalled(),(x) -> _.isEqual(x,toKan)).length == 3)
+        @phase = ["callKaning",playerToKan.playerNumber]
+        for player in @players
+          if(player.playerNumber!= playerToKan.playerNumber)
+            player.sendMessage("Player #{playerToKan.playerNumber} has declared Kan.")
+          else
+            player.sendMessage("You have declared Kan.")
+        kanAfterTen = new Promise((resolve,reject) =>
+          setTimeout(->
+            resolve("Time has Passed")
+          ,1000))
+        kanAfterTen
+          .then(
+            if(_.isEqual(@phase,["callKaning",playerToKan.playerNumber]))
+              @phase = "discard"
+              playerToKan.hand.draw(discarder.discardPile)
+              playerToKan.hand.calledMelds.push(new gamePieces.Meld([toKan,toKan,toKan,toKan],discarder.playerNumber))
+              drawnTile = playerToKan.hand.draw(@wall)
+              @wall.doraFlip()
+              for player in @players
+                if(player.playerNumber!=playerToKan.playerNumber)
+                  player.sendMessage("Player #{playerToKan.playerNumber} has completed their Kan.")
+                else
+                  player.sendMessage("You have completed your Kan.")
+                  player.sendMessage("Your deadwall draw is #{drawnTile.getName(player.namedTiles)}.")
+                player.sendMessage("The Dora Tiles are now: #{@wall.printDora(player.namedTiles)}")
+              @turn = playerToKan.playerNumber
+          )
+          .catch(console.error)
+      else
+        playerToKan.sendMessage("You don't have correct tiles to Kan.")
+    else
+      playerToKan.sendMessage("Wrong time to Kan.")
 
   ponTile:(playerToPon) ->
     if(@phase in ["react","draw"] && @turn != playerToPon.nextPlayer)

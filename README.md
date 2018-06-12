@@ -27,6 +27,8 @@ Currently contains the following commands:
 
 ~chi - Allows one to Chi.  Takes 4 arguments, the two tiles you are forming the meld with from your hand.
 
+~kan - Allows one to Kan players discards.  Self drawn Kan is currently not implemented.
+
 !tiles - Displays a picture of each tile.
 
 ~dora - Displays all current dora indicators.
