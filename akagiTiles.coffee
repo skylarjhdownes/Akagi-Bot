@@ -190,7 +190,7 @@ class Hand
 
   #prints the tiles not yet used in any open melds
   printUncalled: (writtenName = true) ->
-    return (x.getName(writtenName0) for x in @uncalled())
+    return (x.getName(writtenName) for x in @uncalled())
 
   #prints the tiles used in called Melds
   printMelds: (writtenName = true) ->
