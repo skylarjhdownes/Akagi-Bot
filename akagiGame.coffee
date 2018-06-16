@@ -113,7 +113,7 @@ class MahjongGame
     else
       playerToChi.sendMessage("Wrong time to Chi")
 
-  selfKanTiles(playerToKan,tileToKan)
+  selfKanTiles:(playerToKan,tileToKan) ->
     uncalledKanTiles = _.filter(playerToKan.hand.uncalled(),(x) -> _.isEqual(x,tileToKan)).length
     if(@turn != playerToKan.playerNumber)
       playerToKan.sendMessage("It is not your turn.")
