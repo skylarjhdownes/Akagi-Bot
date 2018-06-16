@@ -114,7 +114,78 @@ class MahjongGame
 
   #Not Yet Implemented
   selfKanTiles(playerToKan,tileToKan)
-    return true
+    uncalledKanTiles = _.filter(playerToKan.hand.uncalled(),(x) -> _.isEqual(x,tileToKan)).length
+    if(@phase != "discard")
+      playerToKan.sendMessage("One can only self Kan during one's own turn.")
+    else if(uncalledKanTiles < 1)
+      playerToKan.sendMessage("No tiles to Kan with.")
+    else if(uncalledKanTiles in [2,3])
+      playerToKan.sendMessage("Wrong number of tiles to Kan with.")
+    else
+      if(uncalledKanTiles == 4)
+        @phase = ["concealedKaning",tileToKan]
+        for player in @players
+          if(player.playerNumber != playerToKan.playerNumber)
+            player.sendMessage("Player #{playerToKan.playerNumber} has declared a concealed Kan on #{tileToKan.getName(player.namedTiles)}.")
+          else
+            player.sendMessage("You have declared a concealed Kan on #{tileToKan.getName(player.namedTiles)}.")
+        concealAfterTen = new Promise((resolve,reject) =>
+          setTimeout(->
+            resolve("Time has Passed")
+          ,1000))
+        concealAfterTen
+          .then(
+            if(_.isEqual(@phase,["concealedKaning",tileToKan]))
+              @phase = "discard"
+              playerToKan.hand.calledMelds.push(new gamePieces.Meld([tileToKan,tileToKan,tileToKan,tileToKan]))
+              drawnTile = playerToKan.hand.draw(@wall)
+              @wall.doraFlip()
+              for player in @players
+                if(player.playerNumber!=playerToKan.playerNumber)
+                  player.sendMessage("Player #{playerToKan.playerNumber} has completed their Kan.")
+                else
+                  player.sendMessage("You have completed your Kan.")
+                  player.sendMessage("Your deadwall draw is #{drawnTile.getName(player.namedTiles)}.")
+                player.sendMessage("The Dora Tiles are now: #{@wall.printDora(player.namedTiles)}")
+              @turn = playerToKan.playerNumber
+          )
+          .catch(console.error)
+      else
+        pungToExtend = _.filter(playerToKan.hand.calledMelds,(x) -> x.type == "Pung" && x.suit() == tileToKan.suit && x.value() == tileToKan.value)
+        if(pungToExtend.length == 1)
+          pungToExtend = pungToExtend[0]
+          @phase = ["extendKaning",tileToKan]
+          for player in @players
+            if(player.playerNumber != playerToKan.playerNumber)
+              player.sendMessage("Player #{playerToKan.playerNumber} has declared an extended Kan on #{tileToKan.getName(player.namedTiles)}.")
+            else
+              player.sendMessage("You have declared an extended Kan on #{tileToKan.getName(player.namedTiles)}.")
+          extendAfterTen = new Promise((resolve,reject) =>
+            setTimeout(->
+              resolve("Time has Passed")
+            ,1000))
+          extendAfterTen
+            .then(
+              if(_.isEqual(@phase,["extendKaning",tileToKan]))
+                @phase = "discard"
+                for meld in playerToKan.hand.calledMelds
+                  if(meld.type == "Pung" && meld.suit() == tileToKan.suit && meld.value() == tileToKan.value)
+                    playerToKan.hand.calledMelds.makeKong()
+                drawnTile = playerToKan.hand.draw(@wall)
+                @wall.doraFlip()
+                for player in @players
+                  if(player.playerNumber!=playerToKan.playerNumber)
+                    player.sendMessage("Player #{playerToKan.playerNumber} has completed their Kan.")
+                  else
+                    player.sendMessage("You have completed your Kan.")
+                    player.sendMessage("Your deadwall draw is #{drawnTile.getName(player.namedTiles)}.")
+                  player.sendMessage("The Dora Tiles are now: #{@wall.printDora(player.namedTiles)}")
+                @turn = playerToKan.playerNumber
+            )
+            .catch(console.error)
+        else
+          playerToKan.sendMessage("Don't have Pung to extend into Kong.")
+
 
   openKanTiles:(playerToKan) ->
     if(@phase.isArray && @phase[0] == "roning")

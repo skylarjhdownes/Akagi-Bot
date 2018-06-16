@@ -166,7 +166,7 @@ class Hand
   uncalled: ->
     out = @contains[0..]
     for x in @calledMelds
-      for y in x
+      for y in x.tiles
         remove = out.findIndex(y,(z)->_.isEqual(y,z))
         out.splice(remove,1)
     return out
