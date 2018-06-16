@@ -219,6 +219,7 @@ class Meld
       @type = "Pung"
     else
       @type = "Chow"
+      @tiles.sort((a,b) -> a.value-b.value)
 
   printMeld: (writtenName = true) ->
     return (x.getName(writtenName) for x in @tiles)
