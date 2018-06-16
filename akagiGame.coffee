@@ -17,7 +17,8 @@ class MahjongGame
     @startRoundOne()
 
   startRoundOne: ->
-    #TODO: Randomize starting locations later
+    #Randomize starting locations, then assign each player a seat.
+    @players = _.shuffle(@players)
     @eastPlayer = @players[0]
     @southPlayer = @players[1]
     @westPlayer = @players[2]
@@ -41,11 +42,11 @@ class MahjongGame
     @prevailingWind = prevailingWind
     @dealer = dealer
     @turn = dealer.playerNumber
-    @phase = 'draw'
+    @phase = 'discard'
     @wall.doraFlip()
     for player in @players
       player.hand.startDraw(@wall)
-      player.roundStart()
+      player.roundStart(@wall)
       player.sendMessage("Prevailing wind is #{@prevailingWind}.")
       player.sendMessage("Dora is #{@wall.printDora()}.")
 
@@ -112,11 +113,12 @@ class MahjongGame
     else
       playerToChi.sendMessage("Wrong time to Chi")
 
-  #Not Yet Implemented
   selfKanTiles(playerToKan,tileToKan)
     uncalledKanTiles = _.filter(playerToKan.hand.uncalled(),(x) -> _.isEqual(x,tileToKan)).length
-    if(@phase != "discard")
-      playerToKan.sendMessage("One can only self Kan during one's own turn.")
+    if(@turn != playerToKan.playerNumber)
+      playerToKan.sendMessage("It is not your turn.")
+    else if(@phase != "discard")
+      playerToKan.sendMessage("One can only self Kan during one's own turn after one has drawn.")
     else if(uncalledKanTiles < 1)
       playerToKan.sendMessage("No tiles to Kan with.")
     else if(uncalledKanTiles in [2,3])
