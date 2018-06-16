@@ -167,7 +167,7 @@ class Hand
     out = @contains[0..]
     for x in @calledMelds
       for y in x.tiles
-        remove = out.findIndex(y,(z)->_.isEqual(y,z))
+        remove = _.findIndex(out,(z)->_.isEqual(y,z))
         out.splice(remove,1)
     return out
 
