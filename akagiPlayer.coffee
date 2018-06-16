@@ -26,6 +26,10 @@ class Player
       @playerChannel.send("Tile names hidden")
   printHand: ->
     @hand.printHand(@namedTiles)
+  printUncalled: ->
+    @hand.printUncalled(@namedTiles)
+  printMelds:(tileNames = true) ->
+    @hand.printMelds(tileNames)
   wallDraw:(wall) ->
     tileDrawn = @hand.draw(wall)
     @playerChannel.send(tileDrawn[0].getName(@namedTiles))

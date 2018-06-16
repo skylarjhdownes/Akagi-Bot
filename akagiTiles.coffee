@@ -188,6 +188,16 @@ class Hand
     else
       return (x.getName(writtenName) for x in @contains)
 
+  #prints the tiles not yet used in any open melds
+  printUncalled: (writtenName = true) ->
+    return (x.getName(writtenName0) for x in @uncalled())
+
+  #prints the tiles used in called Melds
+  printMelds: (writtenName = true) ->
+    if(@calledMelds.length == 0)
+      return("No Called Melds")
+    else
+      return (x.printMeld(writtenName) for x in @calledMelds)
 
   #returns true if there are no calledMelds, or if they are all self-called Kongs
   isConcealed: ->

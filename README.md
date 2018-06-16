@@ -17,6 +17,10 @@ Currently contains the following commands:
 
 ~hand - Only usable in player channel.  Looks at the tiles in that player's hand.
 
+~remaining - Only usable in player channel.  Looks at the tiles in that player's hand which have yet to be melded.
+
+~melds - If given a player number, looks at the tiles a player has melded.  If used alone, looks at own called tiles.
+
 ~pile - If given a player number, looks at the tiles in the discard pile of that player. If used alone, looks at your own discard pile.
 
 ~toggle - Turns off or on the written form of the tiles. Only usable by players.
@@ -27,7 +31,7 @@ Currently contains the following commands:
 
 ~chi - Allows one to Chi.  Takes 4 arguments, the two tiles you are forming the meld with from your hand.
 
-~kan - Allows one to Kan players discards.  Self drawn Kan is currently not implemented.
+~kan - Allows one to Kan players discards.  If done on your turn, requires the tile you want to Kan as an argument.
 
 !tiles - Displays a picture of each tile.
 

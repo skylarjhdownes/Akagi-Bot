@@ -168,6 +168,18 @@ bot.on('message', (message) =>
           message.channel.send("Dora Indicator: #{fromGame.wall.printDora()}")
       if(commandArgs[0] == "hand" and channelType == "player")
         message.channel.send("Hand: #{fromPlayer.printHand()}")
+      if(commandArgs[0] == "remaining" and channelType == "player")
+        message.channel.send("Remaining: #{fromPlayer.printUncalled()}")
+      if(commandArgs[0] == "melds")
+        if(commandArgs.length == 1 and channelType == "player")
+          fromPlayer.sendMessage("Your melds are: #{fromPlayer.printMelds(fromPlayer.namedTiles)}")
+        else if (commandArgs[1] in ["1","2","3","4"])
+          if(channelType == "player")
+            fromPlayer.sendMessage("Player #{commandArgs[1]} has the following melds: #{fromGame.players[commandArgs[1]-1].printMelds(fromPlayer.namedTiles)}.")
+          else
+            message.channel.send("Player #{commandArgs[1]} has the following melds: #{fromGame.players[commandArgs[1]-1].printMelds()}.")
+        else
+          message.channel.send("Please select a real player.")
       if(commandArgs[0] == "toggle" and channelType == "player")
         fromPlayer.toggleTiles()
       if(commandArgs[0] == "draw" and channelType == "player")
