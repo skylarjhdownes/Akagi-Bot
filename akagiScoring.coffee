@@ -71,10 +71,12 @@ class gameFlags
 scoreMahjongHand = (hand, gameDataFlags) ->
   #Takes a hand of mahajong tiles and finds the highest scoring way it can be interpreted, returning the score, and the melds which lead to that score
   possibleHands = getPossibleHands(hand)
-  if possibleHands == []
+  console.log(possibleHands)
+  if possibleHands.length == 0
     return([0, "Not a Scoring Hand"])
   doraPoints = 0 #TODO Actually get dora points
-  scores = getScore(getYaku(hand, gameDataFlags), doraPoints) for hand in possibleHands
+  scores = getScore(getYaku(handPattern, gameDataFlags), doraPoints) for handPattern in possibleHands
+  console.log(scores)
   maxScore = _.maxBy(scores, (x) -> if x[0].isArray then x[0][0] else x[0])
   #maxLocation = _.indexOf(scores,maxScore)
   console.log(maxScore)

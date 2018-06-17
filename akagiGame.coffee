@@ -50,6 +50,7 @@ class MahjongGame
       player.roundStart(@wall)
       player.sendMessage("Prevailing wind is #{@prevailingWind}.")
       player.sendMessage("Dora is #{@wall.printDora()}.")
+      @eastPlayer.sendMessage("You are the first player.  Please discard a tile.")
 
   drawTile:(playerToDraw) ->
     if(@turn == playerToDraw.playerNumber)
@@ -62,11 +63,16 @@ class MahjongGame
       playerToDraw.sendMessage("It is not your turn.")
 
   tsumo:(playerToTsumo) ->
-    scoreMax = score.scoreMahjongHand(playerToTsumo.hand, new score.gameFlags(playerToTsumo.wind,@prevailingWind))
-    if(scoreMax[0] == 0)
-      playerToTsumo.sendMessage(scoreMax[1])
+    if(@turn!=playerToTsumo.playerNumber)
+      playerToTsumo.sendMessage("Not your turn.")
+    else if(@phase!="discard")
+      playerToTsumo.sendMessage("You don't have enough tiles.")
     else
-      playerToTsumo.sendMessage(scoreMax[1]) #TODO Actually do stuff here instead of just saying you will.
+      scoreMax = score.scoreMahjongHand(playerToTsumo.hand, new score.gameFlags(playerToTsumo.wind,@prevailingWind))
+      if(scoreMax[0] == 0)
+        playerToTsumo.sendMessage(scoreMax[1])
+      else
+        playerToTsumo.sendMessage(scoreMax[1]) #TODO Actually do stuff here instead of just saying you will.
 
   chiTile:(playerToChi, tile1, tile2) ->
     if(@phase == "draw")

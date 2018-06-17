@@ -117,6 +117,12 @@ bot.on('message', (message) =>
         exports.mahjongGames = (game for game in exports.mahjongGames when game.gameObservationChannel.guild.id != message.guild.id)
       else
         message.channel.send("Can't Ragnarok outside a server.  :(")
+        
+    if(commandArgs[0] == "nuke")
+      if message.channel.type == "text" && message.guild.name == "Akagi's Mahjong Parlor"
+        for channel in message.guild.channels
+          if(channel.type == "text" && channel.name != "general")
+            channel.delete()
 
     if(commandArgs[0] == "tiles")
       message.channel.send(mahjongTiles.allTilesGetter())

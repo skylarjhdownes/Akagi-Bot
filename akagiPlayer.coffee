@@ -13,8 +13,6 @@ class Player
     if(@wind == "East")
       @hand.draw(wall)
     @playerChannel.send("Starting Hand : "+@hand.printHand())
-    if(@wind == "East")
-      @playerChannel.send("You are the first player.  Please discard a tile.")
 
   sendMessage:(message) ->
     @playerChannel.send(message)
