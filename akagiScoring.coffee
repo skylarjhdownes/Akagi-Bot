@@ -68,13 +68,14 @@ class gameFlags
     @chiho = "Chiho" in @flags
     @renho = "Renho" in @flags
 
-scoreMahjongHand = (hand, winningPlayer, gameDataFlags) ->
+scoreMahjongHand = (hand, gameDataFlags) ->
   #Takes a hand of mahajong tiles and finds the highest scoring way it can be interpreted, returning the score, and the melds which lead to that score
   possibleHands = getPossibleHands(hand)
   if possibleHands == []
     return([0, "Not a Scoring Hand"])
-  scores = getScore(getYaku(hand, new gameFlags(playerWind,roundWind)), doraPoints) for hand in possibleHands
-  maxScore = _.maxBy(scores, (x) -> x[0])
+  doraPoints = 0 #TODO Actually get dora points
+  scores = getScore(getYaku(hand, gameDataFlags), doraPoints) for hand in possibleHands
+  maxScore = _.maxBy(scores, (x) -> if x[0].isArray then x[0][0] else x[0])
   maxLocation = _.indexOf(scores,maxScore)
   return([maxScore,possibleHands[maxLocation]])
 
@@ -129,7 +130,7 @@ getPossibleHands = (hand) ->
   _drawnTilePlacer = () =>
     for pattern in possiblePatterns
       for meld, i in pattern
-        if(meld.containsTile(hand.lastTileDrawn))
+        if(meld.containsTile(hand.lastTileDrawn) && meld.takenFrom == "self")
           chosenOne = _.deepCopy(meld)
           chosenOne.lastTileDrawn = _.copy(hand.lastTileDrawn)
           chosenOne.takenFrom = hand.lastTileFrom
@@ -390,7 +391,7 @@ getYaku = (melds, gameDataFlags) ->
 
 
 
-  return({yaku:yakuModifiers,fu:fu,flags:gameDataFlags})
+  return({yaku:yakuModifiers,fu:fu,flags:gameDataFlags,selfDraw:selfDraw})
 
   _meldContainsAtLeastOneTerminalOrHonor = (meld) ->
     for tile in meld.tiles
@@ -527,12 +528,12 @@ getScore = (values, dora) ->
 
   #Takes base Score and multiplies it depending on seat wind and whether ron or tsumo
   if(values.flags.playerWind == "east")
-    if(selfDraw)
+    if(values.selfDraw)
       score = _roundUpToClosestHundred(baseScore * 2)
     else
       score = _roundUpToClosestHundred(baseScore * 6)
   else
-    if(selfDraw)
+    if(values.selfDraw)
       score = [_roundUpToClosestHundred(baseScore), _roundUpToClosestHundred(baseScore*2)]
     else
       score = _roundUpToClosestHundred(baseScore * 4)
@@ -546,5 +547,6 @@ getScore = (values, dora) ->
     else
       inScore
 
-module.exports = scoreMahjongHand
+module.exports.scoreMahjongHand = scoreMahjongHand
 module.exports.getPossibleHands = getPossibleHands
+module.exports.gameFlags = gameFlags

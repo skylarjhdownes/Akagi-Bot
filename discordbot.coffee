@@ -202,6 +202,8 @@ bot.on('message', (message) =>
           tile1 = new mahjongTiles.Tile(commandArgs[2],commandArgs[1])
           tile2 = new mahjongTiles.Tile(commandArgs[4],commandArgs[3])
           fromGame.chiTile(fromPlayer,tile1,tile2)
+      if(commandArgs[0] == "tsumo" and channelType == "player")
+        fromGame.tsumo(fromPlayer)
       if(commandArgs[0] == "pile")
         if(commandArgs.length == 1 and channelType == "player")
           fromPlayer.sendMessage("You have discarded #{fromPlayer.hand.discardPile.printDiscard(fromPlayer.namedTiles)}.")

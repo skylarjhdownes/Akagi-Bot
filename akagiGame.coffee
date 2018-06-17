@@ -1,5 +1,6 @@
 gamePieces = require('./akagiTiles.coffee')
 playerObject = require('./akagiPlayer.coffee')
+score = require('./akagiScoring.coffee')
 Promise = require('promise')
 _ = require('lodash')
 
@@ -59,6 +60,13 @@ class MahjongGame
         @phase = "discard"
     else
       playerToDraw.sendMessage("It is not your turn.")
+
+  tsumo:(playerToTsumo) ->
+    scoreMax = score.scoreMahjongHand(playerToTsumo.hand, new score.gameFlags(playerToTsumo.wind,@prevailingWind))
+    if(scoreMax[0] == 0)
+      playerToTsumo.sendMessage(scoreMax[1])
+    else
+      playerToTsumo.sendMessage(scoreMax[1]) #TODO Actually do stuff here instead of just saying you will.
 
   chiTile:(playerToChi, tile1, tile2) ->
     if(@phase == "draw")
