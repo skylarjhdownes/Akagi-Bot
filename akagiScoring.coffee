@@ -111,10 +111,10 @@ getPossibleHands = (hand) ->
     if(!pairRemaining && remaining.length == 2)
       return "Nope"
     if(pairRemaining && _.isEqual(remaining[0],remaining[1]))
-      normalHandFinder(_.concat(melds,new gamePieces.Meld([remaining[0],remaining[1]])),remaining[2..])
+      _normalHandFinder(_.concat(melds,new gamePieces.Meld([remaining[0],remaining[1]])),remaining[2..])
     if(remaining.length >= 3)
       if(_.isEqual(remaining[0],remaining[1]) && _.isEqual(remaining[1],remaining[2]))
-        normalHandFinder(_.concat(melds,new gamePieces.Meld([remaining[0],remaining[1],remaining[2]])),remaining[3..])
+        _normalHandFinder(_.concat(melds,new gamePieces.Meld([remaining[0],remaining[1],remaining[2]])),remaining[3..])
       nextInRun = new gamePieces.Tile(remaining[0].suit,remaining[0].value+1)
       nextAt = _.findIndex(remaining,(x)->_.isEqual(nextInRun,x))
       afterThat = new gamePieces.Tile(remaining[0].suit,remaining[0].value+2)
@@ -125,7 +125,7 @@ getPossibleHands = (hand) ->
         afterAt = _.findIndex(pruned,(x)->_.isEqual(afterThat,x))
         pruned.splice(afterAt,1)
         pruned = pruned[1..]
-        normalHandFinder(_.concat(melds,new gamePieces.Meld([remaining[0],nextInRun,afterThat])),pruned)
+        _normalHandFinder(_.concat(melds,new gamePieces.Meld([remaining[0],nextInRun,afterThat])),pruned)
 
   _drawnTilePlacer = () =>
     for pattern in possiblePatterns
