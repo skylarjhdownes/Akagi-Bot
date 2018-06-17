@@ -76,8 +76,9 @@ scoreMahjongHand = (hand, gameDataFlags) ->
   doraPoints = 0 #TODO Actually get dora points
   scores = getScore(getYaku(hand, gameDataFlags), doraPoints) for hand in possibleHands
   maxScore = _.maxBy(scores, (x) -> if x[0].isArray then x[0][0] else x[0])
-  maxLocation = _.indexOf(scores,maxScore)
-  return([maxScore,possibleHands[maxLocation]])
+  #maxLocation = _.indexOf(scores,maxScore)
+  console.log(maxScore)
+  return(maxScore)
 
 getPossibleHands = (hand) ->
   #Takes a hand of mahjong tiles and finds every possible way the hand could be interpreted to be a winning hand, returning each different meld combination
