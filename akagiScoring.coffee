@@ -134,10 +134,10 @@ getPossibleHands = (hand) ->
     for pattern in possiblePatterns
       for meld, i in pattern
         if(meld.containsTile(hand.lastTileDrawn) && meld.takenFrom == "self")
-          chosenOne = _.deepCopy(meld)
-          chosenOne.lastTileDrawn = _.copy(hand.lastTileDrawn)
+          chosenOne = _.cloneDeep(meld)
+          chosenOne.lastTileDrawn = _.clone(hand.lastTileDrawn)
           chosenOne.takenFrom = hand.lastTileFrom
-          existingHand = _.deepCopy(pattern)
+          existingHand = _.cloneDeep(pattern)
           existingHand[i] = chosenOne
           possibleHands.push(existingHand)
 

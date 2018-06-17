@@ -50,7 +50,8 @@ class MahjongGame
       player.roundStart(@wall)
       player.sendMessage("Prevailing wind is #{@prevailingWind}.")
       player.sendMessage("Dora is #{@wall.printDora()}.")
-      @eastPlayer.sendMessage("You are the first player.  Please discard a tile.")
+      if(player.wind == "East")
+        player.sendMessage("You are the first player.  Please discard a tile.")
 
   drawTile:(playerToDraw) ->
     if(@turn == playerToDraw.playerNumber)
