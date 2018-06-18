@@ -13,7 +13,9 @@ class Player
     if(@wind == "East")
       @hand.draw(wall)
     @playerChannel.send("Starting Hand : "+@hand.printHand())
-
+  resetHand: ->
+    @discardPile = new gamePieces.Pile()
+    @hand = new gamePieces.Hand(@discardPile)
   sendMessage:(message) ->
     @playerChannel.send(message)
   toggleTiles: ->

@@ -68,19 +68,38 @@ class gameFlags
     @chiho = "Chiho" in @flags
     @renho = "Renho" in @flags
 
-scoreMahjongHand = (hand, gameDataFlags) ->
+scoreMahjongHand = (hand, gameDataFlags, dora) ->
   #Takes a hand of mahajong tiles and finds the highest scoring way it can be interpreted, returning the score, and the melds which lead to that score
   possibleHands = getPossibleHands(hand)
   console.log(possibleHands)
   if possibleHands.length == 0
     return([0, "Not a Scoring Hand"])
-  doraPoints = 0 #TODO Actually get dora points
-  scores = getScore(getYaku(handPattern, gameDataFlags), doraPoints) for handPattern in possibleHands
+  doras = getDora(hand,gameDataFlags.riichi,dora)
+  doraPoints = doras[0]
+  urDoraPoints = doras[1]
+  scores = getScore(getYaku(handPattern, gameDataFlags), doraPoints, urDoraPoints) for handPattern in possibleHands
   console.log(scores)
-  maxScore = _.maxBy(scores, (x) -> if x[0].isArray then x[0][0] else x[0])
+  maxScore = _.maxBy(scores, (x) -> x[0])
   #maxLocation = _.indexOf(scores,maxScore)
   console.log(maxScore)
   return(maxScore)
+
+getDora = (hand, riichi, doraSets) ->
+  nextValue = {1:2,2:3,3:4,4:5,5:6,6:7,7:8,8:9,9:1,"East":"South","South":"West","West":"North","North":"East","Red":"White","White":"Green","Green":"Red"}
+  dora = doraSets[0]
+  urDora = doraSets[1]
+  doraPoints = 0
+  urDoraPoints = 0
+  for doraIndicator in dora
+    for tile in hand.contains
+      if(doraIndicator.suit == tile.suit && nextValue[doraIndicator.value] == tile.value)
+        doraPoints += 1
+  if(riichi)
+    for urDoraIndicator in urDora
+      for tile in hand.contains
+        if(urDoraIndicator.suit == tile.suit && nextValue[urDoraIndicator.value] == tile.value)
+          urDoraPoints += 1
+  return [doraPoints, urDoraPoints]
 
 getPossibleHands = (hand) ->
   #Takes a hand of mahjong tiles and finds every possible way the hand could be interpreted to be a winning hand, returning each different meld combination
@@ -486,7 +505,7 @@ getYaku = (melds, gameDataFlags) ->
       fu = _roundUpToClosestHundred(fu)
     return [fu, meldFu]
 
-getScore = (values, dora) ->
+getScore = (values, dora, urDora) ->
   if(values.yaku.length == 0)
     return([0,["No Yaku"]])
   #Score the yakuModifiers list
@@ -504,13 +523,19 @@ getScore = (values, dora) ->
   else if("Renho" in values.yaku)
     if(yakuPoints > 0 && yakuPoints + dora > 5)
       printedYaku = (yaku for yaku in values.yaku when yaku != "Renho")
-      fan = yakuPoints + dora
+      fan = yakuPoints + dora + urDora
     else
       printedYaku = ["Renho"]
       fan = 5
   else
     printedYaku = values.yaku
-    fan = yakuPoints + dora
+    fan = yakuPoints + dora + urDora
+
+  if "Renho" not in printedYaku
+    if dora > 0
+      printedYaku.push("Dora: #{dora}")
+    if urDora > 0
+      printedYaku.push("Ur Dora: #{urDora}")
 
   #Gives Base Score
   if yakuman
@@ -529,19 +554,19 @@ getScore = (values, dora) ->
     if baseScore > 2000
       baseScore = 2000
 
-  #Takes base Score and multiplies it depending on seat wind and whether ron or tsumo
-  if(values.flags.playerWind == "east")
-    if(values.selfDraw)
-      score = _roundUpToClosestHundred(baseScore * 2)
-    else
-      score = _roundUpToClosestHundred(baseScore * 6)
-  else
-    if(values.selfDraw)
-      score = [_roundUpToClosestHundred(baseScore), _roundUpToClosestHundred(baseScore*2)]
-    else
-      score = _roundUpToClosestHundred(baseScore * 4)
+#  #Takes base Score and multiplies it depending on seat wind and whether ron or tsumo
+#  if(values.flags.playerWind == "east")
+#    if(values.selfDraw)
+#      score = _roundUpToClosestHundred(baseScore * 2)
+#    else
+#      score = _roundUpToClosestHundred(baseScore * 6)
+#  else
+#    if(values.selfDraw)
+#      score = [_roundUpToClosestHundred(baseScore), _roundUpToClosestHundred(baseScore*2)]
+#    else
+#      score = _roundUpToClosestHundred(baseScore * 4)
 
-  return [score,printedYaku]
+  return [baseScore,printedYaku]
 
 
   _roundUpToClosestHundred = (inScore) ->

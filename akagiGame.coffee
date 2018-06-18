@@ -8,6 +8,8 @@ class MahjongGame
   #A four player game of Mahjong
   constructor: (playerChannels, server, gameSettings) ->
     @wall = new gamePieces.Wall()
+    @counter = 0 #Put down when east winds a round, increasing point values.
+    @winningPlayer = false
     @players = [
       new playerObject(playerChannels[1],1),
       new playerObject(playerChannels[2],2),
@@ -37,11 +39,11 @@ class MahjongGame
     @westPlayer.setNextPlayer(@northPlayer.playerNumber)
     @northPlayer.setNextPlayer(@eastPlayer.playerNumber)
 
-    @startRound("East",@eastPlayer)
+    @prevailingWind = "East"
+    @dealer = @eastPlayer
+    @startRound()
 
-  startRound:(prevailingWind,dealer) ->
-    @prevailingWind = prevailingWind
-    @dealer = dealer
+  startRound: ->
     @turn = dealer.playerNumber
     @phase = 'discard'
     @wall.doraFlip()
@@ -52,6 +54,26 @@ class MahjongGame
       player.sendMessage("Dora is #{@wall.printDora()}.")
       if(player.wind == "East")
         player.sendMessage("You are the first player.  Please discard a tile.")
+
+  newRound: ->
+    if !@winningPlayer || @winningPlayer.wind == "East"
+      @counter += 1
+    else
+      @counter = 0
+      for player in @players
+        player.rotateWind()
+      if @eastPlayer.wind == "East"
+        if(@prevailingWind == "East")
+          @prevailingWind = "South"
+        else
+          @endGame() #TODO Implement game end.
+    @wall = new gamePieces.Wall()
+    @winningPlayer = false
+    for player in @players
+      player.resetHand()
+      if player.wind == "East"
+        @dealer = player
+    @startRound()
 
   drawTile:(playerToDraw) ->
     if(@turn == playerToDraw.playerNumber)
@@ -69,11 +91,38 @@ class MahjongGame
     else if(@phase!="discard")
       playerToTsumo.sendMessage("You don't have enough tiles.")
     else
-      scoreMax = score.scoreMahjongHand(playerToTsumo.hand, new score.gameFlags(playerToTsumo.wind,@prevailingWind))
+      scoreMax = score.scoreMahjongHand(playerToTsumo.hand, new score.gameFlags(playerToTsumo.wind,@prevailingWind),[@wall.dora,@wall.urDora])
       if(scoreMax[0] == 0)
         playerToTsumo.sendMessage(scoreMax[1])
       else
-        playerToTsumo.sendMessage(scoreMax[1]) #TODO Actually do stuff here instead of just saying you will.
+        for player in @players
+          if(playerToTsumo.wind == "East")
+            if player.playerNumber != @turn
+              player.roundPoints -= _roundUpToClosestHundred(2*scoreMax[0])+@counter*100
+              player.sendMessage("Player #{playerToTsumo.playerNumber} has won from self draw.")
+              player.sendMessage("You pay out #{_roundUpToClosestHundred(2*scoreMax[0])+@counter*100} points.")
+            else
+              player.roundPoints += _roundUpToClosestHundred(6*scoreMax[0])+@counter*300
+              player.sendMessage("You have won on self draw.")
+              player.sendMessage("You receive #{_roundUpToClosestHundred(6*scoreMax[0])+@counter*300} points.")
+          else
+            if player.wind == "East"
+              player.roundPoints -= _roundUpToClosestHundred(2*scoreMax[0])+@counter*100
+              player.sendMessage("Player #{playerToTsumo.playerNumber} has won from self draw.")
+              player.sendMessage("You pay out #{_roundUpToClosestHundred(2*scoreMax[0])+@counter*100} points.")
+            else if player.playerNumber != @turn
+              player.roundPoints -= _roundUpToClosestHundred(scoreMax[0])+@counter*100
+              player.sendMessage("Player #{playerToTsumo.playerNumber} has won from self draw.")
+              player.sendMessage("You pay out #{_roundUpToClosestHundred(scoreMax[0])+@counter*100} points.")
+            else
+              player.roundPoints += _roundUpToClosestHundred(4*scoreMax[0])+@counter*300
+              player.sendMessage("You have won on self draw.")
+              player.sendMessage("You receive #{_roundUpToClosestHundred(4*scoreMax[0])+@counter*300} points.")
+            player.sendMessage("The winning hand contained the following yaku: #{scoreMax[1]}")
+            player.sendMessage("The round is over.  To start the next round, type next.")
+        @winningPlayer = playerToTsumo
+        @phase = "finished"
+
 
   chiTile:(playerToChi, tile1, tile2) ->
     if(@phase == "draw")
@@ -354,5 +403,10 @@ class MahjongGame
     else
       playerToDiscard.sendMessage("It is not your turn.")
 
+  _roundUpToClosestHundred = (inScore) ->
+    if (inScore%100)!=0
+      return (inScore//100+1)*100
+    else
+      inScore
 
 module.exports = MahjongGame

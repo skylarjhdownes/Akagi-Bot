@@ -120,6 +120,7 @@ class Wall
     @inWall.push(new Tile("wind",y)) for y in ["east","south","west","north"] for z in [0...4]
     @inWall.push(new Tile("dragon",y)) for y in ["red","white","green"] for z in [0...4]
     @dora = []
+    @urDora = []
 
   drawFrom: ->
     #removes a random tile from the wall and returns it
@@ -128,10 +129,13 @@ class Wall
     return out[0]
 
   doraFlip: ->
-    #Draws a random tile and sets it to be the dora
+    #Draws a random tile and sets it to be the dora, and secretly draws one to be the urdora as well.
     take = Math.floor(Math.random()*@inWall.length)
     out = @inWall.splice(take,1)
     @dora.push(out[0])
+    take2 = Math.floor(Math.random()*@inWall.length)
+    out2 = @inWall.splice(take2,1)
+    @urDora.push(out2[0])
     return out[0]
 
   printDora: (writtenName = true) ->

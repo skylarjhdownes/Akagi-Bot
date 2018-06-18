@@ -27,11 +27,15 @@ Currently contains the following commands:
 
 ~abort game - Currently does nothing, but claims the game is over
 
+~next - Used after a round is over, in order to start next round.
+
 ~pon - Allows one to Pon players discards.
 
 ~chi - Allows one to Chi.  Takes 4 arguments, the two tiles you are forming the meld with from your hand.
 
 ~kan - Allows one to Kan players discards.  If done on your turn, requires the tile you want to Kan as an argument.
+
+~tsumo - Allows one to win off of self draw.
 
 !tiles - Displays a picture of each tile.
 

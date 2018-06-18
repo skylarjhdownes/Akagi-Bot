@@ -159,6 +159,11 @@ bot.on('message', (message) =>
       if(commandArgs[0] == "abort" and commandArgs[1] == "game" and channelType == "player")
         #TODO Delete game
         fromGame.gameObservationChannel.sendMessage("Game Ended")
+      if(commandArgs[0] == "next" && channelType == "player")
+        if(fromGame.phase != "finished")
+          message.channel.send("Round is not yet finished.")
+        else
+          fromGame.newRound()
       if(commandArgs[0] == "turn")
         message.channel.send("It is player #{fromGame.turn}'s turn.")
       if(commandArgs[0] == "phase")
