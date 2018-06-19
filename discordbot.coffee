@@ -200,6 +200,8 @@ bot.on('message', (message) =>
         fromGame.drawTile(fromPlayer)
       if(commandArgs[0] == "discard" and channelType == "player")
         fromGame.discardTile(fromPlayer,commandArgs[1]+" "+commandArgs[2])
+      if(commandArgs[0] == "riichi" and channelType == "player")
+        fromGame.discardTile(fromPlayer,commandArgs[1]+" "+commandArgs[2],true)
       if(commandArgs[0] == "pon" and channelType == "player")
         fromGame.ponTile(fromPlayer)
       if(commandArgs[0] == "kan" and channelType == "player")

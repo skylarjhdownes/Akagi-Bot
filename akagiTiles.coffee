@@ -144,6 +144,12 @@ class Wall
     else
       return (x.getName(writtenName) for x in @dora)
 
+  printUrDora: (writtenName = true) ->
+    if(@urDora.length == 0)
+      return "No Ur Dora"
+    else
+      return (x.getName(writtenName) for x in @urDora)
+
 class Hand
   #A Hand of tiles
   constructor: (@discardPile) ->
@@ -258,11 +264,14 @@ class Pile
   discardTo: (x) ->
     @contains.push(x)
 
+  declareRiichi: ->
+    @riichi = @contains.length -1
+
   #Returns the most recent tile, adds that tile to @stolenTiles, and makes next tile riichi if the stolen tile was.
   drawFrom: ->
-    out = @contains[@contains.length-1]
-    @stolenTiles.push(@contains.length-1)
-    if(@riichi == @contains.length-1)
+    out = @contains[@contains.length -1]
+    @stolenTiles.push(@contains.length -1)
+    if(@riichi == @contains.length -1)
       @riichi+=1
     return out
 

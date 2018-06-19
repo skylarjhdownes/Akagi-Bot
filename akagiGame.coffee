@@ -9,6 +9,8 @@ class MahjongGame
   constructor: (playerChannels, server, gameSettings) ->
     @wall = new gamePieces.Wall()
     @counter = 0 #Put down when east winds a round, increasing point values.
+    @riichiSticks = [] #Used to keep track when a player calls riichi
+    @pendingRiichiPoints = false #Keeps track of who just called riichi, so that once we are sure the next round has started, then they can have their stick added to the pile.
     @winningPlayer = false
     @players = [
       new playerObject(playerChannels[1],1),
@@ -75,6 +77,15 @@ class MahjongGame
         @dealer = player
     @startRound()
 
+  #Put the stick into the pot, once the next turn has started.
+  confirmRiichi: ->
+    if(@pendingRiichiPoints)
+      @riichiSticks.append(@pendingRiichiPoints)
+      for player in @players
+        if player.playerNumber == @pendingRiichiPoints
+          player.roundPoints -= 1000
+      @pendingRiichiPoints = false
+
   drawTile:(playerToDraw) ->
     if(@turn == playerToDraw.playerNumber)
       if(@phase != "draw")
@@ -82,8 +93,16 @@ class MahjongGame
       else
         playerToDraw.wallDraw(@wall)
         @phase = "discard"
+        @confirmRiichi()
     else
       playerToDraw.sendMessage("It is not your turn.")
+
+  #Calculates all the flags for non hand based points in the game.
+  winFlagCalculator:(winningPlayer) ->
+    flags = []
+    if(winningPlayer.riichiCalled())
+      flags.push("Riichi")
+    return new score.gameFlags(winningPlayer.wind,@prevailingWind,flags)
 
   tsumo:(playerToTsumo) ->
     if(@turn!=playerToTsumo.playerNumber)
@@ -91,35 +110,39 @@ class MahjongGame
     else if(@phase!="discard")
       playerToTsumo.sendMessage("You don't have enough tiles.")
     else
-      scoreMax = score.scoreMahjongHand(playerToTsumo.hand, new score.gameFlags(playerToTsumo.wind,@prevailingWind),[@wall.dora,@wall.urDora])
+      scoreMax = score.scoreMahjongHand(playerToTsumo.hand, @winFlagCalculator(playerToTsumo), [@wall.dora,@wall.urDora])
       if(scoreMax[0] == 0)
         playerToTsumo.sendMessage(scoreMax[1])
       else
         for player in @players
+          #CalculatePoints
           if(playerToTsumo.wind == "East")
             if player.playerNumber != @turn
-              player.roundPoints -= _roundUpToClosestHundred(2*scoreMax[0])+@counter*100
-              player.sendMessage("Player #{playerToTsumo.playerNumber} has won from self draw.")
-              player.sendMessage("You pay out #{_roundUpToClosestHundred(2*scoreMax[0])+@counter*100} points.")
+              pointsLost = _roundUpToClosestHundred(2*scoreMax[0])+@counter*100
             else
-              player.roundPoints += _roundUpToClosestHundred(6*scoreMax[0])+@counter*300
-              player.sendMessage("You have won on self draw.")
-              player.sendMessage("You receive #{_roundUpToClosestHundred(6*scoreMax[0])+@counter*300} points.")
+              pointsGained = _roundUpToClosestHundred(6*scoreMax[0])+@counter*300+@riichiSticks.length*1000
           else
             if player.wind == "East"
-              player.roundPoints -= _roundUpToClosestHundred(2*scoreMax[0])+@counter*100
-              player.sendMessage("Player #{playerToTsumo.playerNumber} has won from self draw.")
-              player.sendMessage("You pay out #{_roundUpToClosestHundred(2*scoreMax[0])+@counter*100} points.")
+              pointsLost = _roundUpToClosestHundred(2*scoreMax[0])+@counter*100
             else if player.playerNumber != @turn
-              player.roundPoints -= _roundUpToClosestHundred(scoreMax[0])+@counter*100
-              player.sendMessage("Player #{playerToTsumo.playerNumber} has won from self draw.")
-              player.sendMessage("You pay out #{_roundUpToClosestHundred(scoreMax[0])+@counter*100} points.")
+              pointsLost = _roundUpToClosestHundred(scoreMax[0])+@counter*100
             else
-              player.roundPoints += _roundUpToClosestHundred(4*scoreMax[0])+@counter*300
-              player.sendMessage("You have won on self draw.")
-              player.sendMessage("You receive #{_roundUpToClosestHundred(4*scoreMax[0])+@counter*300} points.")
-            player.sendMessage("The winning hand contained the following yaku: #{scoreMax[1]}")
-            player.sendMessage("The round is over.  To start the next round, type next.")
+              pointsGained = _roundUpToClosestHundred(4*scoreMax[0])+@counter*300+@riichiSticks.length*1000
+          @riichiSticks = []
+          #Say points
+          if(player.playerNumber != @turn)
+            player.roundPoints -= pointsLost
+            player.sendMessage("Player #{playerToTsumo.playerNumber} has won from self draw.")
+            player.sendMessage("You pay out #{pointsLost} points.")
+          else
+            player.roundPoints += pointsGained
+            player.sendMessage("You have won on self draw.")
+            player.sendMessage("You receive #{pointsGained} points.")
+          player.sendMessage("The winning hand contained the following yaku: #{scoreMax[1]}")
+          player.sendMessage("The dora were: #{@wall.printDora(player.namedTiles)}")
+          if(playerToTsumo.riichiCalled)
+            player.sendMessage("The ur dora were: #{@wall.printUrDora(player.namedTiles)}")
+          player.sendMessage("The round is over.  To start the next round, type next.")
         @winningPlayer = playerToTsumo
         @phase = "finished"
 
@@ -127,7 +150,9 @@ class MahjongGame
   chiTile:(playerToChi, tile1, tile2) ->
     if(@phase == "draw")
       if(playerToChi.playerNumber == @turn)
-        if(_.findIndex(playerToChi.hand.uncalled(),(x) -> _.isEqual(tile1, x)) != -1 && _.findIndex(playerToChi.hand.uncalled(),(x) -> _.isEqual(tile2, x)) != -1)
+        if(playerToChi.riichiCalled())
+          playerToChi.sendMessage("May not Chi after declaring Riichi.")
+        else if(_.findIndex(playerToChi.hand.uncalled(),(x) -> _.isEqual(tile1, x)) != -1 && _.findIndex(playerToChi.hand.uncalled(),(x) -> _.isEqual(tile2, x)) != -1)
           for discarder in @players
             if(@turn == discarder.nextPlayer)
               toChi = discarder.discardPile.contains[-1..][0]
@@ -154,6 +179,7 @@ class MahjongGame
                   .then((message)=>
                     if(_.isEqual(@phase,["chiing",playerToChi.playerNumber]))
                       @phase = "discard"
+                      @confirmRiichi()
                       for player in @players
                         if(@turn == player.nextPlayer)
                           playerToChi.hand.draw(player.discardPile)
@@ -169,7 +195,6 @@ class MahjongGame
                 playerToChi.sendMessage("Tiles specified do not create a legal meld.")
         else
           playerToChi.sendMessage("Hand doesn't contain tiles specified.")
-
       else
         playerToChi.sendMessage("May only Chi when you are next in turn order.")
     else if(@phase.isArray)
@@ -203,6 +228,7 @@ class MahjongGame
           .then(
             if(_.isEqual(@phase,["concealedKaning",tileToKan]))
               @phase = "discard"
+              @confirmRiichi()
               playerToKan.hand.calledMelds.push(new gamePieces.Meld([tileToKan,tileToKan,tileToKan,tileToKan]))
               drawnTile = playerToKan.hand.draw(@wall)
               @wall.doraFlip()
@@ -234,6 +260,7 @@ class MahjongGame
             .then(
               if(_.isEqual(@phase,["extendKaning",tileToKan]))
                 @phase = "discard"
+                @confirmRiichi()
                 for meld in playerToKan.hand.calledMelds
                   if(meld.type == "Pung" && meld.suit() == tileToKan.suit && meld.value() == tileToKan.value)
                     playerToKan.hand.calledMelds.makeKong()
@@ -254,7 +281,9 @@ class MahjongGame
 
 
   openKanTiles:(playerToKan) ->
-    if(@phase.isArray && @phase[0] == "roning")
+    if(playerToKan.riichiCalled())
+      playerToKan.sendMessage("You can't call tiles, except to win, after declaring Riichi.")
+    else if(@phase.isArray && @phase[0] == "roning")
       playerToKan.sendMessage("Kan has lower priority than Ron.")
     else if(@phase.isArray && @phase[0] == "chiing" && playerToPon.playerNumber == @phase[1])
       playerToKan.sendMessage("One cannot Kan if one has already declared Chi.")
@@ -276,6 +305,7 @@ class MahjongGame
           .then(
             if(_.isEqual(@phase,["callKaning",playerToKan.playerNumber]))
               @phase = "discard"
+              @confirmRiichi()
               playerToKan.hand.draw(discarder.discardPile)
               playerToKan.hand.calledMelds.push(new gamePieces.Meld([toKan,toKan,toKan,toKan],discarder.playerNumber))
               drawnTile = playerToKan.hand.draw(@wall)
@@ -296,7 +326,9 @@ class MahjongGame
       playerToKan.sendMessage("Wrong time to Kan.")
 
   ponTile:(playerToPon) ->
-    if(@phase in ["react","draw"] && @turn != playerToPon.nextPlayer)
+    if(playerToPon.riichiCalled())
+      playerToPon.sendMessage("You may not Pon after declaring Riichi.")
+    else if(@phase in ["react","draw"] && @turn != playerToPon.nextPlayer)
       for player in @players
         if(@turn == player.nextPlayer)
           toPon = player.discardPile.contains[-1..][0]
@@ -315,6 +347,7 @@ class MahjongGame
               .then((message)=>
                 if(_.isEqual(@phase,["poning",playerToPon.playerNumber]))
                   @phase = "discard"
+                  @confirmRiichi()
                   for player in @players
                     if(@turn == player.nextPlayer)
                       playerToPon.hand.draw(player.discardPile)
@@ -349,6 +382,7 @@ class MahjongGame
                 .then((message) =>
                   if(_.isEqual(@phase,["poning",playerToPon.playerNumber]))
                     @phase = "discard"
+                    @confirmRiichi()
                     for player in @players
                       if(@turn == player.nextPlayer)
                         playerToPon.hand.draw(player.discardPile)
@@ -370,25 +404,36 @@ class MahjongGame
       playerToPon.sendMessage("Wrong time to Pon.")
 
 
-
-  discardTile:(playerToDiscard,tileToDiscard) ->
+  discardTile:(playerToDiscard,tileToDiscard,riichi = false) ->
     if(@turn == playerToDiscard.playerNumber)
-      if(@phase == "discard")
+      if(@phase != "discard")
+        playerToDiscard.sendMessage("It is not the discard phase.")
+      else if(riichi && playerToDiscard.hand.concealed() == false)
+        playerToDiscard.sendMessage("You may only riichi with a concealed hand.")
+      else if(playerToDiscard.riichiCalled() && tileToDiscard != playerToDiscard.hand.lastTileDrawn.getTextName())
+        playerToDiscard.sendMessage("Once you have declared Riichi, you must always discard the drawn tile.")
+      else
         discarded = playerToDiscard.discardTile(tileToDiscard)
         if(discarded)
-          @gameObservationChannel.send("Player #{playerToDiscard.playerNumber} discarded a #{discarded.getName()}.")
+          if(riichi)
+            outtext = "declared riichi with"
+            playerToDiscard.discardPile.declareRiichi()
+            @pendingRiichiPoints = playerToDiscard.playerNumber
+          else
+            outtext = "discarded"
+          @gameObservationChannel.send("Player #{playerToDiscard.playerNumber} #{outtext} a #{discarded.getName()}.")
           for player in @players
             if(player.playerNumber != playerToDiscard.playerNumber)
-              player.sendMessage("Player #{playerToDiscard.playerNumber} discarded a #{discarded.getName(player.namedTiles)}.")
+              player.sendMessage("Player #{playerToDiscard.playerNumber}  #{outtext} a #{discarded.getName(player.namedTiles)}.")
             else
-              player.sendMessage("You discarded a #{discarded.getName(player.namedTiles)}.")
+              player.sendMessage("You  #{outtext} a #{discarded.getName(player.namedTiles)}.")
           @turn = playerToDiscard.nextPlayer
           @phase = "react"
-          waitTenSeconds = new Promise((resolve, reject) =>
+          nextTurnAfterTen = new Promise((resolve, reject) =>
             setTimeout(->
               resolve("Time has Passed")
             ,1000))
-          waitTenSeconds
+          nextTurnAfterTen
             .then((message)=>
               if(@phase == "react")
                 @phase = "draw"
@@ -398,8 +443,6 @@ class MahjongGame
             .catch(console.error)
         else
           playerToDiscard.sendMessage("You don't have that tile.")
-      else
-        playerToDiscard.sendMessage("It is not the discard phase.")
     else
       playerToDiscard.sendMessage("It is not your turn.")
 

@@ -29,6 +29,8 @@ Currently contains the following commands:
 
 ~next - Used after a round is over, in order to start next round.
 
+~riichi - Used to declare riichi, takes the tile to be discarded as its argument
+
 ~pon - Allows one to Pon players discards.
 
 ~chi - Allows one to Chi.  Takes 4 arguments, the two tiles you are forming the meld with from your hand.
