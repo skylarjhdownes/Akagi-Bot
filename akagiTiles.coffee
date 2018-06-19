@@ -261,7 +261,7 @@ class Pile
   #Returns the most recent tile, adds that tile to @stolenTiles, and makes next tile riichi if the stolen tile was.
   drawFrom: ->
     out = @contains[@contains.length-1]
-    @stolenTiles.push[@contains.length-1]
+    @stolenTiles.push(@contains.length-1)
     if(@riichi == @contains.length-1)
       @riichi+=1
     return out
@@ -270,12 +270,12 @@ class Pile
   printDiscard: (writtenName = true) ->
     out = []
     for x,i in @contains
-      if(not i in @stolenTiles)
+      if(i not in @stolenTiles)
         if i is @riichi
           out.push("r:"+x.getName(writtenName))
         else
           out.push(x.getName(writtenName))
-    if(@contains.length == 0)
+    if(@contains.length == 0 || @contains.length == @stolenTiles.length)
       out = "Empty"
     return out
 

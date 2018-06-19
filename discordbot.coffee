@@ -228,6 +228,9 @@ bot.on('message', (message) =>
             message.channel.send("Player #{commandArgs[1]} has discarded #{fromGame.players[commandArgs[1]-1].hand.discardPile.printDiscard()}.")
         else
           message.channel.send("Please select a real discard pile.")
+      if(commandArgs[0] == "points")
+        for player in fromGame.players
+          message.channel.send("Player #{player.playerNumber} has #{player.roundPoints} points.")
 
   #console.log(exports)
 )

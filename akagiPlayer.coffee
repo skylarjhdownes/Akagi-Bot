@@ -42,5 +42,7 @@ class Player
     @wind = winds[(winds.indexOf(@wind)+1)%4]
   discardTile:(tileToDiscard)->
     return @hand.discard(tileToDiscard)
+  riichiCalled: ->
+    return @discardPile.riichi != -1
 
 module.exports = Player

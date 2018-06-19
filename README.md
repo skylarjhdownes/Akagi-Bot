@@ -49,6 +49,8 @@ Currently contains the following commands:
 
 ~phase - Displays what phase it is.
 
+~points - Gives you the points every player currently has in the round.
+
 !forge - Takes one argument.  Makes a channel with the argument as its name. People mentioned are able to see the channel.
 
 !mahjong - Takes one argument, and at least 3 mentions.  Makes a channel for poster and each of the first three mentions, as well as a group channel that everyone mentioned can see, and starts a game of mahjong.  
