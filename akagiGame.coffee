@@ -79,6 +79,10 @@ class MahjongGame
         @dealer = player
     @startRound()
 
+  #Called when the round ends with no winner.
+  @exaustiveDraw: ->
+    return true #TODO Implement exaustive draw.
+
   #Put the stick into the pot, once the next turn has started.
   confirmNextTurn: ->
     if(@pendingRiichiPoints)
@@ -190,6 +194,8 @@ class MahjongGame
       if(playerToChi.playerNumber == @turn)
         if(playerToChi.riichiCalled())
           playerToChi.sendMessage("May not Chi after declaring Riichi.")
+        else if(@wall.wallFinished)
+          playerToChi.sendMessage("May not call Chi on the last turn.")
         else if(_.findIndex(playerToChi.hand.uncalled(),(x) -> _.isEqual(tile1, x)) != -1 && _.findIndex(playerToChi.hand.uncalled(),(x) -> _.isEqual(tile2, x)) != -1)
           for discarder in @players
             if(@turn == discarder.nextPlayer)
@@ -247,6 +253,8 @@ class MahjongGame
       playerToKan.sendMessage("It is not your turn.")
     else if(@phase != "discard")
       playerToKan.sendMessage("One can only self Kan during one's own turn after one has drawn.")
+    else if(@wall.wallFinished)
+      playerToKan.sendMessage("May not call Kan on the last turn.")
     else if(uncalledKanTiles < 1)
       playerToKan.sendMessage("No tiles to Kan with.")
     else if(uncalledKanTiles in [2,3])
@@ -326,6 +334,8 @@ class MahjongGame
       playerToKan.sendMessage("You can't call tiles, except to win, after declaring Riichi.")
     else if(@phase.isArray && @phase[0] == "roning")
       playerToKan.sendMessage("Kan has lower priority than Ron.")
+    else if(@wall.wallFinished)
+      playerToKan.sendMessage("May not call Kan on the last turn.")
     else if(@phase.isArray && @phase[0] == "chiing" && playerToPon.playerNumber == @phase[1])
       playerToKan.sendMessage("One cannot Kan if one has already declared Chi.")
     else if((@phase.isArray && @phase[0] == "chiing") || @phase in ["react","draw"])
@@ -371,6 +381,8 @@ class MahjongGame
   ponTile:(playerToPon) ->
     if(playerToPon.riichiCalled())
       playerToPon.sendMessage("You may not Pon after declaring Riichi.")
+    else if(@wall.wallFinished)
+      playerToPon.sendMessage("May not call Pon on the last turn.")
     else if(@phase in ["react","draw"] && @turn != playerToPon.nextPlayer)
       for player in @players
         if(@turn == player.nextPlayer)
@@ -487,10 +499,13 @@ class MahjongGame
           nextTurnAfterTen
             .then((message)=>
               if(@phase == "react")
-                @phase = "draw"
-                for player in @players
-                  if(@turn == player.playerNumber)
-                    player.sendMessage("It is your turn.  You may draw a tile."))
+                if(!@wall.wallFinished)
+                  @phase = "draw"
+                  for player in @players
+                    if(@turn == player.playerNumber)
+                      player.sendMessage("It is your turn.  You may draw a tile."))
+                else
+                  @exaustiveDraw()
             .catch(console.error)
         else
           playerToDiscard.sendMessage("You don't have that tile.")
