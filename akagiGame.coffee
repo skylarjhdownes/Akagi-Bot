@@ -503,9 +503,10 @@ class MahjongGame
                   @phase = "draw"
                   for player in @players
                     if(@turn == player.playerNumber)
-                      player.sendMessage("It is your turn.  You may draw a tile."))
-                else
-                  @exaustiveDraw()
+                      player.sendMessage("It is your turn.  You may draw a tile.")
+              else
+                @exaustiveDraw()
+            )
             .catch(console.error)
         else
           playerToDiscard.sendMessage("You don't have that tile.")
