@@ -7,7 +7,9 @@ class Player
     @gamePoints = 0
     @roundPoints = 27000
     @namedTiles = true
+    @daburu = false
   roundStart:(wall) ->
+    @daburu = false
     @playerChannel.send("New Round Start")
     @playerChannel.send("Seat Wind: #{@wind}")
     if(@wind == "East")

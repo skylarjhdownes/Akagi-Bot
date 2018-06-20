@@ -121,11 +121,14 @@ class Wall
     @inWall.push(new Tile("dragon",y)) for y in ["red","white","green"] for z in [0...4]
     @dora = []
     @urDora = []
+    @wallFinished = false
 
   drawFrom: ->
     #removes a random tile from the wall and returns it
     take = Math.floor(Math.random()*@inWall.length)
     out = @inWall.splice(take,1)
+    if(@dora.length + @urDora.length + @inWall.length == 14)
+      @wallFinished = true
     return out[0]
 
   doraFlip: ->
