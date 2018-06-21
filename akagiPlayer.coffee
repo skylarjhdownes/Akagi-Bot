@@ -5,7 +5,7 @@ class Player
     @discardPile = new gamePieces.Pile()
     @hand = new gamePieces.Hand(@discardPile)
     @gamePoints = 0
-    @roundPoints = 27000
+    @roundPoints = 30000
     @namedTiles = true
     @daburu = false
   roundStart:(wall) ->

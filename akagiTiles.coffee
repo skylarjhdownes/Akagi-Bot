@@ -213,7 +213,7 @@ class Hand
     if(@calledMelds.length == 0)
       return("No Called Melds")
     else
-      return (x.printMeld(writtenName) for x in @calledMelds)
+      return ("#{x.takenFrom} - #{x.printMeld(writtenName)}" for x in @calledMelds)
 
   #returns true if there are no calledMelds, or if they are all self-called Kongs
   isConcealed: ->
