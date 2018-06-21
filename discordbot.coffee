@@ -179,9 +179,9 @@ bot.on('message', (message) =>
           message.channel.send("Player #{commandArgs[1]} is the #{fromGame.players[commandArgs[1]-1].wind} player.")
       if(commandArgs[0] == "dora")
         if(channelType == "player")
-          message.channel.send("Dora Indicator: #{fromGame.wall.printDora(fromPlayer.namedTiles)}")
+          message.channel.send("Dora Indicator(s): #{fromGame.wall.printDora(fromPlayer.namedTiles)}")
         else
-          message.channel.send("Dora Indicator: #{fromGame.wall.printDora()}")
+          message.channel.send("Dora Indicator(s): #{fromGame.wall.printDora()}")
       if(commandArgs[0] == "hand" and channelType == "player")
         message.channel.send("Hand: #{fromPlayer.printHand()}")
       if(commandArgs[0] == "remaining" and channelType == "player")

@@ -6,10 +6,12 @@ class Player
     @hand = new gamePieces.Hand(@discardPile)
     @gamePoints = 0
     @roundPoints = 30000
-    @namedTiles = true
-    @daburu = false
+    @namedTiles = true #Tells whether you want the names written out, or just the symbol.
+    @daburu = false #Activated if a player calls riichi on their first turn
+    @liablePlayer = false #Who fed the last dragon or wind tile to someone who already had 2/3 of them.
   roundStart:(wall) ->
     @daburu = false
+    @liablePlayer = false
     @playerChannel.send("New Round Start")
     @playerChannel.send("Seat Wind: #{@wind}")
     if(@wind == "East")

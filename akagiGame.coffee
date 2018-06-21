@@ -119,6 +119,11 @@ class MahjongGame
     else
       playerToDraw.sendMessage("It is not your turn.")
 
+  #checks and sets liability for 4 winds/3 dragon hands
+  liabilityChecker:(playerCalling,playerLiable) ->
+    if(_.filter(playerCalling.hand.calledMelds,(x)->x.suit() == "dragon").length == 3 || _.filter(playerCalling.hand.calledMelds,(x)->x.suit() == "wind").length == 4)
+      playerCalling.liablePlayer = playerLiable.playerNumber
+
   #Calculates all the flags for non hand based points in the game.
   winFlagCalculator:(winningPlayer,winType) ->
     flags = []
@@ -160,17 +165,33 @@ class MahjongGame
         for player in @players
           #CalculatePoints
           if(playerToTsumo.wind == "East")
-            if player.playerNumber != @turn
-              pointsLost = _roundUpToClosestHundred(2*scoreMax[0])+@counter*100
+            if(playerToTsumo.liablePlayer)
+              if player.playerNumber = playerToTsumo.liablePlayer
+                pointsLost = _roundUpToClosestHundred(6*scoreMax[0])+@counter*100
+              else if player.playerNumber == playerToTsumo.playerNumber
+                pointsGained = _roundUpToClosestHundred(6*scoreMax[0])+@counter*100+@riichiSticks.length*1000
+              else
+                pointsLost = 0
             else
-              pointsGained = _roundUpToClosestHundred(6*scoreMax[0])+@counter*300+@riichiSticks.length*1000
+              if player.playerNumber != @turn
+                pointsLost = _roundUpToClosestHundred(2*scoreMax[0])+@counter*100
+              else
+                pointsGained = 3*_roundUpToClosestHundred(2*scoreMax[0])+@counter*300+@riichiSticks.length*1000
           else
-            if player.wind == "East"
-              pointsLost = _roundUpToClosestHundred(2*scoreMax[0])+@counter*100
-            else if player.playerNumber != @turn
-              pointsLost = _roundUpToClosestHundred(scoreMax[0])+@counter*100
+            if(playerToTsumo.liablePlayer)
+              if player.playerNumber = playerToTsumo.liablePlayer
+                pointsLost = _roundUpToClosestHundred(4*scoreMax[0])+@counter*100
+              else if player.playerNumber == playerToTsumo.playerNumber
+                pointsGained = _roundUpToClosestHundred(4*scoreMax[0])+@counter*100+@riichiSticks.length*1000
+              else
+                pointsLost = 0
             else
-              pointsGained = _roundUpToClosestHundred(4*scoreMax[0])+@counter*300+@riichiSticks.length*1000
+              if player.wind == "East"
+                pointsLost = _roundUpToClosestHundred(2*scoreMax[0])+@counter*100
+              else if player.playerNumber != @turn
+                pointsLost = _roundUpToClosestHundred(scoreMax[0])+@counter*100
+              else
+                pointsGained = _roundUpToClosestHundred(2*scoreMax[0])+2*_roundUpToClosestHundred(scoreMax[0])+@counter*300+@riichiSticks.length*1000
           @riichiSticks = []
           #Say points
           if(player.playerNumber != @turn)
@@ -182,9 +203,9 @@ class MahjongGame
             player.sendMessage("You have won on self draw.")
             player.sendMessage("You receive #{pointsGained} points.")
           player.sendMessage("The winning hand contained the following yaku: #{scoreMax[1]}")
-          player.sendMessage("The dora were: #{@wall.printDora(player.namedTiles)}")
+          player.sendMessage("The dora indicators were: #{@wall.printDora(player.namedTiles)}")
           if(playerToTsumo.riichiCalled)
-            player.sendMessage("The ur dora were: #{@wall.printUrDora(player.namedTiles)}")
+            player.sendMessage("The ur dora indicators were: #{@wall.printUrDora(player.namedTiles)}")
           player.sendMessage("The round is over.  To start the next round, type next.")
         @winningPlayer = playerToTsumo
         @phase = "finished"
@@ -369,6 +390,8 @@ class MahjongGame
               @oneRoundTracker[@playerToKan.playerNumber-1].push("Rinshan Kaihou")
               playerToKan.hand.draw(discarder.discardPile)
               playerToKan.hand.calledMelds.push(new gamePieces.Meld([toKan,toKan,toKan,toKan],discarder.playerNumber))
+              if(toKan.isHonor())
+                @liabilityChecker(playerToKan,discarder)
               drawnTile = playerToKan.hand.draw(@wall)
               @wall.doraFlip()
               for player in @players
@@ -424,6 +447,8 @@ class MahjongGame
                 else
                   player.sendMessage("Player #{playerToPon.playerNumber}'s Pon has completed.")
               @turn = playerToPon.playerNumber
+              if(toPon.isHonor())
+                @liabilityChecker(playerToPon,discarder)
           )
           .catch(console.error)
       else
