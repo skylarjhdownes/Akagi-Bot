@@ -12,6 +12,7 @@ class MahjongGame
     @riichiSticks = [] #Used to keep track when a player calls riichi
     @pendingRiichiPoints = false #Keeps track of who just called riichi, so that once we are sure the next round has started, then they can have their stick added to the pile.
     @oneRoundTracker = [[],[],[],[]] #Keeps track of all the special things that can give points if done within one go around
+    @kuikae = [] #Keeps track of what tiles cannot be discarded after calling chi or pon.
     @winningPlayer = false
     @players = [
       new playerObject(playerChannels[1],1),
@@ -225,6 +226,11 @@ class MahjongGame
                       @phase = "discard"
                       @confirmNextTurn()
                       @interuptRound()
+                      @kuikae.append(toChi)
+                      if(tile1.value > toChi.value && tile2.value > toChi.value)
+                        @kuikae.append(new gamePieces.Tile(toChi.suit,toChi.value+3))
+                      else if(tile1.value < toChi.value && tile2.value < toChi.value)
+                        @kuikae.append(new gamePieces.Tile(toChi.suit,toChi.value-3))
                       for player in @players
                         if(@turn == player.nextPlayer)
                           playerToChi.hand.draw(player.discardPile)
@@ -404,6 +410,7 @@ class MahjongGame
                   @phase = "discard"
                   @confirmNextTurn()
                   @interuptRound()
+                  @kuikae.append(toPon)
                   for player in @players
                     if(@turn == player.nextPlayer)
                       playerToPon.hand.draw(player.discardPile)
@@ -440,6 +447,7 @@ class MahjongGame
                     @phase = "discard"
                     @confirmNextTurn()
                     @interuptRound()
+                    @kuikae.append(toPon)
                     for player in @players
                       if(@turn == player.nextPlayer)
                         playerToPon.hand.draw(player.discardPile)
@@ -469,6 +477,8 @@ class MahjongGame
         playerToDiscard.sendMessage("You may only riichi with a concealed hand.")
       else if(playerToDiscard.riichiCalled() && tileToDiscard != playerToDiscard.hand.lastTileDrawn.getTextName())
         playerToDiscard.sendMessage("Once you have declared Riichi, you must always discard the drawn tile.")
+      else if(_.some(@kuikae,(x)->x.getTextName()==tileToDiscard))
+        playerToDiscard.sendMessage("May not discard the same tile just called, or the opposite end of the chow just called.")
       else
         discarded = playerToDiscard.discardTile(tileToDiscard)
         if(discarded)
@@ -492,6 +502,7 @@ class MahjongGame
               player.sendMessage("You  #{outtext} a #{discarded.getName(player.namedTiles)}.")
           @turn = playerToDiscard.nextPlayer
           @phase = "react"
+          @kuikae = []
           nextTurnAfterTen = new Promise((resolve, reject) =>
             setTimeout(->
               resolve("Time has Passed")
