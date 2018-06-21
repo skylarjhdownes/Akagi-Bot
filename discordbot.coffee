@@ -166,6 +166,8 @@ bot.on('message', (message) =>
           fromGame.newRound()
       if(commandArgs[0] == "turn")
         message.channel.send("It is player #{fromGame.turn}'s turn.")
+      if(commandArgs[0] == "wall")
+        message.channel.send("There are #{fromGame.wall.leftInWall()} tiles left in the the live wall.")
       if(commandArgs[0] == "phase")
         message.channel.send("It is the #{fromGame.phase} phase.")
       if(commandArgs[0] == "prevailing")

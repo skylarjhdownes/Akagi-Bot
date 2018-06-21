@@ -51,6 +51,8 @@ Currently contains the following commands:
 
 ~phase - Displays what phase it is.
 
+~wall - Displays how many tiles are left in the live wall. 
+
 ~points - Gives you the points every player currently has in the round.
 
 !forge - Takes one argument.  Makes a channel with the argument as its name. People mentioned are able to see the channel.

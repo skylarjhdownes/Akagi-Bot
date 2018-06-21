@@ -153,6 +153,9 @@ class Wall
     else
       return (x.getName(writtenName) for x in @urDora)
 
+  leftInWall: ->
+    return @dora.length+@urDora.length+@inWall.length-14
+
 class Hand
   #A Hand of tiles
   constructor: (@discardPile) ->
