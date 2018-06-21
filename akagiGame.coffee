@@ -191,63 +191,61 @@ class MahjongGame
 
 
   chiTile:(playerToChi, tile1, tile2) ->
-    if(@phase == "draw")
-      if(playerToChi.playerNumber == @turn)
-        if(playerToChi.riichiCalled())
-          playerToChi.sendMessage("May not Chi after declaring Riichi.")
-        else if(@wall.wallFinished)
-          playerToChi.sendMessage("May not call Chi on the last turn.")
-        else if(_.findIndex(playerToChi.hand.uncalled(),(x) -> _.isEqual(tile1, x)) != -1 && _.findIndex(playerToChi.hand.uncalled(),(x) -> _.isEqual(tile2, x)) != -1)
-          for discarder in @players
-            if(@turn == discarder.nextPlayer)
-              toChi = discarder.discardPile.contains[-1..][0]
-              _chiable = (t1,t2,t3) ->
-                if(t1.suit!=t2.suit || t2.suit!=t3.suit)
-                  return false
-                sortedValues = [t1.value,t2.value,t3.value].sort()
-                if(sortedValues[0]+1 == sortedValues[1] && sortedValues[1]+1 == sortedValues[2])
-                  return true
-                else
-                  return false
-              if(_chiable(toChi,tile1,tile2))
-                @phase = ["chiing",playerToChi.playerNumber]
+    if(playerToChi.playerNumber != @turn)
+      playerToChi.sendMessage("May only Chi when you are next in turn order.")
+    else if(playerToChi.riichiCalled())
+      playerToChi.sendMessage("May not Chi after declaring Riichi.")
+    else if(@wall.wallFinished)
+      playerToChi.sendMessage("May not call Chi on the last turn.")
+    else if(@phase in ["draw","react"])
+      if(_.findIndex(playerToChi.hand.uncalled(),(x) -> _.isEqual(tile1, x)) != -1 && _.findIndex(playerToChi.hand.uncalled(),(x) -> _.isEqual(tile2, x)) != -1)
+        discarder = _.find(@players,(x)-> @turn == x.nextPlayer)
+        toChi = discarder.discardPile.contains[-1..][0]
+        _chiable = (t1,t2,t3) ->
+          if(t1.suit!=t2.suit || t2.suit!=t3.suit)
+            return false
+          sortedValues = [t1.value,t2.value,t3.value].sort()
+          if(sortedValues[0]+1 == sortedValues[1] && sortedValues[1]+1 == sortedValues[2])
+            return true
+          else
+            return false
+        if(_chiable(toChi,tile1,tile2))
+          @phase = ["chiing",playerToChi.playerNumber]
+          for player in @players
+            if(player.playerNumber != playerToChi.playerNumber)
+              player.sendMessage("Player #{playerToChi.playerNumber} has declared Chi.")
+            else
+              player.sendMessage("You have declared Chi.")
+          chiAfterTen = new Promise((resolve,reject) =>
+            setTimeout(->
+              resolve("Time has Passed")
+            ,1000))
+          chiAfterTen
+            .then((message)=>
+              if(_.isEqual(@phase,["chiing",playerToChi.playerNumber]))
+                @phase = "discard"
+                @confirmNextTurn()
+                @interuptRound()
+                @kuikae.append(toChi)
+                if(tile1.value > toChi.value && tile2.value > toChi.value)
+                  @kuikae.append(new gamePieces.Tile(toChi.suit,toChi.value+3))
+                else if(tile1.value < toChi.value && tile2.value < toChi.value)
+                  @kuikae.append(new gamePieces.Tile(toChi.suit,toChi.value-3))
                 for player in @players
-                  if(player.playerNumber != playerToChi.playerNumber)
-                    player.sendMessage("Player #{playerToChi.playerNumber} has declared Chi.")
+                  if(@turn == player.nextPlayer)
+                    playerToChi.hand.draw(player.discardPile)
+                    playerToChi.hand.calledMelds.push(new gamePieces.Meld([toChi,tile1,tile2],player.playerNumber))
+                    player.sendMessage("Player #{playerToChi.playerNumber}'s Chi has completed.'")
+                  else if(player.playerNumber == playerToChi.playerNumber)
+                    player.sendMessage("Your Chi has completed.  Please discard a tile.")
                   else
-                    player.sendMessage("You have declared Chi.")
-                chiAfterTen = new Promise((resolve,reject) =>
-                  setTimeout(->
-                    resolve("Time has Passed")
-                  ,1000))
-                chiAfterTen
-                  .then((message)=>
-                    if(_.isEqual(@phase,["chiing",playerToChi.playerNumber]))
-                      @phase = "discard"
-                      @confirmNextTurn()
-                      @interuptRound()
-                      @kuikae.append(toChi)
-                      if(tile1.value > toChi.value && tile2.value > toChi.value)
-                        @kuikae.append(new gamePieces.Tile(toChi.suit,toChi.value+3))
-                      else if(tile1.value < toChi.value && tile2.value < toChi.value)
-                        @kuikae.append(new gamePieces.Tile(toChi.suit,toChi.value-3))
-                      for player in @players
-                        if(@turn == player.nextPlayer)
-                          playerToChi.hand.draw(player.discardPile)
-                          playerToChi.hand.calledMelds.push(new gamePieces.Meld([toChi,tile1,tile2],player.playerNumber))
-                          player.sendMessage("Player #{playerToChi.playerNumber}'s Chi has completed.'")
-                        else if(player.playerNumber == playerToChi.playerNumber)
-                          player.sendMessage("Your Chi has completed.  Please discard a tile.")
-                        else
-                          player.sendMessage("Player #{playerToChi.playerNumber}'s Chi has completed.'")
-                  )
-                  .catch(console.error)
-              else
-                playerToChi.sendMessage("Tiles specified do not create a legal meld.")
+                    player.sendMessage("Player #{playerToChi.playerNumber}'s Chi has completed.'")
+            )
+            .catch(console.error)
         else
-          playerToChi.sendMessage("Hand doesn't contain tiles specified.")
+          playerToChi.sendMessage("Tiles specified do not create a legal meld.")
       else
-        playerToChi.sendMessage("May only Chi when you are next in turn order.")
+        playerToChi.sendMessage("Hand doesn't contain tiles specified.")
     else if(@phase.isArray)
       playerToChi.sendMessage("Chi has lower priority than Pon, Kan, and Ron.")
     else
@@ -393,80 +391,43 @@ class MahjongGame
       playerToPon.sendMessage("You may not Pon after declaring Riichi.")
     else if(@wall.wallFinished)
       playerToPon.sendMessage("May not call Pon on the last turn.")
-    else if(@phase in ["react","draw"] && @turn != playerToPon.nextPlayer)
-      for player in @players
-        if(@turn == player.nextPlayer)
-          toPon = player.discardPile.contains[-1..][0]
-          if(_.findIndex(playerToPon.hand.uncalled(),(x)->_.isEqual(toPon,x))!=_.findLastIndex(playerToPon.hand.uncalled(),(x)->_.isEqual(toPon,x)))
-            @phase = ["poning",playerToPon.playerNumber]
-            for player in @players
-              if(player.playerNumber != playerToPon.playerNumber)
-                player.sendMessage("Player #{playerToPon.playerNumber} has declared Pon.")
-              else
-                player.sendMessage("You have declared Pon.")
-            waitTenSeconds = new Promise((resolve,reject) =>
-              setTimeout(->
-                resolve("Time has Passed")
-              ,1000))
-            waitTenSeconds
-              .then((message)=>
-                if(_.isEqual(@phase,["poning",playerToPon.playerNumber]))
-                  @phase = "discard"
-                  @confirmNextTurn()
-                  @interuptRound()
-                  @kuikae.append(toPon)
-                  for player in @players
-                    if(@turn == player.nextPlayer)
-                      playerToPon.hand.draw(player.discardPile)
-                      playerToPon.hand.calledMelds.push(new gamePieces.Meld([toPon,toPon,toPon],player.playerNumber))
-                      player.sendMessage("Player #{playerToPon.playerNumber}'s Pon has completed.")
-                    if(player.playerNumber == playerToPon.playerNumber)
-                      player.sendMessage("Your Pon has completed. Please discard a tile.")
-                    else
-                      player.sendMessage("Player #{playerToPon.playerNumber}'s Pon has completed.")
-                  @turn = playerToPon.playerNumber
-              )
-              .catch(console.error)
+    else if(@phase.isArray && @phase[0] == "Chi" && @phase[1] == playerToPon.playerNumber)
+      playerToPon.sendMessage("Can't call Pon if you already called Chi.")
+    else if((@phase in ["react","draw"] || (@phase.isArray && @phase[0] == "Chi")) && @turn != playerToPon.nextPlayer)
+      discarder = _.find(@players,(x)-> @turn == x.nextPlayer)
+      toPon = discarder.discardPile.contains[-1..][0]
+      if(_.findIndex(playerToPon.hand.uncalled(),(x)->_.isEqual(toPon,x))!=_.findLastIndex(playerToPon.hand.uncalled(),(x)->_.isEqual(toPon,x)))
+        @phase = ["poning",playerToPon.playerNumber]
+        for player in @players
+          if(player.playerNumber != playerToPon.playerNumber)
+            player.sendMessage("Player #{playerToPon.playerNumber} has declared Pon.")
           else
-            playerToPon.sendMessage("Don't have correct tiles.")
-    else if(@phase.isArray && @phase[0] == "chiing")
-      for player in @players
-        if(@turn == player.nextPlayer)
-          toPon = player.discardPile.contains[-1..][0]
-          if(_.findIndex(playerToPon.hand.uncalled(),(x)->_.isEqual(toPon,x))!=_.findLastIndex(playerToPon.hand.uncalled(),(x)->_.isEqual(toPon,x)))
-            if(@playerToPon.playerNumber != @phase[1])
-              @phase = ["poning",playerToPon.playerNumber]
+            player.sendMessage("You have declared Pon.")
+        tenSecondsToPon = new Promise((resolve,reject) =>
+          setTimeout(->
+            resolve("Time has Passed")
+          ,1000))
+        tenSecondsToPon
+          .then((message)=>
+            if(_.isEqual(@phase,["poning",playerToPon.playerNumber]))
+              @phase = "discard"
+              @confirmNextTurn()
+              @interuptRound()
+              @kuikae.append(toPon)
               for player in @players
-                if(player.playerNumber != playerToPon.playerNumber)
-                  player.sendMessage("Player #{playerToPon.playerNumber} has declared Pon.")
+                if(@turn == player.nextPlayer)
+                  playerToPon.hand.draw(player.discardPile)
+                  playerToPon.hand.calledMelds.push(new gamePieces.Meld([toPon,toPon,toPon],player.playerNumber))
+                  player.sendMessage("Player #{playerToPon.playerNumber}'s Pon has completed.")
+                if(player.playerNumber == playerToPon.playerNumber)
+                  player.sendMessage("Your Pon has completed. Please discard a tile.")
                 else
-                  player.sendMessage("You have declared Pon.")
-              waitTenSeconds = new Promise((resolve,reject) =>
-                setTimeout(->
-                  resolve("Time has Passed")
-                ,1000))
-              waitTenSeconds
-                .then((message) =>
-                  if(_.isEqual(@phase,["poning",playerToPon.playerNumber]))
-                    @phase = "discard"
-                    @confirmNextTurn()
-                    @interuptRound()
-                    @kuikae.append(toPon)
-                    for player in @players
-                      if(@turn == player.nextPlayer)
-                        playerToPon.hand.draw(player.discardPile)
-                        playerToPon.hand.calledMelds.push(new gamePieces.Meld([toPon,toPon,toPon],player.playerNumber))
-                      if(player.playerNumber == playerToPon.playerNumber)
-                        player.sendMessage("Your Pon has completed. Please discard a tile.")
-                      else
-                        player.sendMessage("Player #{playerToPon.playerNumber}'s Pon has completed.")
-                    @turn = playerToPon.playerNumber
-                  )
-                  .catch(console.error)
-            else
-              playerToPon.sendMessage("Can't pon if you already called chi.")
-          else
-            playerToPon.sendMessage("Don't have correct tiles.")
+                  player.sendMessage("Player #{playerToPon.playerNumber}'s Pon has completed.")
+              @turn = playerToPon.playerNumber
+          )
+          .catch(console.error)
+      else
+        playerToPon.sendMessage("Don't have correct tiles.")
     else if(@phase.isArray && @phase[0] == "roning")
       playerToPon.sendMessage("Pon has lower priorty than Ron.")
     else
