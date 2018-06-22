@@ -134,8 +134,9 @@ bot.on('message', (message) =>
       inputTiles = commandArgs[1..28]
       testHand = new mahjongTiles.Hand(new mahjongTiles.Pile())
       for x in [0...14]
-        testHand.contains.push(new mahjongTiles.Tile(inputTiles[2*x],inputTiles[2*x+1]))
+        testHand.contains.push(new mahjongTiles.Tile(inputTiles[2*x+1],inputTiles[2*x]))
       testHand.draw(null,0)
+      testHand.lastTileDrawn = new mahjongTiles.Tile(inputTiles[27],inputTiles[26])
       console.log(mahjongScoring.getPossibleHands(testHand))
 
 
