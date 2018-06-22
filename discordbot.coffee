@@ -202,7 +202,7 @@ bot.on('message', (message) =>
           message.channel.send("Can only check for tenpai when your hand has 13 tiles.")
         else
           tenpaiTiles = mahjongScoring.tenpaiWith(fromPlayer.hand)
-          if(tenpaiTiles == [])
+          if(tenpaiTiles.length == 0)
             message.channel.send("You are not in tenpai.")
           else
             message.channel.send("You are in tenpai, waiting on #{x.getName(fromPlayer.namedTiles) for x in tenpaiTiles}.")
