@@ -80,8 +80,9 @@ tenpaiWith = (hand) ->
     testHand = _.cloneDeep(hand)
     testHand.lastTileDrawn = tile
     testHand.contains.push(tile)
-    if(getPossibleHands(testHand) != [])
+    if(getPossibleHands(testHand).length > 0)
       winningTiles.push(tile)
+      console.log(getPossibleHands(testHand))
   return winningTiles
 
 
