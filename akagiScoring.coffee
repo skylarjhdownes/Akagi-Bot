@@ -68,6 +68,23 @@ class gameFlags
     @chiho = "Chiho" in @flags
     @renho = "Renho" in @flags
 
+
+#Finds which tiles could turn a hand into a winning hand
+tenpaiWith = (hand) ->
+  winningTiles = []
+  possibleTiles = []
+  possibleTiles.push(new gamePieces.Tile(x,y)) for x in ["pin","sou","wan"] for y in [1..9]
+  possibleTiles.push(new gamePieces.Tile("dragon",x)) for x in ["red","green","white"]
+  possibleTiles.push(new gamePieces.Tile("wind",x)) for x in ["east","south","west","north"]
+  for tile in possibleTiles
+    testHand = _.cloneDeep(hand)
+    testHand.lastTileDrawn = tile
+    testHand.contains.push(tile)
+    if(getPossibleHands(testHand) != [])
+      winningTiles.push(tile)
+  return winningTiles
+
+
 scoreMahjongHand = (hand, gameDataFlags, dora) ->
   #Takes a hand of mahajong tiles and finds the highest scoring way it can be interpreted, returning the score, and the melds which lead to that score
   possibleHands = getPossibleHands(hand)
@@ -154,7 +171,7 @@ getPossibleHands = (hand) ->
       for meld, i in pattern
         if(meld.containsTile(hand.lastTileDrawn) && meld.takenFrom == "self")
           chosenOne = _.cloneDeep(meld)
-          chosenOne.lastTileDrawn = _.clone(hand.lastTileDrawn)
+          chosenOne.lastDrawnTile = _.clone(hand.lastTileDrawn)
           chosenOne.takenFrom = hand.lastTileFrom
           existingHand = _.cloneDeep(pattern)
           existingHand[i] = chosenOne
@@ -172,10 +189,9 @@ getYaku = (melds, gameDataFlags) ->
   if(melds in ["thirteenorphans","thirteenorphans+"])
     return({yaku:["Kokushi Musou"],fu:0,flags:gameDataFlags})
 
-  selfDraw = false
   for meld in melds
     if meld.lastDrawnTile
-      selfDraw = meld.lastTileFrom
+      selfDraw = meld.takenFrom == "self"
 
   fuArray = _calculateFu(melds, selfDraw, gameDataFlags)
   fu = fuArray[0]
@@ -309,9 +325,9 @@ getYaku = (melds, gameDataFlags) ->
   for meld in pungList
     if meld.suit() == "dragon"
       yakuModifiers.push("Dragon Fanpai/Yahuhai")
-    if meld.value() == gameDataFlags.playerWind
+    if meld.value() == gameDataFlags.playerWind.toLowerCase()
       yakuModifiers.push("Seat Fanpai/Yakuhai")
-    if meld.value() == gameDataFlags.roundWind
+    if meld.value() == gameDataFlags.roundWind.toLowerCase()
       yakuModifiers.push("Prevailing Fanpai/Yakuhai")
 
   #Chanta - All sets contain terminals or honours, the pair is terminals or honours, and the hand contains at least one chow.

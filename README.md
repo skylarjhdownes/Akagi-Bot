@@ -21,6 +21,8 @@ Currently contains the following commands:
 
 ~melds - If given a player number, looks at the tiles a player has melded.  If used alone, looks at own called tiles.
 
+~tenpai - Tells you if you are in tenpai, and which tiles will make you win, if you are.
+
 ~pile - If given a player number, looks at the tiles in the discard pile of that player. If used alone, looks at your own discard pile.
 
 ~toggle - Turns off or on the written form of the tiles. Only usable by players.
@@ -51,7 +53,7 @@ Currently contains the following commands:
 
 ~phase - Displays what phase it is.
 
-~wall - Displays how many tiles are left in the live wall. 
+~wall - Displays how many tiles are left in the live wall.
 
 ~points - Gives you the points every player currently has in the round.
 

@@ -196,6 +196,15 @@ bot.on('message', (message) =>
             message.channel.send("Player #{commandArgs[1]} has the following melds: #{fromGame.players[commandArgs[1]-1].printMelds()}.")
         else
           message.channel.send("Please select a real player.")
+      if(commandArgs[0] == "tenpai" and channelType == "player")
+        if(fromPlayer.hand.contains.length != 13)
+          message.channel.send("Can only check for tenpai when your hand has 13 tiles.")
+        else
+          tenpaiTiles = mahjongScoring.tenpaiWith(fromPlayer.hand)
+          if(tenpaiTiles == [])
+            message.channel.send("You are not in tenpai.")
+          else
+            message.channel.send("You are in tenpai, waiting on #{x.getName(fromPlayer.namedTiles) for x in tenpaiTiles}.")
       if(commandArgs[0] == "toggle" and channelType == "player")
         fromPlayer.toggleTiles()
       if(commandArgs[0] == "draw" and channelType == "player")
