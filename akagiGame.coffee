@@ -501,7 +501,7 @@ class MahjongGame
             @oneRoundTracker[@playerToDiscard.playerNumber-1].push("Ippatsu")
           else
             outtext = "discarded"
-          @endGoAround(playerDiscard)
+          @endGoAround(playerToDiscard)
           @gameObservationChannel.send("Player #{playerToDiscard.playerNumber} #{outtext} a #{discarded.getName()}.")
           for player in @players
             if(player.playerNumber != playerToDiscard.playerNumber)
