@@ -92,6 +92,7 @@ class MahjongGame
         player.sendMessage("No players were in tenpai.")
       else
         player.sendMessage("The following players were in tenpai: #{x.playerNumber for x in @winningPlayer}")
+        player.sendMessage("The tenpai hands looked like this: #{"#{x.playerNumber} - #{x.hand.printHand(player.tileNames)}" for x in @winningPlayer}")
         if(player.playerNumber in _.map(@winningPlayer,(x)->x.playerNumber))
           player.roundPoints += 3000/@winningPlayer.length
           player.sendMessage("Because you were in tenpai, you gain #{3000/@winningPlayer.length} points.")
