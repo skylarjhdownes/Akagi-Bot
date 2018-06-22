@@ -594,3 +594,4 @@ getScore = (values, dora, urDora) ->
 module.exports.scoreMahjongHand = scoreMahjongHand
 module.exports.getPossibleHands = getPossibleHands
 module.exports.gameFlags = gameFlags
+module.exports.tenpaiWith = tenpaiWith
