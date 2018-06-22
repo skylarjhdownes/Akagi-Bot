@@ -13,7 +13,7 @@ class MahjongGame
     @pendingRiichiPoints = false #Keeps track of who just called riichi, so that once we are sure the next round has started, then they can have their stick added to the pile.
     @oneRoundTracker = [[],[],[],[]] #Keeps track of all the special things that can give points if done within one go around
     @kuikae = [] #Keeps track of what tiles cannot be discarded after calling chi or pon.
-    @winningPlayer = false
+    @winningPlayer = []
     @players = [
       new playerObject(playerChannels[1],1),
       new playerObject(playerChannels[2],2),
@@ -51,6 +51,8 @@ class MahjongGame
     @turn = @dealer.playerNumber
     @phase = 'discard'
     @wall.doraFlip()
+    @kuikae = []
+    @pendingRiichiPoints = false
     for player in @players
       player.hand.startDraw(@wall)
       player.roundStart(@wall)
@@ -61,10 +63,11 @@ class MahjongGame
     @oneRoundTracker = [["First Round"],["First Round"],["First Round"],["First Round"]]
 
   newRound: ->
-    if !@winningPlayer || @winningPlayer.wind == "East"
+    if @winningPlayer = [] || "East" in _.map(@winningPlayer,(x)->x.wind)
       @counter += 1
     else
       @counter = 0
+    if("East" not in _.map(@winningPlayer,(x)->x.wind))
       for player in @players
         player.rotateWind()
       if @eastPlayer.wind == "East"
@@ -73,7 +76,7 @@ class MahjongGame
         else
           @endGame() #TODO Implement game end.
     @wall = new gamePieces.Wall()
-    @winningPlayer = false
+    @winningPlayer = []
     for player in @players
       player.resetHand()
       if player.wind == "East"
@@ -82,7 +85,21 @@ class MahjongGame
 
   #Called when the round ends with no winner.
   @exaustiveDraw: ->
-    return true #TODO Implement exaustive draw.
+    @winningPlayer = _.filter(@players,(x)->scoreMahjongHand.tenpaiWith(x.hand) != [])
+    for player in @players
+      player.sendMessage("The round has ended in an exaustive draw.")
+      if(@winningPlayer.length == 0)
+        player.sendMessage("No players were in tenpai.")
+      else
+        player.sendMessage("The following players were in tenpai: #{x.playerNumber for x in @winningPlayer}")
+        if(player.playerNumber in _.map(@winningPlayer,(x)->x.playerNumber))
+          player.roundPoints += 3000/@winningPlayer.length
+          player.sendMessage("Because you were in tenpai, you gain #{3000/@winningPlayer.length} points.")
+        else
+          player.roundPoints -= 3000/(4-@winningPlayer.length)
+          player.sendMessage("Because you were not in tenpai, you pay #{3000/(4-@winningPlayer.length)} points.")
+      player.sendMessage("The round is over.  To start the next round, type next.")
+    @phase = "finished"
 
   #Put the stick into the pot, once the next turn has started.
   confirmNextTurn: ->
@@ -207,7 +224,7 @@ class MahjongGame
           if(playerToTsumo.riichiCalled)
             player.sendMessage("The ur dora indicators were: #{@wall.printUrDora(player.namedTiles)}")
           player.sendMessage("The round is over.  To start the next round, type next.")
-        @winningPlayer = playerToTsumo
+        @winningPlayer = [playerToTsumo]
         @phase = "finished"
 
 

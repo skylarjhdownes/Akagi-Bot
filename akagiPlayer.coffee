@@ -44,6 +44,7 @@ class Player
   rotateWind: ->
     winds = ["East","South","West","North"]
     @wind = winds[(winds.indexOf(@wind)+1)%4]
+    @playerChannel.send("The winds have rotated.")
   discardTile:(tileToDiscard)->
     return @hand.discard(tileToDiscard)
   riichiCalled: ->
