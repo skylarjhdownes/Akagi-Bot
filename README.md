@@ -29,7 +29,7 @@ Currently contains the following commands:
 
 ~toggle - Turns off or on the written form of the tiles. Only usable by players.
 
-~abort game - Currently does nothing, but claims the game is over
+~end game - Deletes all the channels involved in the game, and removes the channels and the game from the global list of such things.
 
 ~next - Used after a round is over, in order to start next round.
 

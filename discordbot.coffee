@@ -111,10 +111,10 @@ bot.on('message', (message) =>
     if(commandArgs[0] == "ragnarok")
       if message.channel.type == "text"
         message.channel.send("Let's Ragnarok!!!!!")
+        exports.mahjongGames = (game for game in exports.mahjongGames when game.gameObservationChannel.guild.id != message.guild.id)
         for x in exports.parlors when x.guild.id == message.guild.id
           x.delete()
         exports.parlors = (parlor for parlor in exports.parlors when parlor.guild.id != message.guild.id)
-        exports.mahjongGames = (game for game in exports.mahjongGames when game.gameObservationChannel.guild.id != message.guild.id)
       else
         message.channel.send("Can't Ragnarok outside a server.  :(")
 
@@ -157,9 +157,15 @@ bot.on('message', (message) =>
             fromPlayer = player
     if(channelType == "player" or channelType == "public")
       #Game Commands
-      if(commandArgs[0] == "abort" and commandArgs[1] == "game" and channelType == "player")
-        #TODO Delete game
+      if(commandArgs[0] == "end" and commandArgs[1] == "game" and channelType == "player")
         fromGame.gameObservationChannel.sendMessage("Game Ended")
+        exports.mahjongGames = (game for game in exports.mahjongGame where fromGame.gameObservationChannel.id != game.gameObservationChannel.id)
+        for player in fromGame.players
+          exports.parlors = (parlor for parlor in exports.parlors where parlor.id != player.playerChannel.id)
+          player.playerChannel.delete()
+        exports.parlors = (parlor for parlor in exports.parlors where parlor.id != fromGame.gameObservationChannel.id)
+        fromGame.gameObservationChannel.delete()
+
       if(commandArgs[0] == "next" && channelType == "player")
         if(fromGame.phase != "finished")
           message.channel.send("Round is not yet finished.")

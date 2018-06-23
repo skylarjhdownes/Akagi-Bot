@@ -85,6 +85,30 @@ class MahjongGame
         @dealer = player
     @startRound()
 
+
+  #Sends out all the appropriate messages when the game ends
+  endGame: ->
+    winOrder = _.sortBy(@players, (x) -> x.player.roundPoints)
+    @phase = "GameOver"
+    winOrder[3].sendMessage("You win!")
+    if(riichiSticks.length > 0)
+      winOrder[3].roundPoints += 1000*riichiSticks.length
+      winOrder[3].sendMessage("As the winner, you recieve the remaining riichi sticks and thus gain #{1000*riichiSticks.length} points.")
+      riichiSticks = []
+    for player in @players
+      player.sendMessage("The game has ended.")
+      player.sendMessage("First place was player #{winOrder[3].playerNumber} with #{winOrder[3].roundPoints} points.")
+      player.sendMessage("Second place was player #{winOrder[2].playerNumber} with #{winOrder[2].roundPoints} points.")
+      player.sendMessage("Third place was player #{winOrder[1].playerNumber} with #{winOrder[1].roundPoints} points.")
+      player.sendMessage("Fourth place was player #{winOrder[0].playerNumber} with #{winOrder[0].roundPoints} points.")
+      player.sendMessage("Congratulations to player #{winOrder[3].playerNumber}!")
+      player.sendMessage("Type 'end game' to remove all game channels, or 'play again' to start a new game with the same players.")
+    @gameObservationChannel.send("The game has ended.")
+    @gameObservationChannel.send("First place was player #{winOrder[3].playerNumber} with #{winOrder[3].roundPoints} points.")
+    @gameObservationChannel.send("Second place was player #{winOrder[2].playerNumber} with #{winOrder[2].roundPoints} points.")
+    @gameObservationChannel.send("Third place was player #{winOrder[1].playerNumber} with #{winOrder[1].roundPoints} points.")
+    @gameObservationChannel.send("Fourth place was player #{winOrder[0].playerNumber} with #{winOrder[0].roundPoints} points.")
+
   #Called when the round ends with no winner.
   exaustiveDraw: ->
     @winningPlayer = _.filter(@players,(x)->scoreMahjongHand.tenpaiWith(x.hand) != [])
