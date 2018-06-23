@@ -9,9 +9,11 @@ class Player
     @namedTiles = true #Tells whether you want the names written out, or just the symbol.
     @daburu = false #Activated if a player calls riichi on their first turn
     @liablePlayer = false #Who fed the last dragon or wind tile to someone who already had 2/3 of them.
+    @tilesSinceLastDraw = [] #Keeps track of which tiles have been discarded since the last time the player has drawn or called.
   roundStart:(wall) ->
     @daburu = false
     @liablePlayer = false
+    @tilesSinceLastDraw = []
     @playerChannel.send("New Round Start")
     @playerChannel.send("Seat Wind: #{@wind}")
     if(@wind == "East")

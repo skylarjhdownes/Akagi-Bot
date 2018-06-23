@@ -23,6 +23,8 @@ Currently contains the following commands:
 
 ~tenpai - Tells you if you are in tenpai, and which tiles will make you win, if you are.
 
+~furiten - Tells you if you are in furiten, and which tiles are keeping you there if you are.
+
 ~pile - If given a player number, looks at the tiles in the discard pile of that player. If used alone, looks at your own discard pile.
 
 ~toggle - Turns off or on the written form of the tiles. Only usable by players.
@@ -56,6 +58,10 @@ Currently contains the following commands:
 ~wall - Displays how many tiles are left in the live wall.
 
 ~points - Gives you the points every player currently has in the round.
+
+~sticks - Tells how many riichi sticks are available.
+
+~counters - Tells how many counters have built up.
 
 !forge - Takes one argument.  Makes a channel with the argument as its name. People mentioned are able to see the channel.
 

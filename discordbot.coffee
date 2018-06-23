@@ -169,6 +169,10 @@ bot.on('message', (message) =>
         message.channel.send("It is player #{fromGame.turn}'s turn.")
       if(commandArgs[0] == "wall")
         message.channel.send("There are #{fromGame.wall.leftInWall()} tiles left in the the live wall.")
+      if(commandArgs[0] == "sticks")
+        message.channel.send("There are currently #{fromGame.riichiSticks.length} riichi sticks present.")
+      if(commandArgs[0] == "counters")
+        message.channel.send("There are currently #{fromGame.counter} counters built up.")
       if(commandArgs[0] == "phase")
         message.channel.send("It is the #{fromGame.phase} phase.")
       if(commandArgs[0] == "prevailing")
@@ -206,6 +210,15 @@ bot.on('message', (message) =>
             message.channel.send("You are not in tenpai.")
           else
             message.channel.send("You are in tenpai, waiting on #{x.getName(fromPlayer.namedTiles) for x in tenpaiTiles}.")
+      if(commandArgs[0] == "furiten" and channelType == "player")
+        if(fromPlayer.hand.contains.length != 13)
+          message.channel.send("Can only check for furiten when your hand has 13 tiles.")
+        else
+          furitenTiles = fromGame.furiten(fromPlayer)
+          if(!furitenTiles)
+            message.channel.send("You are not in furiten.")
+          else
+            message.channel.send("You are in furiten, because of the following tiles: #{x.getName(fromPlayer.namedTiles) for x in furitenTiles}")
       if(commandArgs[0] == "toggle" and channelType == "player")
         fromPlayer.toggleTiles()
       if(commandArgs[0] == "draw" and channelType == "player")

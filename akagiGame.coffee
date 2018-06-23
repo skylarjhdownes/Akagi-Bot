@@ -13,6 +13,7 @@ class MahjongGame
     @pendingRiichiPoints = false #Keeps track of who just called riichi, so that once we are sure the next round has started, then they can have their stick added to the pile.
     @oneRoundTracker = [[],[],[],[]] #Keeps track of all the special things that can give points if done within one go around
     @kuikae = [] #Keeps track of what tiles cannot be discarded after calling chi or pon.
+    @lastDiscard = false #Keeps track of the last tile discarded this game.
     @winningPlayer = []
     @players = [
       new playerObject(playerChannels[1],1),
@@ -53,6 +54,7 @@ class MahjongGame
     @wall.doraFlip()
     @kuikae = []
     @pendingRiichiPoints = false
+    @lastDiscard = false
     for player in @players
       player.hand.startDraw(@wall)
       player.roundStart(@wall)
@@ -84,7 +86,7 @@ class MahjongGame
     @startRound()
 
   #Called when the round ends with no winner.
-  @exaustiveDraw: ->
+  exaustiveDraw: ->
     @winningPlayer = _.filter(@players,(x)->scoreMahjongHand.tenpaiWith(x.hand) != [])
     for player in @players
       player.sendMessage("The round has ended in an exaustive draw.")
@@ -102,7 +104,7 @@ class MahjongGame
       player.sendMessage("The round is over.  To start the next round, type next.")
     @phase = "finished"
 
-  #Put the stick into the pot, once the next turn has started.
+  #Put the stick into the pot, once the next turn has started. Also, adds discarded tile, to possible temporary furiten list.
   confirmNextTurn: ->
     if(@pendingRiichiPoints)
       @riichiSticks.append(@pendingRiichiPoints)
@@ -110,14 +112,18 @@ class MahjongGame
         if player.playerNumber == @pendingRiichiPoints
           player.roundPoints -= 1000
       @pendingRiichiPoints = false
+    for player in @players
+      player.tilesSinceLastDraw.push(@lastDiscard)
 
   #Used to empty the round tracker if someone makes a call
   interuptRound: ->
     @oneRoundTracker = [[],[],[],[]]
 
-  #Removes all one round counters for one player once it gets back to them.
+  #Removes all one round counters for one player once it gets back to them, and removes list of temporary furiten tiles if they are not in riichi
   endGoAround:(playerTurn) ->
     @oneRoundTracker[playerTurn.playerNumber-1] = []
+    if(!playerTurn.riichiCalled())
+      playerTurn.tilesSinceLastDraw = []
 
   drawTile:(playerToDraw) ->
     if(@turn == playerToDraw.playerNumber)
@@ -136,6 +142,22 @@ class MahjongGame
             player.sendMessage("This is the last draw of the game.  The game will end after the discard.")
     else
       playerToDraw.sendMessage("It is not your turn.")
+
+  #checks whether someone is furiten or not
+  furiten:(player) ->
+    tenpai = score.tenpaiWith(player.hand)
+    furitenBecause = []
+    for tile in tenpai
+      for discard in player.discardPile.contains
+        if(tile.getTextName() == discard.getTextName())
+          furitenBecause.push(tile)
+      for discard in player.tilesSinceLastDraw
+        if(tile.getTextName() == discard.getTextName())
+          furitenBecause.push(tile)
+    if(furitenBecause.length == 0)
+      return false
+    else
+      return furitenBecause
 
   #checks and sets liability for 4 winds/3 dragon hands
   liabilityChecker:(playerCalling,playerLiable) ->
@@ -501,6 +523,7 @@ class MahjongGame
             @oneRoundTracker[@playerToDiscard.playerNumber-1].push("Ippatsu")
           else
             outtext = "discarded"
+          @lastDiscard = discarded
           @endGoAround(playerToDiscard)
           @gameObservationChannel.send("Player #{playerToDiscard.playerNumber} #{outtext} a #{discarded.getName()}.")
           for player in @players
