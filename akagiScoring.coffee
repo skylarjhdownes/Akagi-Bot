@@ -85,6 +85,11 @@ tenpaiWith = (hand) ->
       console.log(getPossibleHands(testHand))
   return winningTiles
 
+#Checks whether a hand is the thirteen orphans hand or not.
+thirteenOrphans = (hand,lastTile) ->
+  testHand = hand.contains
+  testHand.push(lastTile)
+  return _.xorWith(testHand, gamePieces.allTerminalsAndHonorsGetter(), _.isEqual).length == 0
 
 scoreMahjongHand = (hand, gameDataFlags, dora) ->
   #Takes a hand of mahajong tiles and finds the highest scoring way it can be interpreted, returning the score, and the melds which lead to that score
@@ -596,3 +601,4 @@ module.exports.scoreMahjongHand = scoreMahjongHand
 module.exports.getPossibleHands = getPossibleHands
 module.exports.gameFlags = gameFlags
 module.exports.tenpaiWith = tenpaiWith
+module.exports.thirteenOrphans = thirteenOrphans

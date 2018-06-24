@@ -216,6 +216,115 @@ class MahjongGame
       flags.push("Haitei")
     return new score.gameFlags(winningPlayer.wind,@prevailingWind,flags)
 
+  ron:(playerToRon) ->
+    if(@turn == playerToRon.nextPlayer && (@phase in ["draw","react"] || (@phase.isArray && @phase[0] not in ["concealedKaning","extendKaning","concealedRon","extendRon"])))
+      playerToRon.sendMessage("Cannot Ron off of own discard.")
+    else if(@turn == playerToRon.playerNumber && (@phase == "discard"||(@phase.isArray && @phase[0] in ["concealedKaning","extendKaning","concealedRon","extendRon"])))
+      playerToRon.sendMessage("During your turn, use Tsumo, instead of Ron.")
+    else if(furiten(playerToRon))
+      playerToRon.sendMessage("You may not Ron, because you are in furiten.")
+    else if(@phase.isArray && @phase[0] in ["concealedKaning","concealedRon"] && !score.thirteenOrphans(playerToRon.hand,@phase[1]))
+      playerToRon.sendMessage("You may only call Ron off of a concealed Kan, if you are winning via the thirteen orphans hand.")
+    else if(@phase.isArray && @phase[0] in ["concealedRon","extendRon","roning"] && playerToRon.playerNumber in @phase[2])
+      playerToRon.sendMessage("You have already declared Ron.")
+    else
+      if(@phase.isArray && @phase[0] in ["concealedKaning","concealedRon","extendKaning","extendRon"])
+        discarder = _.find(@players,(x)-> @turn == x.playerNumber)
+        discardedTile = @phase[1]
+      else
+        discarder = _.find(@players,(x)-> @turn == x.nextPlayer)
+        discardedTile = discarder.discardPile.contains[-1..][0]
+      testHand = _.cloneDeep(playerToRon.hand)
+      testHand.contains.push(discardedTile)
+      testHand.lastTileDrawn = discardedTile
+      testHand.draw(null,0)
+      testHand.lastTileFrom = discarder.playerNumber
+      scoreMax = score.scoreMahjongHand(testHand,@winFlagCalculator(playerToRon,"Ron"),[@wall.dora,@wall.urDora])
+      if(scoreMax[0] == 0)
+        playerToRon.sendMessage(scoreMax[1])
+      else
+        playerToRon.hand = testHand
+        for player in @players
+          if(player.playerNumber = playerToRon.playerNumber)
+            player.sendMessage("You have declared Ron.")
+          else
+            player.sendMessage("Player #{playerToRon.playerNumber} has declared Ron.")
+        if(@phase.isArray)
+          if(@phase[0] in ["concealedKaning","concealedRon"])
+            state = "concealedRon"
+          else if(@phase[0] in ["extendKaning","extendRon"])
+            state = "extendRon"
+          else
+            state = "roning"
+          #Figure out who all has declared ron thus far.
+          if(@phase[0] in ["concealedRon","extendRon","roning"])
+            ronGroup = @phase[2].concat(playerToRon.playerNumber)
+          else
+            ronGroup = [playerToRon.playerNumber]
+        else
+          state = "roning"
+          ronGroup = [playerToRon.playerNumber]
+        @phase = [state,discardedTile,ronGroup]
+        ronAfterTen = new Promise((resolve,reject) =>
+          setTimeout(->
+            resolve("Time has Passed")
+          ,1000))
+        ronAfterTen
+        .then((message)=>
+          if(_.isEqual(@phase,[state,discardedTile,ronGroup]))
+            riichiBet = riichiSticks.length
+            winnerOrder = []
+            winnerOrder.push(_.search(@players,(x)->discarder.nextPlayer == x.playerNumber)
+            winnerOrder.push(_.search(@players,(x)->winnerOrder[0].nextPlayer==x.playerNumber))
+            winnerOrder.push(_.search(@players,(x)->winnerOrder[1].nextPlayer==x.playerNumber))
+            winnerOrder = _.filter(winnerOrder,(x)->x.playerNumber in @phase[2]))
+            for winner in winnerOrder
+              if(winner.riichiCalled())
+                winner.roundPoints+=1000
+                winner.sendMessage("Riichi bet returned to you.")
+                riichiBet -= 1
+            if(riichiBet>0)
+              winnerOrder[0].roundPoints+=1000*riichiBet
+              winner.sendMessage("Remaining riichi bets give you #{1000*riichiBet} points.")
+            riichiSticks = []
+            for winner in winnerOrder
+              scoreMax = score.scoreMahjongHand(winner.hand,@winFlagCalculator(playerToRon,"Ron"),[@wall.dora,@wall.urDora])
+              if(playerToRon.wind == "East")
+                pointsGained = _roundUpToClosestHundred(6*scoreMax[0])+@counter*300
+                pointsLost = _roundUpToClosestHundred(6*scoreMax[0])
+              else
+                pointsGained = _roundUpToClosestHundred(4*scoreMax[0])+@counter*300
+                pointsLost = _roundUpToClosestHundred(4*scoreMax[0])
+              for player in @players
+                if(player.playerNumber == winner.playerNumber)
+                  player.roundPoints += pointsGained
+                  player.sendMessage("You have won from Ron.")
+                  player.sendMessage("You receive #{pointsGained} points.")
+                else
+                  player.sendMessage("Player #{winner.playerNumber} has won via Ron.")
+                  if(winner.liablePlayer && winner.liablePlayer != discarder.playerNumber)
+                    pointsLost = pointsLost/2
+                    if(player.playerNumber == winner.liablePlayer)
+                      player.roundPoints -= pointsLost
+                      player.sendMessage("Because you were liable for this hand, you pay #{pointsLost} points.")
+                  if(discarder.playerNumber == player.playerNumber)
+                    player.roundPoints -= pointsLost+300*@counter
+                    player.sendMessage("Because you discarded the winning tile, you pay #{pointsLost+300*@counter} points.")
+                player.sendMessage("The winning hand contained the following yaku: #{scoreMax[1]}")
+                player.sendMessage("The winning hand was: #{winner.hand.printHand(player.namedTiles)}")
+                player.sendMessage("The dora indicators were: #{@wall.printDora(player.namedTiles)}")
+                if(playerToTsumo.riichiCalled)
+                  player.sendMessage("The ur dora indicators were: #{@wall.printUrDora(player.namedTiles)}")
+            for player in @players
+              player.sendMessage("The round is over.  To start the next round, type next.")
+            @winningPlayer = winnerOrder
+            @phase = "finished"
+        )
+        .catch(console.error)
+
+
+
+
   tsumo:(playerToTsumo) ->
     if(@turn!=playerToTsumo.playerNumber)
       playerToTsumo.sendMessage("Not your turn.")
@@ -267,6 +376,7 @@ class MahjongGame
             player.sendMessage("You have won on self draw.")
             player.sendMessage("You receive #{pointsGained} points.")
           player.sendMessage("The winning hand contained the following yaku: #{scoreMax[1]}")
+          player.sendMessage("The winning hand was: #{winner.hand.printHand(player.namedTiles)}")
           player.sendMessage("The dora indicators were: #{@wall.printDora(player.namedTiles)}")
           if(playerToTsumo.riichiCalled)
             player.sendMessage("The ur dora indicators were: #{@wall.printUrDora(player.namedTiles)}")
@@ -336,6 +446,9 @@ class MahjongGame
     else
       playerToChi.sendMessage("Wrong time to Chi")
 
+  onlyPung:(hand,tile) ->
+    return true #TODO Actually computer whether only a pung is interpretable.
+
   selfKanTiles:(playerToKan,tileToKan) ->
     uncalledKanTiles = _.filter(playerToKan.hand.uncalled(),(x) -> _.isEqual(x,tileToKan)).length
     if(@turn != playerToKan.playerNumber)
@@ -350,6 +463,8 @@ class MahjongGame
       playerToKan.sendMessage("No tiles to Kan with.")
     else if(uncalledKanTiles in [2,3])
       playerToKan.sendMessage("Wrong number of tiles to Kan with.")
+    else if(playerToKan.riichiCalled() && !@onlyPung(playerToKan.hand,tileToKan))
+      playerToKan.sendMessage("You can't call Kan with this tile, because it changes the structure of the hand.")
     else
       if(uncalledKanTiles == 4)
         @phase = ["concealedKaning",tileToKan]

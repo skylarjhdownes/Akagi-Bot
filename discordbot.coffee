@@ -251,6 +251,8 @@ bot.on('message', (message) =>
           fromGame.chiTile(fromPlayer,tile1,tile2)
       if(commandArgs[0] == "tsumo" and channelType == "player")
         fromGame.tsumo(fromPlayer)
+      if(commandArgs[0] == "ron" and channelType == "player")
+        fromGame.ron(fromPlayer)
       if(commandArgs[0] == "pile")
         if(commandArgs.length == 1 and channelType == "player")
           fromPlayer.sendMessage("You have discarded #{fromPlayer.hand.discardPile.printDiscard(fromPlayer.namedTiles)}.")

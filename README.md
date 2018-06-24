@@ -43,6 +43,8 @@ Currently contains the following commands:
 
 ~tsumo - Allows one to win off of self draw.
 
+~ron - Allows one to win off a discarded tile.
+
 !tiles - Displays a picture of each tile.
 
 ~dora - Displays all current dora indicators.
