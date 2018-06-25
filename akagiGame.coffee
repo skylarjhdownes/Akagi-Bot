@@ -446,8 +446,21 @@ class MahjongGame
     else
       playerToChi.sendMessage("Wrong time to Chi")
 
+  #Finds out if the tiles in a concealed pung
   onlyPung:(hand,tile) ->
-    return true #TODO Actually computer whether only a pung is interpretable.
+    withoutDraw = _.cloneDeep(hand)
+    withoutDraw.discard(tile.getTextName())
+    waits = score.tenpaiWith(withoutDraw)
+    for win in waits
+      testHand = _.cloneDeep(withoutDraw)
+      testHand.lastTileDrawn = win
+      testHand.contains.push(win)
+      melds = score.getPossibleHands(testHand)
+      for meld in melds
+        if(meld.type == "Chow" && meld.containsTile(tile))
+          return false
+    return true
+
 
   selfKanTiles:(playerToKan,tileToKan) ->
     uncalledKanTiles = _.filter(playerToKan.hand.uncalled(),(x) -> _.isEqual(x,tileToKan)).length
@@ -463,7 +476,7 @@ class MahjongGame
       playerToKan.sendMessage("No tiles to Kan with.")
     else if(uncalledKanTiles in [2,3])
       playerToKan.sendMessage("Wrong number of tiles to Kan with.")
-    else if(playerToKan.riichiCalled() && !@onlyPung(playerToKan.hand,tileToKan))
+    else if(uncalledKanTiles == 4 && playerToKan.riichiCalled() && !@onlyPung(playerToKan.hand,tileToKan))
       playerToKan.sendMessage("You can't call Kan with this tile, because it changes the structure of the hand.")
     else
       if(uncalledKanTiles == 4)
@@ -646,6 +659,8 @@ class MahjongGame
         playerToDiscard.sendMessage("You may only riichi with a concealed hand.")
       else if(playerToDiscard.riichiCalled() && tileToDiscard != playerToDiscard.hand.lastTileDrawn.getTextName())
         playerToDiscard.sendMessage("Once you have declared Riichi, you must always discard the drawn tile.")
+      else if(riichi && @wall.leftInWall() < 4)
+        playerToDiscard.sendMessage("You can't call riichi if there are less than four tiles remaining in the wall.")
       else if(_.some(@kuikae,(x)->x.getTextName()==tileToDiscard))
         playerToDiscard.sendMessage("May not discard the same tile just called, or the opposite end of the chow just called.")
       else
