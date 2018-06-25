@@ -595,7 +595,7 @@ class MahjongGame
       playerToPon.sendMessage("May not call Pon on the last turn.")
     else if(@phase.isArray && @phase[0] == "Chi" && @phase[1] == playerToPon.playerNumber)
       playerToPon.sendMessage("Can't call Pon if you already called Chi.")
-    else if((@phase in ["react","draw"] || (@phase.isArray && @phase[0] == "Chi")) && @turn != playerToPon.nextPlayer)
+    else if((@phase in ["react","draw"] || (@phase.isArray && @phase[0] == "chiing")) && @turn != playerToPon.nextPlayer)
       discarder = _.find(@players,(x)-> @turn == x.nextPlayer)
       toPon = discarder.discardPile.contains[-1..][0]
       if(_.findIndex(playerToPon.hand.uncalled(),(x)->_.isEqual(toPon,x))!=_.findLastIndex(playerToPon.hand.uncalled(),(x)->_.isEqual(toPon,x)))
@@ -685,8 +685,8 @@ class MahjongGame
                   for player in @players
                     if(@turn == player.playerNumber)
                       player.sendMessage("It is your turn.  You may draw a tile.")
-              else
-                @exaustiveDraw()
+                else
+                  @exaustiveDraw()
             )
             .catch(console.error)
         else
