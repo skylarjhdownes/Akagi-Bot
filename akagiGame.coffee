@@ -4,6 +4,26 @@ score = require('./akagiScoring.coffee')
 Promise = require('promise')
 _ = require('lodash')
 
+class messageSender
+  #Way to make sending messages to both players and the observation channel easier.
+  constuctor:(@playerOrObserver,whichType) ->
+    if whichType == "player"
+      @player = true
+    else
+      @player = false
+
+  sendMessage:(text) ->
+    if(@player)
+      @playerOrObserver.sendMessage(text)
+    else
+      @playerOrObserver.send(text)
+
+  namedTiles:->
+    if(@player)
+      return @playerOrObserver.namedTiles
+    else
+      return true
+
 class MahjongGame
   #A four player game of Mahjong
   constructor: (playerChannels, server, gameSettings) ->
@@ -22,6 +42,10 @@ class MahjongGame
       new playerObject(playerChannels[4],4)
     ]
     @gameObservationChannel = playerChannels[0]
+    @messageRecievers = []
+    @messageRecievers.push(new messageSender(@gameObservationChannel,"observer"))
+    for player in @players
+      @messageRecievers.push(new messageSender(player,"player"))
     @startRoundOne()
 
   startRoundOne: ->
@@ -88,26 +112,67 @@ class MahjongGame
 
   #Sends out all the appropriate messages when the game ends
   endGame: ->
-    winOrder = _.sortBy(@players, (x) -> x.player.roundPoints)
+    winOrder = _.sortBy(@players, (x) -> -1*x.roundPoints)
     @phase = "GameOver"
-    winOrder[3].sendMessage("You win!")
-    if(riichiSticks.length > 0)
-      winOrder[3].roundPoints += 1000*riichiSticks.length
-      winOrder[3].sendMessage("As the winner, you recieve the remaining riichi sticks and thus gain #{1000*riichiSticks.length} points.")
-      riichiSticks = []
-    for player in @players
+    placements = {"First":[],"Second":[],"Third":[],"Fourth":[]}
+    ranks = ["First","Second","Third","Fourth"]
+    for player in winOrder
+      for rank in ranks
+        if(placements[rank].length == 0 || placements[rank][0].roundPoints == player.roundPoints)
+          placements[rank].push(player)
+          break
+
+    for winner in placements["First"]
+      winner.sendMessage("You win!")
+      if(riichiSticks.length > 0)
+        winner.roundPoints += 1000*riichiSticks.length/placements["First"].length
+        winner.sendMessage("As the winner, you recieve the remaining riichi sticks and thus gain #{1000*riichiSticks.length/placements["First"].length} points.")
+    riichiSticks = []
+    for player in @messageRecievers
       player.sendMessage("The game has ended.")
-      player.sendMessage("First place was player #{winOrder[3].playerNumber} with #{winOrder[3].roundPoints} points.")
-      player.sendMessage("Second place was player #{winOrder[2].playerNumber} with #{winOrder[2].roundPoints} points.")
-      player.sendMessage("Third place was player #{winOrder[1].playerNumber} with #{winOrder[1].roundPoints} points.")
-      player.sendMessage("Fourth place was player #{winOrder[0].playerNumber} with #{winOrder[0].roundPoints} points.")
-      player.sendMessage("Congratulations to player #{winOrder[3].playerNumber}!")
-      player.sendMessage("Type 'end game' to remove all game channels, or 'play again' to start a new game with the same players.")
-    @gameObservationChannel.send("The game has ended.")
-    @gameObservationChannel.send("First place was player #{winOrder[3].playerNumber} with #{winOrder[3].roundPoints} points.")
-    @gameObservationChannel.send("Second place was player #{winOrder[2].playerNumber} with #{winOrder[2].roundPoints} points.")
-    @gameObservationChannel.send("Third place was player #{winOrder[1].playerNumber} with #{winOrder[1].roundPoints} points.")
-    @gameObservationChannel.send("Fourth place was player #{winOrder[0].playerNumber} with #{winOrder[0].roundPoints} points.")
+      if(placements["First"].length == 1)
+        player.sendMessage("First place was player #{placements["First"][0].playerNumber} with #{placements["First"][0].roundPoints} points.")
+      else
+        player.sendMessage("The following players tied for first with #{placements["First"][0].roundPoints}: #{_.map(placements["First"],(x)->x.playerNumber)}")
+      if(placements["Second"].length == 1)
+        player.sendMessage("Second place was player #{placements["Second"][0].playerNumber} with #{placements["Second"][0].roundPoints} points.")
+      else if(placements["Second"].length > 1)
+        player.sendMessage("The following players tied for second with #{placements["Second"][0].roundPoints}: #{_.map(placements["Second"],(x)->x.playerNumber)}")
+      if(placements["Third"].length == 1)
+        player.sendMessage("Third place was player #{placements["Third"][0].playerNumber} with #{placements["Third"][0].roundPoints} points.")
+      else if(placements["Third"].length > 1)
+        player.sendMessage("The following players tied for third with #{placements["Third"][0].roundPoints}: #{_.map(placements["Third"],(x)->x.playerNumber)}")
+      if(placements["Fourth"].length == 1)
+        player.sendMessage("Fourth place was player #{placements["Fourth"][0].playerNumber} with #{placements["Fourth"][0].roundPoints} points.")
+
+    #Uma calculations
+    umaPoints = [15000,5000,-5000,-15000]
+    for rank in ranks
+      accumulatedPoints = 0
+      for x in placements[rank]
+        accumulatedPoints += umaPoints.shift()
+      for x in placements[rank]
+        x.roundPoints += accumulatedPoints/placements[rank].length
+
+    for player in @messageRecievers
+      player.sendMessage("After factoring in uma, here are the final point values.")
+      if(placements["First"].length == 1)
+        player.sendMessage("First place was player #{placements["First"][0].playerNumber} with #{placements["First"][0].roundPoints} points.")
+      else
+        player.sendMessage("The following players tied for first with #{placements["First"][0].roundPoints}: #{_.map(placements["First"],(x)->x.playerNumber)}")
+      if(placements["Second"].length == 1)
+        player.sendMessage("Second place was player #{placements["Second"][0].playerNumber} with #{placements["Second"][0].roundPoints} points.")
+      else if(placements["Second"].length > 1)
+        player.sendMessage("The following players tied for second with #{placements["Second"][0].roundPoints}: #{_.map(placements["Second"],(x)->x.playerNumber)}")
+      if(placements["Third"].length == 1)
+        player.sendMessage("Third place was player #{placements["Third"][0].playerNumber} with #{placements["Third"][0].roundPoints} points.")
+      else if(placements["Third"].length > 1)
+        player.sendMessage("The following players tied for third with #{placements["Third"][0].roundPoints}: #{_.map(placements["Third"],(x)->x.playerNumber)}")
+      if(placements["Fourth"].length == 1)
+        player.sendMessage("Fourth place was player #{placements["Fourth"][0].playerNumber} with #{placements["Fourth"][0].roundPoints} points.")
+      player.sendMessage("Congratulations to the winning player(s)!")
+      if(player.player)
+        player.sendMessage("Type 'end game' to remove all game channels, or 'play again' to start a new game with the same players.")
 
   #Called when the round ends with no winner.
   exaustiveDraw: ->
