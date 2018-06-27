@@ -207,7 +207,6 @@ getYaku = (melds, gameDataFlags) ->
   isConcealedHand = true
   for meld in melds
     if(!meld.lastDrawnTile && meld.takenFrom != "self")
-      console.log(meld)
       isConcealedHand = false
 
   yakuModifiers = []  #I think it could be more useful to calc out all of the yaku names,
@@ -321,6 +320,10 @@ getYaku = (melds, gameDataFlags) ->
   if(concealedPungs == 3)
     yakuModifiers.push("San Ankou")
 
+  #Toitoi Hou - All pungs/kongs
+  if(pungList.length == 4)
+    yakuModifiers.push("Toitoi Hou")
+    
   #Itsu - Pure Straight
   for suit,value of possibleStraight
     if(_.uniq(value).length == 3)
