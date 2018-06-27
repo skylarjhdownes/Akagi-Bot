@@ -95,17 +95,17 @@ thirteenOrphans = (hand,lastTile) ->
 scoreMahjongHand = (hand, gameDataFlags, dora) ->
   #Takes a hand of mahajong tiles and finds the highest scoring way it can be interpreted, returning the score, and the melds which lead to that score
   possibleHands = getPossibleHands(hand)
-  console.log(possibleHands)
+  #console.log(possibleHands)
   if possibleHands.length == 0
     return([0, "Not a Scoring Hand"])
   doras = getDora(hand,gameDataFlags.riichi,dora)
   doraPoints = doras[0]
   urDoraPoints = doras[1]
-  scores = getScore(getYaku(handPattern, gameDataFlags), doraPoints, urDoraPoints) for handPattern in possibleHands
-  console.log(scores)
+  scores = (getScore(getYaku(handPattern, gameDataFlags), doraPoints, urDoraPoints) for handPattern in possibleHands)
+  #console.log(scores)
   maxScore = _.maxBy(scores, (x) -> x[0])
   #maxLocation = _.indexOf(scores,maxScore)
-  console.log(maxScore)
+  #console.log(maxScore)
   return(maxScore)
 
 getDora = (hand, riichi, doraSets) ->
@@ -206,7 +206,8 @@ getYaku = (melds, gameDataFlags) ->
 
   isConcealedHand = true
   for meld in melds
-    if(!meld.lastTileDrawn && meld.takenFrom != "self")
+    if(!meld.lastDrawnTile && meld.takenFrom != "self")
+      console.log(meld)
       isConcealedHand = false
 
   yakuModifiers = []  #I think it could be more useful to calc out all of the yaku names,
@@ -221,7 +222,7 @@ getYaku = (melds, gameDataFlags) ->
   identicalChow = 0 #Used for Iipeikou and Ryan Peikou
   similarChow = {} #Used for San Shoku Doujin
   similarPung = {} #Used for San Shoku Dokou
-  possibleStaight = {} #Used for Itsu
+  possibleStraight = {} #Used for Itsu
   for chow1, index1 in chowList
     if(chow1.value() in ["1 - 2 - 3","4 - 5 - 6","7 - 8 - 9"])
       if chow1.suit() of possibleStraight
@@ -280,7 +281,7 @@ getYaku = (melds, gameDataFlags) ->
       yakuModifiers.push("Renho")
 
   #Tanyao Chuu - All simples (no terminals/honors)
-  if (_.every(meld, (x) -> !_meldContainsAtLeastOneTerminalOrHonor(x)))
+  if (_.every(melds, (x) -> !_meldContainsAtLeastOneTerminalOrHonor(x)))
     yakuModifiers.push("Tanyao Chuu")
 
   #Rinshan Kaihou - Mahjong declared on replacementTile from Kong
@@ -302,7 +303,7 @@ getYaku = (melds, gameDataFlags) ->
   #San Shoku Doujin - Mixed Triple Chow
   for value,suit of similarChow
     if(_.uniq(suit).length == 3)
-      if(isConcealed)
+      if(isConcealedHand)
         yakuModifiers.push("Concealed San Shoku Doujin")
       else
         yakuModifiers.push("San Shoku Doujin")
@@ -321,9 +322,9 @@ getYaku = (melds, gameDataFlags) ->
     yakuModifiers.push("San Ankou")
 
   #Itsu - Pure Straight
-  for suit,value of possibleStaight
+  for suit,value of possibleStraight
     if(_.uniq(value).length == 3)
-      if(isConcealed)
+      if(isConcealedHand)
         yakuModifiers.push("Concealed Itsu")
       else
         yakuModifiers.push("Itsu")
@@ -331,20 +332,18 @@ getYaku = (melds, gameDataFlags) ->
   #Fanpai/Yakuhai - Pung/kong of dragons, round wind, or player wind.
   for meld in pungList
     if meld.suit() == "dragon"
-      yakuModifiers.push("Dragon Fanpai/Yahuhai")
+      yakuModifiers.push("Dragon Fanpai/Yakuhai")
     if meld.value() == gameDataFlags.playerWind.toLowerCase()
       yakuModifiers.push("Seat Fanpai/Yakuhai")
     if meld.value() == gameDataFlags.roundWind.toLowerCase()
       yakuModifiers.push("Prevailing Fanpai/Yakuhai")
 
   #Chanta - All sets contain terminals or honours, the pair is terminals or honours, and the hand contains at least one chow.
-  if (meld for meld in melds when meld.type == "Chow").length > 0 &&
-      meldContainsOnlyTerminalsOrHonors(meld for meld in melds when meld.type == "Pair")
-    if _.filter((meld for meld in melds when meld.type != "Pair"), _meldContainsAtLeastOneTerminalOrHonor).length == 4
-      if(isConcealedHand)
-        yakuModifiers.push("Concealed Chanta")
-      else
-        yakuModifiers.push("Chanta")
+  if chowList.length > 0 && _.every(melds, _meldContainsAtLeastOneTerminalOrHonor)
+    if(isConcealedHand)
+      yakuModifiers.push("Concealed Chanta")
+    else
+      yakuModifiers.push("Chanta")
 
   #Shou Sangen - Little Three Dragons, two pungs/kongs and a pair of Dragons
   if((pung for pung in pungList when pung.suit()=="dragon").length == 2)
@@ -357,22 +356,22 @@ getYaku = (melds, gameDataFlags) ->
       yakuModifiers.push("Honroutou")
 
   #Junchan - Terminals in All Sets, but at least one Chow
-  if(chowList.length > 0 && _.every(meld, _meldContainsAtLeastOneTerminalOrHonor))
-    if(isConcealed)
+  if(chowList.length > 0 && _.every(melds, (x)-> _meldContainsAtLeastOneTerminalOrHonor(x) == "Terminal"))
+    if(isConcealedHand)
       yakuModifiers.push("Concealed Junchan")
     else
       yakuModifiers.push("Junchan")
 
   #Honitsu - Half Flush - One suit plus honors
   if(_.intersection(suitList,["dragon","wind"]).length > 0 && _.xor(suitList,["dragon","wind"]).length == 1)
-    if(isConcealed)
+    if(isConcealedHand)
       yakuModifiers.push("Concealed Honitsu")
     else
       yakuModifiers.push("Honitsu")
 
   #Chinitsu - Full Flush - One Suit, no honors
   if(_.uniq(suitList).length == 1 and suitList[0] not in ["dragon", "wind"])
-    if(isConcealed)
+    if(isConcealedHand)
       yakuModifiers.push("Concealed Chinitsu")
     else
       yakuModifiers.push("Chinitsu")
@@ -410,15 +409,15 @@ getYaku = (melds, gameDataFlags) ->
     yakuModifiers.push("Suu Kan Tsu")
 
   #Ryuu Iisou - All Green
-  if(_.every(meld,_meldIsGreen))
+  if(_.every(melds,_meldIsGreen))
     yakuModifiers.push("Ryuu Iisou")
 
   #Chinrouto - All Terminals
-  if(_.every(meld,(x) -> meld.value() in [1,9]))
+  if(_.every(melds,(x) -> x.value() in [1,9]))
     yakuModifiers.push("Chinrouto")
 
   #Tsuu Iisou - All Honors
-  if(_.every(meld,(x) -> meld.suit() in ["dragon", "wind"]))
+  if(_.every(melds,(x) -> x.suit() in ["dragon", "wind"]))
     yakuModifiers.push("Tsuu Iisou")
 
   #Dai Sangan - Big Three Dragons
@@ -438,95 +437,107 @@ getYaku = (melds, gameDataFlags) ->
 
   return({yaku:yakuModifiers,fu:fu,flags:gameDataFlags,selfDraw:selfDraw})
 
-  _meldContainsAtLeastOneTerminalOrHonor = (meld) ->
-    for tile in meld.tiles
-      if tile.isHonor() || tile.isTerminal()
-        return true
-    return false
+_meldContainsAtLeastOneTerminalOrHonor = (meld) ->
+  for tile in meld.tiles
+    if tile.isHonor()
+      return "Honor"
+    else if tile.isTerminal()
+      return "Terminal"
+  return false
 
-  _meldIsGreen = (meld) ->
-    for tile in meld.tiles
-      if !tile.isGreen()
-        return false
-    return true
+_meldIsGreen = (meld) ->
+  for tile in meld.tiles
+    if !tile.isGreen()
+      return false
+  return true
 
-  _meldContainsOnlyGivenTile = (meld, givenTile) ->
-    allSameTile = true
-    for tile in meld.tiles
-      if tile != givenTile
-        allSameTile = false
-        break
-    return allSameTile
+_meldContainsOnlyGivenTile = (meld, givenTile) ->
+  allSameTile = true
+  for tile in meld.tiles
+    if tile != givenTile
+      allSameTile = false
+      break
+  return allSameTile
 
-  _roundUpToClosestHundred = (inScore) ->
-    if (inScore%100)!=0
-      return (inScore//100+1)*100
-    else
-      inScore
+_roundUpToClosestHundred = (inScore) ->
+  if (inScore%100)!=0
+    return (inScore//100+1)*100
+  else
+    inScore
 
-  _calculateFu = (melds, selfDraw, gameDataFlags) ->
-    isConcealedHand = melds.isConcealed()
+_roundUpToClosestTen = (inScore) ->
+  if (inScore%10)!=0
+    return (inScore//10+1)*10
+  else
+    inScore
 
-    baseFu = 0
-    if(melds.length == 7)
-      baseFu = 25
-    else if(isConcealedHand && !selfDraw)
-      baseFu = 30
-    else
-      baseFu = 20
+_calculateFu = (melds, selfDraw, gameDataFlags) ->
+  isConcealedHand = true
+  for meld in melds
+    if(!meld.lastDrawnTile && meld.takenFrom != "self")
+      isConcealedHand = false
 
-    meldFu = 0
-    if(melds.length != 7)
-      for meld in melds
-        if(meld.type == "Pung")
-          if(meld.suit() in ["dragon","wind"] || meld.value() in [1,9])
-            if(meld.takenFrom == "self")
-              meldFu += 8
-            else
-              meldFu += 4
+  baseFu = 0
+  if(melds.length == 7)
+    baseFu = 25
+  else if(isConcealedHand && !selfDraw)
+    baseFu = 30
+  else
+    baseFu = 20
+
+  meldFu = 0
+  if(melds.length != 7)
+    for meld in melds
+      if(meld.type == "Pung")
+        if(meld.suit() in ["dragon","wind"] || meld.value() in [1,9])
+          if(meld.takenFrom == "self")
+            meldFu += 8
           else
-            if(meld.takenFrom == "self")
-              meldFu += 4
-            else
-              meldFu += 2
-        if(meld.type == "Kong")
-          if(meld.suit() in ["dragon","wind"] || meld.value() in [1,9])
-            if(meld.takenFrom == "self")
-              meldFu += 32
-            else
-              meldFu += 16
+            meldFu += 4
+        else
+          if(meld.takenFrom == "self")
+            meldFu += 4
           else
-            if(meld.takenFrom == "self")
-              meldFu += 16
-            else
-              meldFu += 8
-        if(meld.type == "Pair")
-          if(meld.suit() == "dragon")
             meldFu += 2
-          else if(meld.suit() == "wind")
-            if(meld.value() == gameDataFlags.playerWind)
-              meldFu += 2
-            if(meld.value() == gameDataFlags.roundWind)
-              meldFu += 2
-          if(meld.lastDrawnTile)
+      if(meld.type == "Kong")
+        if(meld.suit() in ["dragon","wind"] || meld.value() in [1,9])
+          if(meld.takenFrom == "self")
+            meldFu += 32
+          else
+            meldFu += 16
+        else
+          if(meld.takenFrom == "self")
+            meldFu += 16
+          else
+            meldFu += 8
+      if(meld.type == "Pair")
+        if(meld.suit() == "dragon")
+          meldFu += 2
+        else if(meld.suit() == "wind")
+          if(meld.value() == gameDataFlags.playerWind)
             meldFu += 2
-        if(meld.type == "Chow")
-          if(meld.lastDrawnTile)
-            if(meld.lastDrawnTile.value*3 == meld.tiles[0].value+meld.tiles[1].value+meld.tiles[2].value)
-              meldFu += 2
-            if(meld.value() == "1 - 2 - 3" && meld.lastDrawnTile.value == 3)
-              meldFu += 2
-            if(meld.value() == "7 - 8 - 9" && meld.lastDrawnTile.value == 7)
-              meldFu += 2
-      if(!(meldFu == 0 && isConcealedHand) && selfDraw)
-        meldFu += 2
-      if(meldFu == 0 && !isConcealedHand)
-        meldFu += 2
+          if(meld.value() == gameDataFlags.roundWind)
+            meldFu += 2
+        if(meld.lastDrawnTile)
+          meldFu += 2
+      if(meld.type == "Chow")
+        if(meld.lastDrawnTile)
+          if(meld.lastDrawnTile.value*3 == meld.tiles[0].value+meld.tiles[1].value+meld.tiles[2].value)
+            meldFu += 2
+          if(meld.value() == "1 - 2 - 3" && meld.lastDrawnTile.value == 3)
+            meldFu += 2
+          if(meld.value() == "7 - 8 - 9" && meld.lastDrawnTile.value == 7)
+            meldFu += 2
+    if(!(meldFu == 0 && isConcealedHand) && selfDraw)
+      meldFu += 2
+    if(meldFu == 0 && !isConcealedHand)
+      meldFu += 2
 
-    fu = baseFu + meldFu
-    if(fu != 25)
-      fu = _roundUpToClosestHundred(fu)
-    return [fu, meldFu]
+  fu = baseFu + meldFu
+  #console.log(fu)
+  if(fu != 25)
+    fu = _roundUpToClosestTen(fu)
+  return [fu, meldFu]
 
 getScore = (values, dora, urDora) ->
   if(values.yaku.length == 0)
@@ -536,7 +547,10 @@ getScore = (values, dora, urDora) ->
   yakuPoints = 0
   printedYaku = []
   for yaku in values.yaku
-    if(yakuList[yaku].score == "Y")
+    #testing
+    if(yaku not of yakuList)
+      console.log(yaku)
+    else if(yakuList[yaku].score == "Y")
       yakuman = true
     else if(yaku != "Renho")
       yakuPoints += yakuList[yaku].score
@@ -573,30 +587,14 @@ getScore = (values, dora, urDora) ->
     else
       baseScore = 5000
   else
-    baseScore = fu * math.pow(2,2+fan)
+    #console.log(values.fu)
+    baseScore = values.fu * Math.pow(2,2+fan)
     if baseScore > 2000
       baseScore = 2000
-
-#  #Takes base Score and multiplies it depending on seat wind and whether ron or tsumo
-#  if(values.flags.playerWind == "east")
-#    if(values.selfDraw)
-#      score = _roundUpToClosestHundred(baseScore * 2)
-#    else
-#      score = _roundUpToClosestHundred(baseScore * 6)
-#  else
-#    if(values.selfDraw)
-#      score = [_roundUpToClosestHundred(baseScore), _roundUpToClosestHundred(baseScore*2)]
-#    else
-#      score = _roundUpToClosestHundred(baseScore * 4)
 
   return [baseScore,printedYaku]
 
 
-  _roundUpToClosestHundred = (inScore) ->
-    if (inScore%100)!=0
-      return (inScore//100+1)*100
-    else
-      inScore
 
 module.exports.scoreMahjongHand = scoreMahjongHand
 module.exports.getPossibleHands = getPossibleHands

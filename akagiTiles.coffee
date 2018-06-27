@@ -256,7 +256,7 @@ class Meld
 
   value: ->
     if(@type == "Chow")
-      return("#{@tiles[0].value} - #{@tiles[1]} - #{@tiles[2]}")
+      return("#{@tiles[0].value} - #{@tiles[1].value} - #{@tiles[2].value}")
     else
       return @tiles[0].value
 
