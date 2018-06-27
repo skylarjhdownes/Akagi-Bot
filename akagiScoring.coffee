@@ -22,7 +22,7 @@ yakuList = {
             "Chan Kan":                     {jpn: "Chan Kan",eng: "Robbing a Kong",score: 1},
             "Haitei":                       {jpn: "Haitei",eng: "Under the Sea",score: 1},
             "Houtei":                       {jpn: "Houtei",eng: "Bottom of the Sea",score: 1},
-            "Chi Toitsu":                   {jpn: "Chi Toitsu",eng: "Seven Pairs",score: 2},
+            "Chii Toitsu":                  {jpn: "Chii Toitsu",eng: "Seven Pairs",score: 2},
             "San Shoku Dokou":              {jpn: "San Shoku Dokou",eng: "Triple Pung",score: 2},
             "San Ankou":                    {jpn: "San Ankou",eng: "Three Concealed Pungs",score: 2},
             "San Kan Tsu":                  {jpn: "San Kan Tsu",eng: "Three Kongs",score: 2},
@@ -47,8 +47,8 @@ yakuList = {
             "Chinrouto":                    {jpn: "Chinrouto",eng: "All Terminals",score: "Y"},
             "Tsuu Iisou":                   {jpn: "Tsuu Iisou",eng: "All Honours",score: "Y"},
             "Dai Sangen":                   {jpn: "Dai Sangen",eng: "Big Three Winds",score: "Y"},
-            "Shou Suushi":                  {jpn: "Shou Suushi",eng: "Little Four Winds",score: "Y"},
-            "Dai Suushi":                   {jpn: "Dai Suushi",eng: "Big Four Winds",score: "Y"}
+            "Shou Suushii":                 {jpn: "Shou Suushii",eng: "Little Four Winds",score: "Y"},
+            "Dai Suushii":                  {jpn: "Dai Suushii",eng: "Big Four Winds",score: "Y"}
           }
 
 
@@ -269,7 +269,7 @@ getYaku = (melds, gameDataFlags) ->
 
     #Ryan Peikou - Concealed hand with two sets of two identical chows
     if identicalChow in [4,12]
-      yakumodifiers.push("Ryan Peikou")
+      yakuModifiers.push("Ryan Peikou")
 
     #Chii Toitsu - Concealed hand with 7 pairs
     if melds.length == 7
@@ -323,7 +323,7 @@ getYaku = (melds, gameDataFlags) ->
   #Toitoi Hou - All pungs/kongs
   if(pungList.length == 4)
     yakuModifiers.push("Toitoi Hou")
-    
+
   #Itsu - Pure Straight
   for suit,value of possibleStraight
     if(_.uniq(value).length == 3)
@@ -366,7 +366,7 @@ getYaku = (melds, gameDataFlags) ->
       yakuModifiers.push("Junchan")
 
   #Honitsu - Half Flush - One suit plus honors
-  if(_.intersection(suitList,["dragon","wind"]).length > 0 && _.xor(suitList,["dragon","wind"]).length == 1)
+  if(_.intersection(suitList,["dragon","wind"]).length > 0 && _.uniq(_.difference(suitList,["dragon","wind"])).length == 1)
     if(isConcealedHand)
       yakuModifiers.push("Concealed Honitsu")
     else
@@ -425,7 +425,7 @@ getYaku = (melds, gameDataFlags) ->
 
   #Dai Sangan - Big Three Dragons
   if((pung for pung in pungList when pung.suit()=="dragon").length == 3)
-    yakuModifiers.push("Dai Sangan")
+    yakuModifiers.push("Dai Sangen")
 
   #Shou Suushii - Little Four Winds
   if((suit for suit in suitList when suit == "wind").length == 4)
