@@ -27,6 +27,7 @@ tester = (expected, input) ->
 
 
 tester(1280,testH("1 pin 2 pin 3 pin 5 pin 6 pin 7 pin 2 wan 3 wan 4 wan east wind east wind east wind 2 pin 2 pin"))
+
 #10 Example Hands from the EMA Ruleset
 tester(2000,testH("3 sou 3 sou 1 sou 2 sou 3 sou 1 pin 2 pin 3 pin 4 pin 5 pin 6 pin 7 pin 8 pin 9 pin",[],new score.gameFlags("East","East",["Riichi"])))
 tester(1920,testH("3 sou 3 sou 1 sou 2 sou 3 sou 1 pin 2 pin 3 pin 4 pin 5 pin 6 pin 7 pin 8 pin 9 pin",[],new score.gameFlags("East","East",["Riichi"]),2))
@@ -38,6 +39,8 @@ tester(400,testH("green dragon green dragon 3 sou 3 sou 5 sou 5 sou 2 wan 2 wan 
 tester(1920,testH("3 sou 3 sou 4 sou 4 sou 5 sou 5 sou 1 wan 1 wan 2 wan 2 wan 3 wan 3 wan red dragon red dragon"))
 tester(3000,testH("1 pin 1 pin 1 pin 2 pin 3 pin 7 pin 8 pin 9 pin east wind east wind east wind west wind west wind west wind",[[2,["east wind","east wind","east wind"]]],new score.gameFlags("East","East"),2,[[new game.Tile("pin", 6)],[]]))
 tester(2000,testH("north wind north wind north wind 1 wan 1 wan 2 wan 3 wan 4 wan 5 wan 6 wan 7 wan 8 wan 9 wan 7 wan"))
+
+
 #Thirteen Orphans Test
 tester(8000,testH("1 sou 9 sou 1 wan 9 wan 9 wan 1 pin 9 pin east wind north wind south wind west wind green dragon red dragon white dragon"))
 #9 Gates Test
@@ -62,3 +65,55 @@ tester(8000,testH("1 pin 1 pin 1 pin 1 pin 2 pin 2 pin 2 pin 2 pin 3 pin 3 pin 3
 tester(8000,testH("3 sou 3 sou 1 sou 2 sou 3 sou 1 pin 2 pin 3 pin 4 pin 5 pin 6 pin 7 pin 8 pin 9 pin",[],new score.gameFlags("East","East",["Tenho"])))
 #Blessing of Earth
 tester(8000,testH("3 sou 3 sou 1 sou 2 sou 3 sou 1 pin 2 pin 3 pin 4 pin 5 pin 6 pin 7 pin 8 pin 9 pin",[],new score.gameFlags("East","East",["Chiho"])))
+
+
+#Blessing of Man
+tester(2000,testH("3 sou 3 sou 1 sou 2 sou 3 sou 1 pin 2 pin 3 pin 4 pin 5 pin 6 pin 7 pin 8 pin 9 pin",[],new score.gameFlags("East","East",["Renho"])))
+#Full Flush
+tester(3000,testH("2 sou 3 sou 4 sou 3 sou 4 sou 5 sou 5 sou 6 sou 7 sou 8 sou 8 sou 8 sou 1 sou 1 sou"))
+#Twice Pure Double Chow
+tester(1920,testH("2 sou 2 sou 3 sou 3 sou 4 sou 4 sou 1 pin 1 pin 2 pin 2 pin 3 pin 3 pin green dragon green dragon"))
+#Terminals in all sets
+tester(2000,testH("1 pin 2 pin 3 pin 7 pin 8 pin 9 pin 1 sou 1 sou 1 sou 1 sou 2 sou 3 sou 9 pin 9 pin"))
+#All Sets Contain Terminals Or Honours
+tester(3000,testH("1 pin 1 pin 1 pin 1 wan 1 wan 1 wan west wind west wind west wind green dragon green dragon green dragon north wind north wind",[[1,["west wind","west wind","west wind"]]]))
+#Little Three Dragons
+tester(2000,testH("1 pin 2 pin 3 pin 4 sou 5 sou 6 sou green dragon green dragon green dragon red dragon red dragon red dragon white dragon white dragon"))
+#Half Flush
+tester(1920,testH("2 sou 3 sou 4 sou 3 sou 4 sou 5 sou 5 sou 6 sou 7 sou 8 sou 8 sou 8 sou west wind west wind"))
+#All Pungs
+tester(800,testH("1 pin 1 pin 1 pin 2 pin 2 pin 2 pin 1 sou 1 sou 1 sou 5 sou 5 sou 5 sou 7 pin 7 pin",[[1,["2 pin","2 pin","2 pin"]],[1,["1 pin","1 pin","1 pin"]]]))
+#Three Kongs
+tester(4000,testH("1 pin 1 pin 1 pin 2 pin 2 pin 2 pin 2 pin 3 pin 3 pin 3 pin 3 pin 4 pin 4 pin 4 pin 4 pin 5 pin 5 pin",[[1,["2 pin","2 pin","2 pin","2 pin"]],["self",["4 pin","4 pin","4 pin","4 pin"]],["self",["3 pin","3 pin","3 pin","3 pin"]]]))
+#Three Concealed Pungs
+tester(1280,testH("1 pin 2 pin 3 pin 4 sou 4 sou 4 sou 5 sou 5 sou 5 sou 2 wan 2 wan 2 wan west wind west wind"))
+#Triple Pung
+tester(640,testH("2 pin 3 pin 4 pin 1 sou 1 sou 4 sou 4 sou 4 sou 4 pin 4 pin 4 pin 4 wan 4 wan 4 wan",[],new score.gameFlags("East","East"),2))
+#7 pairs
+tester(800,testH("1 pin 1 pin 3 pin 3 pin 2 sou 2 sou 5 sou 5 sou green dragon green dragon 7 wan 7 wan west wind west wind"))
+#Bottom of the Sea
+tester(2000,testH("3 sou 3 sou 1 sou 2 sou 3 sou 1 pin 2 pin 3 pin 4 pin 5 pin 6 pin 7 pin 8 pin 9 pin",[],new score.gameFlags("East","East",["Houtei"])))
+#Bottomer of the Sea
+tester(2000,testH("3 sou 3 sou 1 sou 2 sou 3 sou 1 pin 2 pin 3 pin 4 pin 5 pin 6 pin 7 pin 8 pin 9 pin",[],new score.gameFlags("East","East",["Haitei"])))
+#Robbing the Kong
+tester(2000,testH("3 sou 3 sou 1 sou 2 sou 3 sou 1 pin 2 pin 3 pin 4 pin 5 pin 6 pin 7 pin 8 pin 9 pin",[],new score.gameFlags("East","East",["Chan Kan"])))
+#After a Kong
+tester(2000,testH("3 sou 3 sou 1 sou 2 sou 3 sou 1 pin 2 pin 3 pin 4 pin 5 pin 6 pin 7 pin 8 pin 9 pin",[],new score.gameFlags("East","East",["Rinshan Kaihou"])))
+#Outside Hand
+tester(1280,testH("1 pin 2 pin 3 pin green dragon green dragon west wind west wind west wind 7 sou 8 sou 9 sou 1 wan 1 wan 1 wan"))
+#Fanpai/Yakuhai
+tester(3000,testH("east wind east wind east wind green dragon green dragon green dragon red dragon red dragon red dragon 2 pin 3 pin 4 pin 5 sou 5 sou"))
+#Pure Straight
+tester(960,testH("1 pin 2 pin 3 pin 4 pin 5 pin 6 pin 7 pin 8 pin 9 pin 2 sou 3 sou 4 sou 3 wan 3 wan"))
+#Mixed Triple Chow
+tester(960,testH("2 pin 3 pin 4 pin 2 wan 3 wan 4 wan 2 sou 3 sou 4 sou 6 wan 7 wan 8 wan 9 pin 9 pin"))
+#All Simples
+tester(480,testH("2 pin 3 pin 4 pin 3 wan 4 wan 5 wan 5 sou 6 sou 7 sou 6 pin 7 pin 8 pin 7 wan 7 wan"))
+#Pure Double Chow
+tester(640,testH("1 pin 2 pin 3 pin 1 pin 2 pin 3 pin 8 sou 8 sou 8 sou 3 wan 3 wan 3 wan 2 wan 2 wan"))
+#Pinfu
+tester(240,testH("7 pin 7 pin 1 pin 2 pin 3 pin 7 sou 8 sou 9 sou 2 wan 3 wan 4 wan 6 sou 7 sou 8 sou",[],new score.gameFlags("East","East"),2))
+#Fully Concealed Hand
+tester(240,testH("1 pin 2 pin 3 pin 7 sou 8 sou 9 sou 2 wan 3 wan 4 wan 6 sou 7 sou 8 sou 7 pin 7 pin"))
+#Riichi - Ippatsu - Daburu Riichi
+tester(1920,testH("1 pin 2 pin 3 pin 7 sou 8 sou 9 sou 2 wan 3 wan 4 wan 6 sou 7 sou 8 sou 7 pin 7 pin",[],new score.gameFlags("East","East",["Riichi","Daburu Riichi","Ippatsu"])))

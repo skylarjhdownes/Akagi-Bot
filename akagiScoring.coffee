@@ -60,8 +60,8 @@ class gameFlags
     @riichi = "Riichi" in @flags
     @ippatsu = "Ippatsu" in @flags
     @daburuRiichi = "Daburu Riichi" in @flags
-    @houtai = "Houtai" in @flags
-    @haitai = "Haitai" in @flags
+    @houtei = "Houtei" in @flags
+    @haitei = "Haitei" in @flags
     @chanKan = "Chan Kan" in @flags
     @rinshanKaihou = "Rinshan Kaihou" in @flags
     @tenho = "Tenho" in @flags
@@ -341,8 +341,8 @@ getYaku = (melds, gameDataFlags) ->
     if meld.value() == gameDataFlags.roundWind.toLowerCase()
       yakuModifiers.push("Prevailing Fanpai/Yakuhai")
 
-  #Chanta - All sets contain terminals or honours, the pair is terminals or honours, and the hand contains at least one chow.
-  if chowList.length > 0 && _.every(melds, _meldContainsAtLeastOneTerminalOrHonor)
+  #Chanta - All sets contain terminals or honours, there are both terminals and honors in the hand, the pair is terminals or honours, and the hand contains at least one chow.
+  if chowList.length > 0 && _.every(melds, _meldContainsAtLeastOneTerminalOrHonor) && _.some(melds, (x)-> _meldContainsAtLeastOneTerminalOrHonor(x) == "Honor")
     if(isConcealedHand)
       yakuModifiers.push("Concealed Chanta")
     else
