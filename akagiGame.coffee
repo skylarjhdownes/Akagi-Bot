@@ -124,10 +124,10 @@ class MahjongGame
 
     for winner in placements["First"]
       winner.sendMessage("You win!")
-      if(riichiSticks.length > 0)
-        winner.roundPoints += 1000*riichiSticks.length/placements["First"].length
-        winner.sendMessage("As the winner, you recieve the remaining riichi sticks and thus gain #{1000*riichiSticks.length/placements["First"].length} points.")
-    riichiSticks = []
+      if(@riichiSticks.length > 0)
+        winner.roundPoints += 1000*@riichiSticks.length/placements["First"].length
+        winner.sendMessage("As the winner, you recieve the remaining riichi sticks and thus gain #{1000*@riichiSticks.length/placements["First"].length} points.")
+    @riichiSticks = []
     for player in @messageRecievers
       player.sendMessage("The game has ended.")
       if(placements["First"].length == 1)
@@ -196,7 +196,7 @@ class MahjongGame
   #Put the stick into the pot, once the next turn has started. Also, adds discarded tile, to possible temporary furiten list.
   confirmNextTurn: ->
     if(@pendingRiichiPoints)
-      @riichiSticks.append(@pendingRiichiPoints)
+      @riichiSticks.push(@pendingRiichiPoints)
       for player in @players
         if player.playerNumber == @pendingRiichiPoints
           player.roundPoints -= 1000
@@ -286,7 +286,7 @@ class MahjongGame
       playerToRon.sendMessage("Cannot Ron off of own discard.")
     else if(@turn == playerToRon.playerNumber && (@phase == "discard"||(@phase.isArray && @phase[0] in ["concealedKaning","extendKaning","concealedRon","extendRon"])))
       playerToRon.sendMessage("During your turn, use Tsumo, instead of Ron.")
-    else if(furiten(playerToRon))
+    else if(@furiten(playerToRon))
       playerToRon.sendMessage("You may not Ron, because you are in furiten.")
     else if(@phase.isArray && @phase[0] in ["concealedKaning","concealedRon"] && !score.thirteenOrphans(playerToRon.hand,@phase[1]))
       playerToRon.sendMessage("You may only call Ron off of a concealed Kan, if you are winning via the thirteen orphans hand.")
@@ -294,10 +294,12 @@ class MahjongGame
       playerToRon.sendMessage("You have already declared Ron.")
     else
       if(@phase.isArray && @phase[0] in ["concealedKaning","concealedRon","extendKaning","extendRon"])
-        discarder = _.find(@players,(x)-> @turn == x.playerNumber)
+        discarder = _.find(@players,(x)=> @turn == x.playerNumber)
         discardedTile = @phase[1]
       else
-        discarder = _.find(@players,(x)-> @turn == x.nextPlayer)
+        discarder = _.find(@players,(x)=> @turn == x.nextPlayer)
+        console.log(@players)
+        console.log(@turn)
         discardedTile = discarder.discardPile.contains[-1..][0]
       testHand = _.cloneDeep(playerToRon.hand)
       testHand.contains.push(discardedTile)
@@ -337,7 +339,7 @@ class MahjongGame
         ronAfterTen
         .then((message)=>
           if(_.isEqual(@phase,[state,discardedTile,ronGroup]))
-            riichiBet = riichiSticks.length
+            riichiBet = @riichiSticks.length
             winnerOrder = []
             winnerOrder.push(_.search(@players,(x)->discarder.nextPlayer == x.playerNumber)
             winnerOrder.push(_.search(@players,(x)->winnerOrder[0].nextPlayer==x.playerNumber))
@@ -351,7 +353,7 @@ class MahjongGame
             if(riichiBet>0)
               winnerOrder[0].roundPoints+=1000*riichiBet
               winner.sendMessage("Remaining riichi bets give you #{1000*riichiBet} points.")
-            riichiSticks = []
+            @riichiSticks = []
             for winner in winnerOrder
               scoreMax = score.scoreMahjongHand(winner.hand,@winFlagCalculator(playerToRon,"Ron"),[@wall.dora,@wall.urDora])
               if(playerToRon.wind == "East")
@@ -459,7 +461,7 @@ class MahjongGame
       playerToChi.sendMessage("May not call Chi on the last turn.")
     else if(@phase in ["draw","react"])
       if(_.findIndex(playerToChi.hand.uncalled(),(x) -> _.isEqual(tile1, x)) != -1 && _.findIndex(playerToChi.hand.uncalled(),(x) -> _.isEqual(tile2, x)) != -1)
-        discarder = _.find(@players,(x)-> @turn == x.nextPlayer)
+        discarder = _.find(@players,(x)=> @turn == x.nextPlayer)
         toChi = discarder.discardPile.contains[-1..][0]
         _chiable = (t1,t2,t3) ->
           if(t1.suit!=t2.suit || t2.suit!=t3.suit)
@@ -486,11 +488,11 @@ class MahjongGame
                 @phase = "discard"
                 @confirmNextTurn()
                 @interuptRound()
-                @kuikae.append(toChi)
+                @kuikae.push(toChi)
                 if(tile1.value > toChi.value && tile2.value > toChi.value)
-                  @kuikae.append(new gamePieces.Tile(toChi.suit,toChi.value+3))
+                  @kuikae.push(new gamePieces.Tile(toChi.suit,toChi.value+3))
                 else if(tile1.value < toChi.value && tile2.value < toChi.value)
-                  @kuikae.append(new gamePieces.Tile(toChi.suit,toChi.value-3))
+                  @kuikae.push(new gamePieces.Tile(toChi.suit,toChi.value-3))
                 for player in @players
                   if(@turn == player.nextPlayer)
                     playerToChi.hand.draw(player.discardPile)
@@ -625,7 +627,7 @@ class MahjongGame
     else if(@phase.isArray && @phase[0] == "chiing" && playerToPon.playerNumber == @phase[1])
       playerToKan.sendMessage("One cannot Kan if one has already declared Chi.")
     else if((@phase.isArray && @phase[0] == "chiing") || @phase in ["react","draw"])
-      discarder = _.find(@players,(x)-> @turn == x.nextPlayer)
+      discarder = _.find(@players,(x)=> @turn == x.nextPlayer)
       toKan = discarder.discardPile.contains[-1..][0]
       if(_.filter(playerToKan.hand.uncalled(),(x) -> _.isEqual(x,toKan)).length == 3)
         @phase = ["callKaning",playerToKan.playerNumber]
@@ -674,7 +676,7 @@ class MahjongGame
     else if(@phase.isArray && @phase[0] == "Chi" && @phase[1] == playerToPon.playerNumber)
       playerToPon.sendMessage("Can't call Pon if you already called Chi.")
     else if((@phase in ["react","draw"] || (@phase.isArray && @phase[0] == "chiing")) && @turn != playerToPon.nextPlayer)
-      discarder = _.find(@players,(x)-> @turn == x.nextPlayer)
+      discarder = _.find(@players,(x)=> @turn == x.nextPlayer)
       toPon = discarder.discardPile.contains[-1..][0]
       if(_.findIndex(playerToPon.hand.uncalled(),(x)->_.isEqual(toPon,x))!=_.findLastIndex(playerToPon.hand.uncalled(),(x)->_.isEqual(toPon,x)))
         @phase = ["poning",playerToPon.playerNumber]
@@ -693,7 +695,7 @@ class MahjongGame
               @phase = "discard"
               @confirmNextTurn()
               @interuptRound()
-              @kuikae.append(toPon)
+              @kuikae.push(toPon)
               for player in @players
                 if(@turn == player.nextPlayer)
                   playerToPon.hand.draw(player.discardPile)
@@ -720,12 +722,14 @@ class MahjongGame
     if(@turn == playerToDiscard.playerNumber)
       if(@phase != "discard")
         playerToDiscard.sendMessage("It is not the discard phase.")
-      else if(riichi && playerToDiscard.hand.concealed() == false)
+      else if(riichi && playerToDiscard.hand.isConcealed() == false)
         playerToDiscard.sendMessage("You may only riichi with a concealed hand.")
       else if(playerToDiscard.riichiCalled() && tileToDiscard != playerToDiscard.hand.lastTileDrawn.getTextName())
         playerToDiscard.sendMessage("Once you have declared Riichi, you must always discard the drawn tile.")
       else if(riichi && @wall.leftInWall() < 4)
         playerToDiscard.sendMessage("You can't call riichi if there are less than four tiles remaining in the wall.")
+      else if(riichi && !_.some(score.tenpaiWithout(playerToDiscard.hand),(x)->x.getTextName()==tileToDiscard))
+        playerToDiscard.sendMessage("You would not be in tenpai if you discarded that tile to call Riichi.")
       else if(_.some(@kuikae,(x)->x.getTextName()==tileToDiscard))
         playerToDiscard.sendMessage("May not discard the same tile just called, or the opposite end of the chow just called.")
       else
