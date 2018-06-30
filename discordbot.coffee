@@ -55,7 +55,7 @@ bot.on('message', (message) =>
           else
             userPermissions.push({type:'member', id:gameObserver.id, allow: Discord.Permissions.FLAGS.VIEW_CHANNEL})
 
-        chatChannel = message.channel.guild.createChannel(commandArgs[1]+"GroupChat","text",userPermissions)
+        chatChannel = message.channel.guild.createChannel(commandArgs[1]+"-Mahjong-Table-Center","text",userPermissions)
           .then((channel) ->
             return channel)
           .catch(console.error)
@@ -63,7 +63,7 @@ bot.on('message', (message) =>
         channelHolder = []
         for i in [0..3]
           temp = message.channel.guild.createChannel(
-            commandArgs[1]+"Player"+(i+1),
+            commandArgs[1]+"-Mahjong-Hand-Player-"+(i+1),
             "text",
             [
               {type:'role', id:message.channel.guild.defaultRole.id, deny: Discord.Permissions.FLAGS.VIEW_CHANNEL},
