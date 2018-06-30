@@ -18,6 +18,16 @@ testH = (handText,calledTiles = [],gameFlags = new score.gameFlags("East","East"
 
   return score.scoreMahjongHand(testHand,gameFlags,dora)
 
+testT = (handText,calledTiles=[]) ->
+  textChunks = handText.split(" ")
+  testHand = new game.Hand(new game.Pile())
+  for x in [0...textChunks.length/2]
+    testHand.contains.push(new game.Tile(textChunks[2*x+1],textChunks[2*x]))
+  testHand.draw(null,0)
+  testHand.lastTileDrawn = new game.Tile(textChunks[textChunks.length-1],textChunks[textChunks.length-2])
+  return score.tenpaiWith(testHand)
+
+
 tester = (expected, input) ->
   if(_.isEqual(expected,input[0]))
     console.log("Test Passed")
@@ -117,3 +127,5 @@ tester(240,testH("7 pin 7 pin 1 pin 2 pin 3 pin 7 sou 8 sou 9 sou 2 wan 3 wan 4 
 tester(240,testH("1 pin 2 pin 3 pin 7 sou 8 sou 9 sou 2 wan 3 wan 4 wan 6 sou 7 sou 8 sou 7 pin 7 pin"))
 #Riichi - Ippatsu - Daburu Riichi
 tester(1920,testH("1 pin 2 pin 3 pin 7 sou 8 sou 9 sou 2 wan 3 wan 4 wan 6 sou 7 sou 8 sou 7 pin 7 pin",[],new score.gameFlags("East","East",["Riichi","Daburu Riichi","Ippatsu"])))
+
+console.log(testT("1 pin 1 pin 1 pin 2 pin 2 pin 2 pin 4 pin 4 pin 5 pin 5 pin 8 sou 8 sou 8 sou"))
