@@ -68,6 +68,15 @@ class gameFlags
     @chiho = "Chiho" in @flags
     @renho = "Renho" in @flags
 
+#Finds which tiles can be discarded from a hand in order that it will be tenpai after the discard.
+tenpaiWithout = (hand) ->
+  tilesToDiscard = []
+  for tile in hand.uncalled()
+    testHand = _.cloneDeep(hand)
+    testHand.discard(tile.getTextName())
+    if(tenpaiWith(testHand).length > 0)
+      tilesToDiscard.push(tile)
+  return tilesToDiscard
 
 #Finds which tiles could turn a hand into a winning hand
 tenpaiWith = (hand) ->
@@ -94,8 +103,8 @@ thirteenOrphans = (hand,lastTile) ->
 
 scoreMahjongHand = (hand, gameDataFlags, dora) ->
   #Takes a hand of mahajong tiles and finds the highest scoring way it can be interpreted, returning the score, and the melds which lead to that score
+  console.log(gameDataFlags)
   possibleHands = getPossibleHands(hand)
-  #console.log(possibleHands)
   if possibleHands.length == 0
     return([0, "Not a Scoring Hand"])
   doras = getDora(hand,gameDataFlags.riichi,dora)
@@ -603,4 +612,5 @@ module.exports.scoreMahjongHand = scoreMahjongHand
 module.exports.getPossibleHands = getPossibleHands
 module.exports.gameFlags = gameFlags
 module.exports.tenpaiWith = tenpaiWith
+module.exports.tenpaiWithout = tenpaiWithout
 module.exports.thirteenOrphans = thirteenOrphans
