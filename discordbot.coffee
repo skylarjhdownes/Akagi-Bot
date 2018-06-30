@@ -119,6 +119,7 @@ bot.on('message', (message) =>
         message.channel.send("Can't Ragnarok outside a server.  :(")
 
     if(commandArgs[0] == "nuke")
+      #TODO: Either remove this command or add a permission check to prevent abuse.
       console.log(message.guild.name)
       if message.channel.type == "text" && message.guild.name == "Akagi's Mahjong Parlor"
         message.channel.send("Launching...")
