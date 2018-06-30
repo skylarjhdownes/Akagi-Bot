@@ -27,7 +27,9 @@ Currently contains the following commands:
 
 ~pile - If given a player number, looks at the tiles in the discard pile of that player. If used alone, looks at your own discard pile.
 
-~toggle - Turns off or on the written form of the tiles. Only usable by players.
+~toggle - Accepts either tiles or help as argument
+    tiles - Turn off or on the written form of the tiles. Only usable by players.
+    help - Turn off or on tenpai suggestions, pon/chi suggestions, etc...
 
 ~end game - Deletes all the channels involved in the game, and removes the channels and the game from the global list of such things.
 

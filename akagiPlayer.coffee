@@ -10,6 +10,7 @@ class Player
     @daburu = false #Activated if a player calls riichi on their first turn
     @liablePlayer = false #Who fed the last dragon or wind tile to someone who already had 2/3 of them.
     @tilesSinceLastDraw = [] #Keeps track of which tiles have been discarded since the last time the player has drawn or called.
+    @wantsHelp = false #Keeps track of whether a player wants reminders to pon, chi, ron, etc.
   roundStart:(wall) ->
     @daburu = false
     @liablePlayer = false
@@ -30,6 +31,12 @@ class Player
       @playerChannel.send("Tile names visible")
     else
       @playerChannel.send("Tile names hidden")
+  toggleHelp: ->
+    @wantsHelp = not @wantsHelp
+    if(@wantsHelp)
+      @playerChannel.send("Help now turned on.")
+    else
+      @playerChannel.send("Help now turned off.")
   printHand: ->
     @hand.printHand(@namedTiles)
   printUncalled: ->

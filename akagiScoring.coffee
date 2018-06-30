@@ -89,10 +89,10 @@ tenpaiWith = (hand) ->
     testHand = _.cloneDeep(hand)
     testHand.lastTileDrawn = tile
     testHand.contains.push(tile)
+    testHand.draw(null,0)
     if(getPossibleHands(testHand).length > 0)
       if(_.filter(testHand.contains,(x)->_.isEqual(x,tile)).length < 5)
         winningTiles.push(tile)
-        console.log(getPossibleHands(testHand))
   return winningTiles
 
 #Checks whether a hand is the thirteen orphans hand or not.
@@ -195,7 +195,6 @@ getPossibleHands = (hand) ->
 
   _normalHandFinder(hand.calledMelds,hand.uncalled())
   _drawnTilePlacer()
-
   return possibleHands
 
 

@@ -227,7 +227,12 @@ bot.on('message', (message) =>
           else
             message.channel.send("You are in furiten, because of the following tiles: #{x.getName(fromPlayer.namedTiles) for x in furitenTiles}")
       if(commandArgs[0] == "toggle" and channelType == "player")
-        fromPlayer.toggleTiles()
+        if(commandArgs[1] == "tiles")
+          fromPlayer.toggleTiles()
+        else if(commandArgs[1] == "help")
+          fromPlayer.toggleHelp()
+        else
+          fromPlayer.sendMessage("You may toggle 'tiles' or 'help'.")
       if(commandArgs[0] == "draw" and channelType == "player")
         fromGame.drawTile(fromPlayer)
       if(commandArgs[0] == "discard" and channelType == "player")
