@@ -317,7 +317,7 @@ class MahjongGame
       else
         playerToRon.hand = testHand
         for player in @players
-          if(player.playerNumber = playerToRon.playerNumber)
+          if(player.playerNumber == playerToRon.playerNumber)
             player.sendMessage("You have declared Ron.")
           else
             player.sendMessage("Player #{playerToRon.playerNumber} has declared Ron.")
@@ -346,9 +346,9 @@ class MahjongGame
           if(_.isEqual(@phase,[state,discardedTile,ronGroup]))
             riichiBet = @riichiSticks.length
             winnerOrder = []
-            winnerOrder.push(_.search(@players,(x)->discarder.nextPlayer == x.playerNumber)
-            winnerOrder.push(_.search(@players,(x)->winnerOrder[0].nextPlayer==x.playerNumber))
-            winnerOrder.push(_.search(@players,(x)->winnerOrder[1].nextPlayer==x.playerNumber))
+            winnerOrder.push(_.find(@players,(x)->discarder.nextPlayer == x.playerNumber)
+            winnerOrder.push(_.find(@players,(x)->winnerOrder[0].nextPlayer==x.playerNumber))
+            winnerOrder.push(_.find(@players,(x)->winnerOrder[1].nextPlayer==x.playerNumber))
             winnerOrder = _.filter(winnerOrder,(x)->x.playerNumber in @phase[2]))
             for winner in winnerOrder
               if(winner.riichiCalled())
