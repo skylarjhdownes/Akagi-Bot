@@ -222,6 +222,22 @@ class Hand
     else
       return _.every(@calledMelds, (x) -> x.takenFrom == "self" and x.type == "Kong")
 
+  #Tells if a tile can be called on with this hand.
+  whichCalls:(tileToCall) ->
+    calls = []
+    remaining = _.filter(@uncalled(),(x) -> x.suit == tileToCall.suit)
+    copies = _.filter(remaining,(x)->_.isEqual(tileToCall,x))
+    if(copies > 1)
+      calls.push("Pon")
+    if(copies > 2)
+      calls.push("Kan")
+    if(_.some(remaining,(x)->x.value+1==tileToCall.suit))
+      if(_.some(remaining,(x)->x.value+2==tileToCall.suit)||_.some(remaining,(x)->x.value-1==tileToCall.suit))
+        calls.push("Chi")
+    else if(_.some(remaining,(x)->x.value-1==tileToCall.suit) && _.some(remaining,(x)->x.value-2==tileToCall.suit))
+      calls.push("Chi")
+    return calls
+
 #This class assumes that a legal meld has been passed to it.
 class Meld
   #A set of two, three or four tiles

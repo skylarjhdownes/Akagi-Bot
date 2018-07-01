@@ -222,6 +222,13 @@ class MahjongGame
         playerToDraw.wallDraw(@wall)
         @phase = "discard"
         @confirmNextTurn()
+        if(playerToDraw.wantsHelp)
+          tenpaiDiscards = score.tenpaiWithout(playerToDraw.hand)
+          if(score.getPossibleHands(playerToDraw.hand).length > 0)
+            playerToDraw.sendMessage("You have a completed hand.  You may call Tsumo if you have any yaku.")
+          else if(tenpaiDiscards.length > 0)
+            playerToDraw.sendMessage("You can be in tenpai by discarding any of the following tiles:")
+            playerToDraw.sendMessage((tile.getName(playerToDraw.namedTiles) for tile in tenpaiDiscards))
         if(@wall.wallFinished)
           @oneRoundTracker[playerToDraw.playerNumber - 1].push("Haitei")
         for player in @players
@@ -757,6 +764,13 @@ class MahjongGame
           @turn = playerToDiscard.nextPlayer
           @phase = "react"
           @kuikae = []
+          for player in @players
+            if(player.wantsHelp)
+              calls = player.hand.whichCalls(@lastDiscard)
+              if(calls.length > 0)
+                player.sendMessage("You may call #{calls} on this tile.")
+              if(_.some(score.tenpaiWith(player.hand),(x)->_.isEqual(x,discarded)))
+                player.sendMessage("You may Ron off of this discard, as long as you are not furiten.")
           nextTurnAfterTen = new Promise((resolve, reject) =>
             setTimeout(->
               resolve("Time has Passed")
