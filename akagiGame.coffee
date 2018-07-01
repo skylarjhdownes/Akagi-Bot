@@ -1,6 +1,7 @@
 gamePieces = require('./akagiTiles.coffee')
 playerObject = require('./akagiPlayer.coffee')
 score = require('./akagiScoring.coffee')
+test = require('./akagiTest.coffee')
 Promise = require('promise')
 _ = require('lodash')
 
@@ -27,7 +28,10 @@ class messageSender
 class MahjongGame
   #A four player game of Mahjong
   constructor: (playerChannels, server, gameSettings) ->
-    @wall = new gamePieces.Wall()
+    if("TestGame" in gameSettings)
+      @wall = new gamePieces.Wall(test.testWall)
+    else
+      @wall = new gamePieces.Wall()
     @counter = 0 #Put down when east winds a round, increasing point values.
     @riichiSticks = [] #Used to keep track when a player calls riichi
     @pendingRiichiPoints = false #Keeps track of who just called riichi, so that once we are sure the next round has started, then they can have their stick added to the pile.

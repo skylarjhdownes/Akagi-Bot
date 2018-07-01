@@ -113,7 +113,7 @@ class Tile
 
 class Wall
   #The deck from which all things are drawn
-  constructor: ->
+  constructor: (@sortedWall = false) ->
     #Fills it up with 4 copies of each normal tile
     @inWall = []
     @inWall.push(new Tile(x,y)) for x in ["pin","sou","wan"] for y in [1..9] for z in [0...4]
@@ -125,7 +125,14 @@ class Wall
 
   drawFrom: ->
     #removes a random tile from the wall and returns it
-    take = Math.floor(Math.random()*@inWall.length)
+    if(@sortedWall)
+      take = _.findIndex(@inWall,(x)=>@sortedWall[0]==x.getTextName())
+      if(@sortedWall.length == 1)
+        @sortedWall = false
+      else
+        @sortedWall = @sortedWall[1..]
+    else
+      take = Math.floor(Math.random()*@inWall.length)
     out = @inWall.splice(take,1)
     if(@dora.length + @urDora.length + @inWall.length == 14)
       @wallFinished = true
