@@ -305,8 +305,6 @@ class MahjongGame
         discardedTile = @phase[1]
       else
         discarder = _.find(@players,(x)=> @turn == x.nextPlayer)
-        console.log(@players)
-        console.log(@turn)
         discardedTile = discarder.discardPile.contains[-1..][0]
       testHand = _.cloneDeep(playerToRon.hand)
       testHand.contains.push(discardedTile)

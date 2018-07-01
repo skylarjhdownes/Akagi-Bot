@@ -138,3 +138,4 @@ tester(1920,testH("1 pin 2 pin 3 pin 7 sou 8 sou 9 sou 2 wan 3 wan 4 wan 6 sou 7
 
 console.log(testT("1 pin 1 pin 1 pin 2 pin 2 pin 2 pin 4 pin 4 pin 5 pin 5 pin 8 sou 8 sou 8 sou"))
 console.log(testTP("1 pin 1 pin 1 pin 2 pin 2 pin 2 pin 4 pin 4 pin 5 pin 5 pin 8 sou 8 sou 8 sou 3 pin"))
+console.log(testTP("3 sou 4 sou 5 sou 6 sou 7 sou 2 pin 2 pin 2 pin 3 pin green dragon green dragon west wind west wind west wind"))

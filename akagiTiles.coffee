@@ -192,7 +192,7 @@ class Hand
     for x,i in @contains
       if(x.getTextName()==whichTile && _.findIndex(@uncalled(),(y)->y.getTextName()==whichTile) != -1)
         out = @contains.splice(i,1)
-        console.log(out[0])
+        #console.log(out[0])
         @discardPile.discardTo(out[0])
         return out[0]
     return false
