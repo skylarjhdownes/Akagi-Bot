@@ -350,10 +350,10 @@ class MahjongGame
           if(_.isEqual(@phase,[state,discardedTile,ronGroup]))
             riichiBet = @riichiSticks.length
             winnerOrder = []
-            winnerOrder.push(_.find(@players,(x)->discarder.nextPlayer == x.playerNumber)
+            winnerOrder.push(_.find(@players,(x)->discarder.nextPlayer == x.playerNumber))
             winnerOrder.push(_.find(@players,(x)->winnerOrder[0].nextPlayer==x.playerNumber))
             winnerOrder.push(_.find(@players,(x)->winnerOrder[1].nextPlayer==x.playerNumber))
-            winnerOrder = _.filter(winnerOrder,(x)->x.playerNumber in @phase[2]))
+            winnerOrder = _.filter(winnerOrder,(x)=>x.playerNumber in @phase[2])
             for winner in winnerOrder
               if(winner.riichiCalled())
                 winner.roundPoints+=1000
@@ -389,7 +389,7 @@ class MahjongGame
                 player.sendMessage("The winning hand contained the following yaku: #{scoreMax[1]}")
                 player.sendMessage("The winning hand was: #{winner.hand.printHand(player.namedTiles)}")
                 player.sendMessage("The dora indicators were: #{@wall.printDora(player.namedTiles)}")
-                if(playerToTsumo.riichiCalled)
+                if(winner.riichiCalled())
                   player.sendMessage("The ur dora indicators were: #{@wall.printUrDora(player.namedTiles)}")
             for player in @players
               player.sendMessage("The round is over.  To start the next round, type next.")
@@ -452,9 +452,9 @@ class MahjongGame
             player.sendMessage("You have won on self draw.")
             player.sendMessage("You receive #{pointsGained} points.")
           player.sendMessage("The winning hand contained the following yaku: #{scoreMax[1]}")
-          player.sendMessage("The winning hand was: #{winner.hand.printHand(player.namedTiles)}")
+          player.sendMessage("The winning hand was: #{playerToTsumo.hand.printHand(player.namedTiles)}")
           player.sendMessage("The dora indicators were: #{@wall.printDora(player.namedTiles)}")
-          if(playerToTsumo.riichiCalled)
+          if(playerToTsumo.riichiCalled())
             player.sendMessage("The ur dora indicators were: #{@wall.printUrDora(player.namedTiles)}")
           player.sendMessage("The round is over.  To start the next round, type next.")
         @winningPlayer = [playerToTsumo]
@@ -752,7 +752,7 @@ class MahjongGame
               outtext = "declared riichi with"
             playerToDiscard.discardPile.declareRiichi()
             @pendingRiichiPoints = playerToDiscard.playerNumber
-            @oneRoundTracker[@playerToDiscard.playerNumber-1].push("Ippatsu")
+            @oneRoundTracker[playerToDiscard.playerNumber-1].push("Ippatsu")
           else
             outtext = "discarded"
           @lastDiscard = discarded

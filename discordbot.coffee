@@ -160,11 +160,11 @@ bot.on('message', (message) =>
       #Game Commands
       if(commandArgs[0] == "end" and commandArgs[1] == "game" and channelType == "player")
         fromGame.gameObservationChannel.sendMessage("Game Ended")
-        exports.mahjongGames = (game for game in exports.mahjongGames where fromGame.gameObservationChannel.id != game.gameObservationChannel.id)
+        exports.mahjongGames = (game for game in exports.mahjongGames when fromGame.gameObservationChannel.id != game.gameObservationChannel.id)
         for player in fromGame.players
-          exports.parlors = (parlor for parlor in exports.parlors where parlor.id != player.playerChannel.id)
+          exports.parlors = (parlor for parlor in exports.parlors when parlor.id != player.playerChannel.id)
           player.playerChannel.delete()
-        exports.parlors = (parlor for parlor in exports.parlors where parlor.id != fromGame.gameObservationChannel.id)
+        exports.parlors = (parlor for parlor in exports.parlors when parlor.id != fromGame.gameObservationChannel.id)
         fromGame.gameObservationChannel.delete()
 
       if(commandArgs[0] == "next" && channelType == "player")

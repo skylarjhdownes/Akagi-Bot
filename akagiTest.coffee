@@ -43,7 +43,7 @@ tester = (expected, input) ->
     console.log("Test Failed #{expected} != #{input[0]}")
     console.log(input)
 
-testWall = ["1 pin-1 pin-1 pin-2 pin-2 pin-2 pin-3 pin-3 pin-3 pin-4 pin-4 pin-4 pin-5 pin-5 pin-5 pin-6 pin-6 pin-6 pin"].split("-")
+testWall = "1 pin-1 pin-1 pin-2 pin-2 pin-2 pin-3 pin-3 pin-3 pin-4 pin-4 pin-4 pin-5 pin-8 pin-5 pin-6 pin-6 pin-6 pin".split("-")
 
 tester(1280,testH("1 pin 2 pin 3 pin 5 pin 6 pin 7 pin 2 wan 3 wan 4 wan east wind east wind east wind 2 pin 2 pin"))
 
