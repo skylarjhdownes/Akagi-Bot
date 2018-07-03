@@ -93,7 +93,7 @@ class MahjongGame
     @oneRoundTracker = [["First Round"],["First Round"],["First Round"],["First Round"]]
 
   newRound: ->
-    if @winningPlayer = [] || "East" in _.map(@winningPlayer,(x)->x.wind)
+    if @winningPlayer.length == 0 || "East" in _.map(@winningPlayer,(x)->x.wind)
       @counter += 1
     else
       @counter = 0
@@ -104,7 +104,7 @@ class MahjongGame
         if(@prevailingWind == "East")
           @prevailingWind = "South"
         else
-          @endGame() #TODO Implement game end.
+          @endGame()
     @wall = new gamePieces.Wall()
     @winningPlayer = []
     for player in @players
