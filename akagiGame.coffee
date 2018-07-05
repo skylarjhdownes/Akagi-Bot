@@ -608,7 +608,7 @@ class MahjongGame
                 @oneRoundTracker[playerToKan.playerNumber-1].push("Rinshan Kaihou")
                 for meld in playerToKan.hand.calledMelds
                   if(meld.type == "Pung" && meld.suit() == tileToKan.suit && meld.value() == tileToKan.value)
-                    playerToKan.hand.calledMelds.makeKong()
+                    meld.makeKong()
                 drawnTile = playerToKan.hand.draw(@wall)[0]
                 @wall.doraFlip()
                 for player in @players
