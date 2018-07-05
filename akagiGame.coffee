@@ -768,9 +768,8 @@ class MahjongGame
           @phase = "react"
           @kuikae = []
           for player in @players
-            if(player.wantsHelp)
+            if(player.wantsHelp && player.nextPlayer != @turn)
               calls = player.hand.whichCalls(@lastDiscard)
-              console.log(calls)
               if(player.playerNumber != @turn)
                 calls = _.filter(calls,(x)->x != "Chi")
               if(calls.length > 0)
