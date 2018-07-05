@@ -574,7 +574,7 @@ class MahjongGame
               @interuptRound()
               @oneRoundTracker[playerToKan.playerNumber-1].push("Rinshan Kaihou")
               playerToKan.hand.calledMelds.push(new gamePieces.Meld([tileToKan,tileToKan,tileToKan,tileToKan]))
-              drawnTile = playerToKan.hand.draw(@wall)
+              drawnTile = playerToKan.hand.draw(@wall)[0]
               @wall.doraFlip()
               for player in @players
                 if(player.playerNumber!=playerToKan.playerNumber)
@@ -609,7 +609,7 @@ class MahjongGame
                 for meld in playerToKan.hand.calledMelds
                   if(meld.type == "Pung" && meld.suit() == tileToKan.suit && meld.value() == tileToKan.value)
                     playerToKan.hand.calledMelds.makeKong()
-                drawnTile = playerToKan.hand.draw(@wall)
+                drawnTile = playerToKan.hand.draw(@wall)[0]
                 @wall.doraFlip()
                 for player in @players
                   if(player.playerNumber!=playerToKan.playerNumber)
@@ -661,7 +661,7 @@ class MahjongGame
               playerToKan.hand.calledMelds.push(new gamePieces.Meld([toKan,toKan,toKan,toKan],discarder.playerNumber))
               if(toKan.isHonor())
                 @liabilityChecker(playerToKan,discarder)
-              drawnTile = playerToKan.hand.draw(@wall)
+              drawnTile = playerToKan.hand.draw(@wall)[0]
               @wall.doraFlip()
               for player in @players
                 if(player.playerNumber!=playerToKan.playerNumber)
@@ -770,6 +770,7 @@ class MahjongGame
           for player in @players
             if(player.wantsHelp)
               calls = player.hand.whichCalls(@lastDiscard)
+              console.log(calls)
               if(calls.length > 0)
                 player.sendMessage("You may call #{calls} on this tile.")
               if(_.some(score.tenpaiWith(player.hand),(x)->_.isEqual(x,discarded)))

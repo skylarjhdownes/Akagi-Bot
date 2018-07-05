@@ -103,7 +103,6 @@ thirteenOrphans = (hand,lastTile) ->
 
 scoreMahjongHand = (hand, gameDataFlags, dora) ->
   #Takes a hand of mahajong tiles and finds the highest scoring way it can be interpreted, returning the score, and the melds which lead to that score
-  console.log(gameDataFlags)
   possibleHands = getPossibleHands(hand)
   if possibleHands.length == 0
     return([0, "Not a Scoring Hand"])
