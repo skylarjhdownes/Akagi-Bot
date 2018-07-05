@@ -771,6 +771,8 @@ class MahjongGame
             if(player.wantsHelp)
               calls = player.hand.whichCalls(@lastDiscard)
               console.log(calls)
+              if(player.playerNumber != @turn)
+                calls = _.filter(call,(x)->x != "Chi")
               if(calls.length > 0)
                 player.sendMessage("You may call #{calls} on this tile.")
               if(_.some(score.tenpaiWith(player.hand),(x)->_.isEqual(x,discarded)))
