@@ -238,10 +238,10 @@ class Hand
       calls.push("Pon")
     if(copies > 2)
       calls.push("Kan")
-    if(_.some(remaining,(x)->x.value+1==tileToCall.suit))
-      if(_.some(remaining,(x)->x.value+2==tileToCall.suit)||_.some(remaining,(x)->x.value-1==tileToCall.suit))
+    if(_.some(remaining,(x)->x.value+1==tileToCall.value))
+      if(_.some(remaining,(x)->x.value+2==tileToCall.value)||_.some(remaining,(x)->x.value-1==tileToCall.value))
         calls.push("Chi")
-    else if(_.some(remaining,(x)->x.value-1==tileToCall.suit) && _.some(remaining,(x)->x.value-2==tileToCall.suit))
+    else if(_.some(remaining,(x)->x.value-1==tileToCall.value) && _.some(remaining,(x)->x.value-2==tileToCall.value))
       calls.push("Chi")
     return calls
 
