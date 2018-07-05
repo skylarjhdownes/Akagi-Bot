@@ -233,7 +233,7 @@ class Hand
   whichCalls:(tileToCall) ->
     calls = []
     remaining = _.filter(@uncalled(),(x) -> x.suit == tileToCall.suit)
-    copies = _.filter(remaining,(x)->_.isEqual(tileToCall,x))
+    copies = _.filter(remaining,(x)->_.isEqual(tileToCall,x)).length
     if(copies > 1)
       calls.push("Pon")
     if(copies > 2)
