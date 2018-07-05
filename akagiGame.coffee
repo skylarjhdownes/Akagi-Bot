@@ -290,6 +290,7 @@ class MahjongGame
         flags.push("Houtei")
     if("Haitei" in @oneRoundTracker[winningPlayer.playerNumber-1])
       flags.push("Haitei")
+    console.log(flags)
     return new score.gameFlags(winningPlayer.wind,@prevailingWind,flags)
 
   ron:(playerToRon) ->
@@ -571,7 +572,7 @@ class MahjongGame
             if(_.isEqual(@phase,["concealedKaning",tileToKan]))
               @phase = "discard"
               @interuptRound()
-              @oneRoundTracker[@playerToKan.playerNumber-1].push("Rinshan Kaihou")
+              @oneRoundTracker[playerToKan.playerNumber-1].push("Rinshan Kaihou")
               playerToKan.hand.calledMelds.push(new gamePieces.Meld([tileToKan,tileToKan,tileToKan,tileToKan]))
               drawnTile = playerToKan.hand.draw(@wall)
               @wall.doraFlip()
@@ -604,7 +605,7 @@ class MahjongGame
               if(_.isEqual(@phase,["extendKaning",tileToKan]))
                 @phase = "discard"
                 @interuptRound()
-                @oneRoundTracker[@playerToKan.playerNumber-1].push("Rinshan Kaihou")
+                @oneRoundTracker[playerToKan.playerNumber-1].push("Rinshan Kaihou")
                 for meld in playerToKan.hand.calledMelds
                   if(meld.type == "Pung" && meld.suit() == tileToKan.suit && meld.value() == tileToKan.value)
                     playerToKan.hand.calledMelds.makeKong()
@@ -655,7 +656,7 @@ class MahjongGame
               @phase = "discard"
               @confirmNextTurn()
               @interuptRound()
-              @oneRoundTracker[@playerToKan.playerNumber-1].push("Rinshan Kaihou")
+              @oneRoundTracker[playerToKan.playerNumber-1].push("Rinshan Kaihou")
               playerToKan.hand.draw(discarder.discardPile)
               playerToKan.hand.calledMelds.push(new gamePieces.Meld([toKan,toKan,toKan,toKan],discarder.playerNumber))
               if(toKan.isHonor())
