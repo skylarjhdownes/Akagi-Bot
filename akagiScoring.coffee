@@ -578,7 +578,7 @@ getScore = (values, dora, urDora) ->
     printedYaku = values.yaku
     fan = yakuPoints + dora + urDora
 
-  if "Renho" not in printedYaku
+  if "Renho" not in printedYaku && !yakuman
     if dora > 0
       printedYaku.push("Dora: #{dora}")
     if urDora > 0
