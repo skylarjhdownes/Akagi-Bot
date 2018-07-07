@@ -212,11 +212,9 @@ class MahjongGame
   interuptRound: ->
     @oneRoundTracker = [[],[],[],[]]
 
-  #Removes all one round counters for one player once it gets back to them, and removes list of temporary furiten tiles if they are not in riichi
+  #Removes all one round counters for one player once it gets back to them.
   endGoAround:(playerTurn) ->
     @oneRoundTracker[playerTurn.playerNumber-1] = []
-    if(!playerTurn.riichiCalled())
-      playerTurn.tilesSinceLastDraw = []
 
   drawTile:(playerToDraw) ->
     if(@turn == playerToDraw.playerNumber)
@@ -226,6 +224,8 @@ class MahjongGame
         playerToDraw.wallDraw(@wall)
         @phase = "discard"
         @confirmNextTurn()
+        if(!playerToDraw.riichiCalled())
+          playerToDraw.tilesSinceLastDraw = []
         if(playerToDraw.wantsHelp)
           tenpaiDiscards = score.tenpaiWithout(playerToDraw.hand)
           if(score.getPossibleHands(playerToDraw.hand).length > 0)
@@ -284,7 +284,7 @@ class MahjongGame
     if("Rinshan Kaihou" in @oneRoundTracker[winningPlayer.playerNumber-1])
       flags.push("Rinshan Kaihou")
     if(winType == "Ron")
-      if(Array.isArray(@phase) && @phase[0] == "extendKaning")
+      if(Array.isArray(@phase) && @phase[0] in ["extendKaning","extendRon"])
         flags.push("Chan Kan")
       if(@wall.wallFinished)
         flags.push("Houtei")
@@ -372,6 +372,8 @@ class MahjongGame
               else
                 pointsGained = _roundUpToClosestHundred(4*scoreMax[0])+@counter*300
                 pointsLost = _roundUpToClosestHundred(4*scoreMax[0])
+              if(winner.liablePlayer && winner.liablePlayer != discarder.playerNumber)
+                pointsLost = pointsLost/2
               for player in @players
                 if(player.playerNumber == winner.playerNumber)
                   player.roundPoints += pointsGained
@@ -379,11 +381,9 @@ class MahjongGame
                   player.sendMessage("You receive #{pointsGained} points.")
                 else
                   player.sendMessage("Player #{winner.playerNumber} has won via Ron.")
-                  if(winner.liablePlayer && winner.liablePlayer != discarder.playerNumber)
-                    pointsLost = pointsLost/2
-                    if(player.playerNumber == winner.liablePlayer)
-                      player.roundPoints -= pointsLost
-                      player.sendMessage("Because you were liable for this hand, you pay #{pointsLost} points.")
+                  if(player.playerNumber == winner.liablePlayer)
+                    player.roundPoints -= pointsLost
+                    player.sendMessage("Because you were liable for this hand, you pay #{pointsLost} points.")
                   if(discarder.playerNumber == player.playerNumber)
                     player.roundPoints -= pointsLost+300*@counter
                     player.sendMessage("Because you discarded the winning tile, you pay #{pointsLost+300*@counter} points.")
