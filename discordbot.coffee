@@ -51,15 +51,15 @@ bot.on('message', (message) =>
       else if(commandArgs[1] == "tiles")
         message.channel.send("Prints out the unicode text of all of the mahjong tiles in riichi mahjong.")
       else if(commandArgs[1] == "akagi")
-        message.channel.send("Type '!help X' where X is the command you want to learn about.  \n
+        message.channel.send("""Type '!help X' where X is the command you want to learn about.  \n
                               Mahjong commands may only be used in channels created by Akagi-Bot.  \n
-                              The mahjong commands are: draw, discard, hand, remaining, melds, tenpai, furiten, pile, toggle, end, next, riichi, pon, chi, kan, tsumo, ron, dora, seat, turn, phase, wall, points, sticks, and counters.")
+                              The mahjong commands are: draw, discard, hand, remaining, melds, tenpai, furiten, pile, toggle, end, next, riichi, pon, chi, kan, tsumo, ron, dora, seat, turn, phase, wall, points, sticks, and counters.""")
       else if(commandArgs[1] == "draw")
         message.channel.send("Draws a tile for you if it is currently your draw phase.")
       else if(commandArgs[1] == "discard")
-        message.channel.send("Syntax: discard <tile name> \n
+        message.channel.send("""Syntax: discard <tile name> \n
                               Examples: \"discard red dragon\", \"discard 2 sou\", \"discard north wind\"\n
-                              Discard a tile from your hand if it is currently your discard phase.")
+                              Discard a tile from your hand if it is currently your discard phase.""")
       else if(commandArgs[1] in ["hand", "remaining", "melds", "tenpai", "furiten", "pile", "toggle", "end", "next", "riichi", "pon", "chi", "kan", "tsumo", "ron", "dora", "seat", "turn", "phase", "wall", "points", "sticks", "counters"])
         message.channel.send("Help text currently unavailable for this command.")
       else
