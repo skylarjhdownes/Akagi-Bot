@@ -34,7 +34,7 @@ bot.on('ready', =>
 # Create an event listener for messages
 bot.on('message', (message) =>
   if (message.content.substring(0, 1) in ["!","/"])
-    commandArgs = message.content.substring(1).split("/[\s]+/")
+    commandArgs = message.content.substring(1).split(/\s+/)
 
     if(commandArgs[0] == "roll")
       message.channel.send("#{message.author.username} rolled: "+dice.rollDice(commandArgs[1..].join("")))
@@ -60,7 +60,9 @@ bot.on('message', (message) =>
         message.channel.send("""Syntax: discard <tile name>
                               Examples: \"discard red dragon\", \"discard 2 sou\", \"discard north wind\"
                               Discard a tile from your hand if it is currently your discard phase.""")
-      else if(commandArgs[1] in ["hand", "remaining", "melds", "tenpai", "furiten", "pile", "toggle", "end", "next", "riichi", "pon", "chi", "kan", "tsumo", "ron", "dora", "seat", "turn", "phase", "wall", "points", "sticks", "counters"])
+      else if(commandArgs[1] == "hand")
+        message.channel.send("Display your hand.")
+      else if(commandArgs[1] in ["remaining", "melds", "tenpai", "furiten", "pile", "toggle", "end", "next", "riichi", "pon", "chi", "kan", "tsumo", "ron", "dora", "seat", "turn", "phase", "wall", "points", "sticks", "counters"])
         message.channel.send("Help text currently unavailable for this command.")
       else
         message.channel.send("Command not recognized.  Try typing !help to get a list of commands.")
@@ -169,7 +171,7 @@ bot.on('message', (message) =>
 
     #TODO: make game commands work with game objects
   if(exports.mahjongGames.length > 0)
-    commandArgs = message.content.split("/[\s]+/")
+    commandArgs = message.content.split(/\s+/)
     channelType = "none"
     fromChannel = message.channel
     for game in exports.mahjongGames
