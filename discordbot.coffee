@@ -34,7 +34,7 @@ bot.on('ready', =>
 # Create an event listener for messages
 bot.on('message', (message) =>
   if (message.content.substring(0, 1) in ["!","/"])
-    commandArgs = message.content.substring(1).split("/[ ]+/")
+    commandArgs = message.content.substring(1).split("/[\s]+/")
 
     if(commandArgs[0] == "roll")
       message.channel.send("#{message.author.username} rolled: "+dice.rollDice(commandArgs[1..].join("")))
