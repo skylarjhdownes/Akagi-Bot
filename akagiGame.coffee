@@ -770,7 +770,7 @@ class MahjongGame
           @gameObservationChannel.send("Player #{playerToDiscard.playerNumber} #{outtext} a #{discarded.getName()}.")
           for player in @players
             if(player.playerNumber != playerToDiscard.playerNumber)
-              player.sendMessage("Player #{playerToDiscard.playerNumber}  #{outtext} a #{discarded.getName(player.namedTiles)}.")
+              player.sendMessage("Player #{playerToDiscard.playerNumber} #{outtext} a #{discarded.getName(player.namedTiles)}.")
             else
               player.sendMessage("You  #{outtext} a #{discarded.getName(player.namedTiles)}.")
           @turn = playerToDiscard.nextPlayer
