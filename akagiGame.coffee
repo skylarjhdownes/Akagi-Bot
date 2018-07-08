@@ -263,6 +263,8 @@ class MahjongGame
   liabilityChecker:(playerCalling,playerLiable) ->
     if(_.filter(playerCalling.hand.calledMelds,(x)->x.suit() == "dragon").length == 3 || _.filter(playerCalling.hand.calledMelds,(x)->x.suit() == "wind").length == 4)
       playerCalling.liablePlayer = playerLiable.playerNumber
+      for player in @players
+        player.sendMessage("Player #{playerLiable.playerNumber} is now liable for the cost of the potential Dai Sangen or Dai Suushii.")
 
   #Calculates all the flags for non hand based points in the game.
   winFlagCalculator:(winningPlayer,winType) ->
@@ -563,6 +565,9 @@ class MahjongGame
             player.sendMessage("Player #{playerToKan.playerNumber} has declared a concealed Kan on #{tileToKan.getName(player.namedTiles)}.")
           else
             player.sendMessage("You have declared a concealed Kan on #{tileToKan.getName(player.namedTiles)}.")
+          if(player.wantsHelp && player.nextPlayer != @turn)
+            if(score.thirteenOrphans(player.hand,tileToKan))
+              player.sendMessage("You may Ron off of this concealed kong, as long as you are not furiten.")
         concealAfterTen = new Promise((resolve,reject) =>
           setTimeout(->
             resolve("Time has Passed")
@@ -596,6 +601,9 @@ class MahjongGame
               player.sendMessage("Player #{playerToKan.playerNumber} has declared an extended Kan on #{tileToKan.getName(player.namedTiles)}.")
             else
               player.sendMessage("You have declared an extended Kan on #{tileToKan.getName(player.namedTiles)}.")
+            if(player.wantsHelp && player.nextPlayer != @turn)
+              if(_.some(score.tenpaiWith(player.hand),(x)->_.isEqual(x,discarded)))
+                player.sendMessage("You may rob the kong and Ron, as long as you are not furiten.")
           extendAfterTen = new Promise((resolve,reject) =>
             setTimeout(->
               resolve("Time has Passed")
