@@ -11,6 +11,8 @@ Currently contains the following commands:
 '#' means it is currently being worked on and doesn't work
 ~ means it only works in mahjong channels
 
+!help - Used to bring up lists of commands, or, if the second argument is a command, explain what that command does.
+
 ~draw - Draws a tile for the active players
 
 ~discard - Needs name of tile to discard.  Discards the specified tile from the hand of the active player.
