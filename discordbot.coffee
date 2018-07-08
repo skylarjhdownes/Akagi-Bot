@@ -51,7 +51,7 @@ bot.on('message', (message) =>
       else if(commandArgs[1] == "tiles")
         message.channel.send("Prints out the unicode text of all of the mahjong tiles in riichi mahjong.")
       else if(commandArgs[1] == "akagi")
-        message.channel.send("Type '!help X' where X is the command you want to learn about.  The mahjong commands are: draw, discard, hand, remaining, melds, tenpai, furiten, pile, toggle, end, next, riichi, pon, chi, kan, tsumo, ron, dora, seat, turn, phase, wall, points, sticks, and counters.")
+        message.channel.send("Type '!help X' where X is the command you want to learn about.  \nMahjong commands may only be used in channels created by Akagi-Bot.  \nThe mahjong commands are: draw, discard, hand, remaining, melds, tenpai, furiten, pile, toggle, end, next, riichi, pon, chi, kan, tsumo, ron, dora, seat, turn, phase, wall, points, sticks, and counters.")
       else if(commandArgs[1] in ["draw", "discard", "hand", "remaining", "melds", "tenpai", "furiten", "pile", "toggle", "end", "next", "riichi", "pon", "chi", "kan", "tsumo", "ron", "dora", "seat", "turn", "phase", "wall", "points", "sticks", "counters"])
         message.channel.send("Help text currently unavailable for this command.")
       else
@@ -137,7 +137,7 @@ bot.on('message', (message) =>
         message.channel.send("Can't Ragnarok outside a server.  :(")
 
     if(commandArgs[0] == "nuke")
-      #TODO: Either remove this command or add a permission check to prevent abuse.
+      #Testing utility. Should only run on our specific testing Discord.
       console.log(message.guild.name)
       if message.channel.type == "text" && message.guild.name == "Akagi's Mahjong Parlor"
         message.channel.send("Launching...")
