@@ -169,7 +169,7 @@ bot.on('message', (message) =>
 
     #TODO: make game commands work with game objects
   if(exports.mahjongGames.length > 0)
-    commandArgs = message.content.split("/[ ]+/")
+    commandArgs = message.content.split("/[\s]+/")
     channelType = "none"
     fromChannel = message.channel
     for game in exports.mahjongGames
