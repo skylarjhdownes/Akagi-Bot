@@ -612,3 +612,4 @@ module.exports.gameFlags = gameFlags
 module.exports.tenpaiWith = tenpaiWith
 module.exports.tenpaiWithout = tenpaiWithout
 module.exports.thirteenOrphans = thirteenOrphans
+module.exports.yakuList = yakuList

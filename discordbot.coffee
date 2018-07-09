@@ -44,13 +44,17 @@ bot.on('message', (message) =>
       if(commandArgs.length == 1)
         message.channel.send("Type '!help akagi' to learn about mahjong specific commands.  Type '!help general' to learn about commands that can be used anywhere.")
       else if(commandArgs[1] == "general")
-        message.channel.send("Type '!help X' where X is the command you want to learn about.  The general commands are: roll, mahjong, and tiles.")
+        message.channel.send("Type '!help X' where X is the command you want to learn about.  The general commands are: roll, mahjong, english, value, and tiles.")
       else if(commandArgs[1] == "mahjong")
         message.channel.send("Used to start a new game of mahjong.  Type '!mahjong Y @a @b @c' where Y is the game name, and a, b, and c are players you want to play with.")
       else if(commandArgs[1] == "roll")
         message.channel.send("Used to roll dice.  Type '!rollXdY' where X is the number of dice, and Y is the number of sides.  You can also add and subtract other dice, or add and subtract constant numbers.")
       else if(commandArgs[1] == "tiles")
         message.channel.send("Prints out the unicode text of all of the mahjong tiles in riichi mahjong.")
+      else if(commandArgs[1] == "english")
+        message.channel.send("Gives you the english translation of the japanese yaku.")
+      else if(commandArgs[1] == "tiles")
+        message.channel.send("Gives the fan value of a yaku.  Input must use the japanese name.")
       else if(commandArgs[1] == "akagi")
         message.channel.send("""Type '!help X' where X is the command you want to learn about.
                               Mahjong commands may only be used in channels created by Akagi-Bot.
@@ -197,6 +201,14 @@ bot.on('message', (message) =>
     if(commandArgs[0] == "yell")
       for x in exports.parlors
         x.send(commandArgs[1..])
+
+    if(commandArgs[0] == "english")
+      yaku = _.map(commandArgs[1..],_.capitalize).join(" ")
+      message.channel.send(mahjongScoring.yakuList[yaku].eng)
+
+    if(commandArgs[0] == "value")
+      yaku = _.map(commandArgs[1..],_.capitalize).join(" ")
+      message.channel.send(mahjongScoring.yakuList[yaku].score)
 
     if(commandArgs[0] == "ragnarok")
       if message.channel.type == "text"
