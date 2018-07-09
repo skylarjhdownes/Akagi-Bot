@@ -5,9 +5,9 @@ test = require('./akagiTest.coffee')
 Promise = require('promise')
 _ = require('lodash')
 
-class messageSender
+class MessageSender
   #Way to make sending messages to both players and the observation channel easier.
-  constuctor:(@playerOrObserver,whichType) ->
+  constructor: (@playerOrObserver, whichType) ->
     if whichType == "player"
       @player = true
       @playerNumber = @playerOrObserver.playerNumber
@@ -15,7 +15,7 @@ class messageSender
       @player = false
       @playerNumber = 0
 
-  sendMessage:(text) ->
+  sendMessage: (text) ->
     if(@player)
       @playerOrObserver.sendMessage(text)
     else
@@ -49,9 +49,9 @@ class MahjongGame
     ]
     @gameObservationChannel = playerChannels[0]
     @messageRecievers = []
-    @messageRecievers.push(new messageSender(@gameObservationChannel,"observer"))
+    @messageRecievers.push(new MessageSender(@gameObservationChannel,"observer"))
     for player in @players
-      @messageRecievers.push(new messageSender(player,"player"))
+      @messageRecievers.push(new MessageSender(player,"player"))
     @startRoundOne()
 
   startRoundOne: ->
