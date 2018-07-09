@@ -180,7 +180,7 @@ class MahjongGame
 
   #Called when the round ends with no winner.
   exaustiveDraw: ->
-    @winningPlayer = _.filter(@players,(x)->scoreMahjongHand.tenpaiWith(x.hand) != [])
+    @winningPlayer = _.filter(@players,(x)->score.scoreMahjongHand.tenpaiWith(x.hand) != [])
     for player in @players
       player.sendMessage("The round has ended in an exaustive draw.")
       if(@winningPlayer.length == 0)
