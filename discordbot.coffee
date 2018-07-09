@@ -237,7 +237,9 @@ bot.on('message', (message) =>
     channelType = "none"
     fromChannel = message.channel
     for game in exports.mahjongGames
-      if(fromChannel.id == game.gameObservationChannel.id)
+      if(message.author.bot)
+        channelType = "bot"
+      else if(fromChannel.id == game.gameObservationChannel.id)
         channelType = "public"
         fromGame = game
       else
