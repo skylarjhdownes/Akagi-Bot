@@ -62,7 +62,48 @@ bot.on('message', (message) =>
                               Discard a tile from your hand if it is currently your discard phase.""")
       else if(commandArgs[1] == "hand")
         message.channel.send("Display your hand.")
-      else if(commandArgs[1] in ["remaining", "melds", "tenpai", "furiten", "pile", "toggle", "end", "next", "riichi", "pon", "chi", "kan", "tsumo", "ron", "dora", "seat", "turn", "phase", "wall", "points", "sticks", "counters"])
+      else if(commandArgs[1] == "remaining")
+        message.channel.send("Displays the tiles in your hand that are not part of called melds.")
+      else if(commandArgs[1] == "melds")
+        message.channel.send("""Syntax: melds <player number>
+                              Examples: \"melds\", \"melds 1\", \"melds 3\"
+                              Displays the tiles in either your or another player's hand that are part of called melds.""")
+      else if(commandArgs[1] == "tenpai")
+        message.channel.send("""Tells you if you are in tenpai, and which tiles will make you win if you are.
+                              Being in tenpai means it is possible to complete your hand with the addition of a single tile""")
+      else if(commandArgs[1] == "furiten")
+        message.channel.send("""Tells you if you are in furiten, and which tiles are keeping you there if you are.
+                              Being in furiten means that you have discarded a tile that would have otherwise completed your hand.
+                              A player who is furiten cannot win on an opponent's discard, but can only win by self-drawing the needed tile.""")
+      else if(commandArgs[1] == "pile")
+        message.channel.send("""Syntax: pile <player number>
+                              Examples: \"pile\", \"pile 1\", \"pile 3\"
+                              Displays your discard pile, or the pile of another player.""")
+      else if(commandArgs[1] == "pile")
+        message.channel.send("""Syntax: toggle <tiles || help>
+                              Typing \"toggle tiles\" will toggle the display of tile text, ex. \"green dragon 🀅\" -> \"🀅\".
+                              Typing \"toggle help\" will toggle help suggestions.""")
+      else if(commandArgs[1] == "end")
+        message.channel.send("Typing \"end game\" will end the game and destroy all game channels.")
+      else if(commandArgs[1] == "next")
+        message.channel.send("Start the next round.")
+      else if(commandArgs[1] == "riichi")
+        message.channel.send("""Syntax: riichi <tile name>
+                              Examples: \"riichi green dragon\", \"riichi 3 wan\", riichi 7 sou\"
+                              Declare riichi.  Takes the tile to be discarded as its argument.""")
+      else if(commandArgs[1] == "pon")
+        message.channel.send("Declare pon on the last discarded tile.")
+      else if(commandArgs[1] == "chi")
+        message.channel.send("""Syntax: chi <tile name> <tile name>
+                              Examples: \"chi 2 sou 4 sou\", \"chi 8 wan 9 wan\"
+                              Declare chi on the last discarded tile.""")
+      else if(commandArgs[1] == "kan")
+        message.channel.send("""Syntax: kan [<tile name>]
+                              Examples: \"kan\", \"kan 1 wan\", \"kan west wind\"
+                              Declare kan on the last discarded tile, or on a tile in your hand.""")
+      else if(commandArgs[1] == "tsumo")
+        message.channel.send("Declare tsumo on a drawn tile.")
+      else if(commandArgs[1] in ["ron", "dora", "seat", "turn", "phase", "wall", "points", "sticks", "counters"])
         message.channel.send("Help text currently unavailable for this command.")
       else
         message.channel.send("Command not recognized.  Try typing !help to get a list of commands.")
