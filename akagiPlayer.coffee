@@ -51,7 +51,7 @@ class Player
   setWind:(wind)->
     @wind = wind
   rotateWind: ->
-    winds = ["East","South","West","North"]
+    winds = ["East","North","West","South"]
     @wind = winds[(winds.indexOf(@wind)+1)%4]
     @playerChannel.send("The winds have rotated.")
   discardTile:(tileToDiscard)->

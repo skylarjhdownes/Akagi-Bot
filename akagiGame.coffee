@@ -10,8 +10,10 @@ class messageSender
   constuctor:(@playerOrObserver,whichType) ->
     if whichType == "player"
       @player = true
+      @playerNumber = @playerOrObserver.playerNumber
     else
       @player = false
+      @playerNumber = 0
 
   sendMessage:(text) ->
     if(@player)
@@ -235,7 +237,7 @@ class MahjongGame
             playerToDraw.sendMessage((tile.getName(playerToDraw.namedTiles) for tile in tenpaiDiscards))
         if(@wall.wallFinished)
           @oneRoundTracker[playerToDraw.playerNumber - 1].push("Haitei")
-        for player in @players
+        for player in @messageRecievers
           if player.playerNumber != playerToDraw.playerNumber
             player.sendMessage("Player #{playerToDraw.playerNumber} has drawn a tile.")
           if(@wall.wallFinished)
@@ -772,7 +774,7 @@ class MahjongGame
             if(player.playerNumber != playerToDiscard.playerNumber)
               player.sendMessage("Player #{playerToDiscard.playerNumber} #{outtext} a #{discarded.getName(player.namedTiles)}.")
             else
-              player.sendMessage("You  #{outtext} a #{discarded.getName(player.namedTiles)}.")
+              player.sendMessage("You #{outtext} a #{discarded.getName(player.namedTiles)}.")
           @turn = playerToDiscard.nextPlayer
           @phase = "react"
           @kuikae = []
