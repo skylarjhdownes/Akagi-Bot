@@ -15,7 +15,6 @@ class Player
     @daburu = false
     @liablePlayer = false
     @tilesSinceLastDraw = []
-    @playerChannel.send("New Round Start")
     @playerChannel.send("Seat Wind: #{@wind}")
     if(@wind == "East")
       @hand.draw(wall)
@@ -53,7 +52,6 @@ class Player
   rotateWind: ->
     winds = ["East","North","West","South"]
     @wind = winds[(winds.indexOf(@wind)+1)%4]
-    @playerChannel.send("The winds have rotated.")
   discardTile:(tileToDiscard)->
     return @hand.discard(tileToDiscard)
   riichiCalled: ->

@@ -85,11 +85,13 @@ class MahjongGame
     @kuikae = []
     @pendingRiichiPoints = false
     @lastDiscard = false
+    for player in @messageRecievers
+      player.sendMessage("New Round Start")
+      player.sendMessage("Prevailing wind is #{@prevailingWind}.")
+      player.sendMessage("Dora is #{@wall.printDora()}.")
     for player in @players
       player.hand.startDraw(@wall)
       player.roundStart(@wall)
-      player.sendMessage("Prevailing wind is #{@prevailingWind}.")
-      player.sendMessage("Dora is #{@wall.printDora()}.")
       if(player.wind == "East")
         player.sendMessage("You are the first player.  Please discard a tile.")
     @oneRoundTracker = [["First Round"],["First Round"],["First Round"],["First Round"]]
@@ -102,6 +104,8 @@ class MahjongGame
     if("East" not in _.map(@winningPlayer,(x)->x.wind))
       for player in @players
         player.rotateWind()
+      for player in @messageRecievers
+        player.sendMessage("The winds have rotated.")
       if @eastPlayer.wind == "East"
         if(@prevailingWind == "East")
           @prevailingWind = "South"
@@ -183,7 +187,7 @@ class MahjongGame
   #Called when the round ends with no winner.
   exaustiveDraw: ->
     @winningPlayer = _.filter(@players,(x)->score.tenpaiWith(x.hand).length != 0)
-    for player in @players
+    for player in @messageRecievers
       player.sendMessage("The round has ended in an exaustive draw.")
       if(@winningPlayer.length == 0)
         player.sendMessage("No players were in tenpai.")
@@ -191,10 +195,10 @@ class MahjongGame
         player.sendMessage("The following players were in tenpai: #{x.playerNumber for x in @winningPlayer}")
         player.sendMessage("The tenpai hands looked like this: #{"#{x.playerNumber} - #{x.hand.printHand(player.tileNames)}" for x in @winningPlayer}")
         if(player.playerNumber in _.map(@winningPlayer,(x)->x.playerNumber))
-          player.roundPoints += 3000/@winningPlayer.length
+          player.playerOrObserver.roundPoints += 3000/@winningPlayer.length
           player.sendMessage("Because you were in tenpai, you gain #{3000/@winningPlayer.length} points.")
-        else
-          player.roundPoints -= 3000/(4-@winningPlayer.length)
+        else if(player.playerNumber != 0)
+          player.playerOrObserver.roundPoints -= 3000/(4-@winningPlayer.length)
           player.sendMessage("Because you were not in tenpai, you pay #{3000/(4-@winningPlayer.length)} points.")
       player.sendMessage("The round is over.  To start the next round, type next.")
     @phase = "finished"
@@ -265,8 +269,11 @@ class MahjongGame
   liabilityChecker:(playerCalling,playerLiable) ->
     if(_.filter(playerCalling.hand.calledMelds,(x)->x.suit() == "dragon").length == 3 || _.filter(playerCalling.hand.calledMelds,(x)->x.suit() == "wind").length == 4)
       playerCalling.liablePlayer = playerLiable.playerNumber
-      for player in @players
-        player.sendMessage("Player #{playerLiable.playerNumber} is now liable for the cost of the potential Dai Sangen or Dai Suushii.")
+      for player in @messageRecievers
+        if(player.playerNumber != playerLiable.playerNumber)
+          player.sendMessage("Player #{playerLiable.playerNumber} is now liable for the cost of the potential Dai Sangen or Dai Suushii.")
+        else
+          player.sendMessage("You are now liable for the cost of the potential Dai Sangen or Dai Suushii")
 
   #Calculates all the flags for non hand based points in the game.
   winFlagCalculator:(winningPlayer,winType) ->
@@ -290,7 +297,7 @@ class MahjongGame
     if(winType == "Ron")
       if(Array.isArray(@phase) && @phase[0] in ["extendKaning","extendRon"])
         flags.push("Chan Kan")
-      if(@wall.wallFinished)
+      if(@wall.wallFinished  && @phase in ["react","roning"])
         flags.push("Houtei")
     if("Haitei" in @oneRoundTracker[winningPlayer.playerNumber-1])
       flags.push("Haitei")
@@ -325,7 +332,7 @@ class MahjongGame
         playerToRon.sendMessage(scoreMax[1])
       else
         playerToRon.hand = testHand
-        for player in @players
+        for player in @messageRecievers
           if(player.playerNumber == playerToRon.playerNumber)
             player.sendMessage("You have declared Ron.")
           else
@@ -346,11 +353,11 @@ class MahjongGame
           state = "roning"
           ronGroup = [playerToRon.playerNumber]
         @phase = [state,discardedTile,ronGroup]
-        ronAfterTen = new Promise((resolve,reject) =>
+        ronAfterFive = new Promise((resolve,reject) =>
           setTimeout(->
             resolve("Time has Passed")
           ,5000))
-        ronAfterTen
+        ronAfterFive
         .then((message)=>
           if(_.isEqual(@phase,[state,discardedTile,ronGroup]))
             riichiBet = @riichiSticks.length
@@ -378,18 +385,18 @@ class MahjongGame
                 pointsLost = _roundUpToClosestHundred(4*scoreMax[0])
               if(winner.liablePlayer && winner.liablePlayer != discarder.playerNumber)
                 pointsLost = pointsLost/2
-              for player in @players
+              for player in @messageRecievers
                 if(player.playerNumber == winner.playerNumber)
-                  player.roundPoints += pointsGained
+                  player.playerOrObserver.roundPoints += pointsGained
                   player.sendMessage("You have won from Ron.")
                   player.sendMessage("You receive #{pointsGained} points.")
                 else
                   player.sendMessage("Player #{winner.playerNumber} has won via Ron.")
                   if(player.playerNumber == winner.liablePlayer)
-                    player.roundPoints -= pointsLost
+                    player.playerOrObserver.roundPoints -= pointsLost
                     player.sendMessage("Because you were liable for this hand, you pay #{pointsLost} points.")
                   if(discarder.playerNumber == player.playerNumber)
-                    player.roundPoints -= pointsLost+300*@counter
+                    player.playerOrObserver.roundPoints -= pointsLost+300*@counter
                     player.sendMessage("Because you discarded the winning tile, you pay #{pointsLost+300*@counter} points.")
                 player.sendMessage("The winning hand contained the following yaku: #{scoreMax[1]}")
                 player.sendMessage("The winning hand was: #{winner.hand.printHand(player.namedTiles)}")
@@ -456,12 +463,15 @@ class MahjongGame
             player.roundPoints += pointsGained
             player.sendMessage("You have won on self draw.")
             player.sendMessage("You receive #{pointsGained} points.")
+        @gameObservationChannel.send("Player #{playerToTsumo.playerNumber} has won from self draw.")
+        for player in @messageRecievers
           player.sendMessage("The winning hand contained the following yaku: #{scoreMax[1]}")
           player.sendMessage("The winning hand was: #{playerToTsumo.hand.printHand(player.namedTiles)}")
           player.sendMessage("The dora indicators were: #{@wall.printDora(player.namedTiles)}")
           if(playerToTsumo.riichiCalled())
             player.sendMessage("The ur dora indicators were: #{@wall.printUrDora(player.namedTiles)}")
-          player.sendMessage("The round is over.  To start the next round, type next.")
+          if(player.player)
+            player.sendMessage("The round is over.  To start the next round, type next.")
         @winningPlayer = [playerToTsumo]
         @phase = "finished"
 
@@ -487,16 +497,16 @@ class MahjongGame
             return false
         if(_chiable(toChi,tile1,tile2))
           @phase = ["chiing",playerToChi.playerNumber]
-          for player in @players
+          for player in @messageRecievers
             if(player.playerNumber != playerToChi.playerNumber)
               player.sendMessage("Player #{playerToChi.playerNumber} has declared Chi.")
             else
               player.sendMessage("You have declared Chi.")
-          chiAfterTen = new Promise((resolve,reject) =>
+          chiAfterFive = new Promise((resolve,reject) =>
             setTimeout(->
               resolve("Time has Passed")
             ,5000))
-          chiAfterTen
+          chiAfterFive
             .then((message)=>
               if(_.isEqual(@phase,["chiing",playerToChi.playerNumber]))
                 @phase = "discard"
@@ -511,11 +521,12 @@ class MahjongGame
                   if(@turn == player.nextPlayer)
                     playerToChi.hand.draw(player.discardPile)
                     playerToChi.hand.calledMelds.push(new gamePieces.Meld([toChi,tile1,tile2],player.playerNumber))
-                    player.sendMessage("Player #{playerToChi.playerNumber}'s Chi has completed.'")
+                    player.sendMessage("Player #{playerToChi.playerNumber}'s Chi has completed.")
                   else if(player.playerNumber == playerToChi.playerNumber)
                     player.sendMessage("Your Chi has completed.  Please discard a tile.")
                   else
-                    player.sendMessage("Player #{playerToChi.playerNumber}'s Chi has completed.'")
+                    player.sendMessage("Player #{playerToChi.playerNumber}'s Chi has completed.")
+                @gameObservationChannel.send("Player #{playerToChi.playerNumber}'s Chi has completed.")
             )
             .catch(console.error)
         else
@@ -562,19 +573,20 @@ class MahjongGame
     else
       if(uncalledKanTiles == 4)
         @phase = ["concealedKaning",tileToKan]
-        for player in @players
+        for player in @messageRecievers
           if(player.playerNumber != playerToKan.playerNumber)
             player.sendMessage("Player #{playerToKan.playerNumber} has declared a concealed Kan on #{tileToKan.getName(player.namedTiles)}.")
           else
             player.sendMessage("You have declared a concealed Kan on #{tileToKan.getName(player.namedTiles)}.")
+        for player in @players
           if(player.wantsHelp && player.nextPlayer != @turn)
             if(score.thirteenOrphans(player.hand,tileToKan))
               player.sendMessage("You may Ron off of this concealed kong, as long as you are not furiten.")
-        concealAfterTen = new Promise((resolve,reject) =>
+        concealAfterFive = new Promise((resolve,reject) =>
           setTimeout(->
             resolve("Time has Passed")
           ,5000))
-        concealAfterTen
+        concealAfterFive
           .then((message)=>
             if(_.isEqual(@phase,["concealedKaning",tileToKan]))
               @phase = "discard"
@@ -583,7 +595,7 @@ class MahjongGame
               playerToKan.hand.calledMelds.push(new gamePieces.Meld([tileToKan,tileToKan,tileToKan,tileToKan]))
               drawnTile = playerToKan.hand.draw(@wall)[0]
               @wall.doraFlip()
-              for player in @players
+              for player in @messageRecievers
                 if(player.playerNumber!=playerToKan.playerNumber)
                   player.sendMessage("Player #{playerToKan.playerNumber} has completed their Kan.")
                 else
@@ -598,19 +610,20 @@ class MahjongGame
         if(pungToExtend.length == 1)
           pungToExtend = pungToExtend[0]
           @phase = ["extendKaning",tileToKan]
-          for player in @players
+          for player in @messageRecievers
             if(player.playerNumber != playerToKan.playerNumber)
               player.sendMessage("Player #{playerToKan.playerNumber} has declared an extended Kan on #{tileToKan.getName(player.namedTiles)}.")
             else
               player.sendMessage("You have declared an extended Kan on #{tileToKan.getName(player.namedTiles)}.")
+          for player in @players
             if(player.wantsHelp && player.nextPlayer != @turn)
               if(_.some(score.tenpaiWith(player.hand),(x)->_.isEqual(x,discarded)))
                 player.sendMessage("You may rob the kong and Ron, as long as you are not furiten.")
-          extendAfterTen = new Promise((resolve,reject) =>
+          extendAfterFive = new Promise((resolve,reject) =>
             setTimeout(->
               resolve("Time has Passed")
             ,5000))
-          extendAfterTen
+          extendAfterFive
             .then((message)=>
               if(_.isEqual(@phase,["extendKaning",tileToKan]))
                 @phase = "discard"
@@ -621,7 +634,7 @@ class MahjongGame
                     meld.makeKong()
                 drawnTile = playerToKan.hand.draw(@wall)[0]
                 @wall.doraFlip()
-                for player in @players
+                for player in @messageRecievers
                   if(player.playerNumber!=playerToKan.playerNumber)
                     player.sendMessage("Player #{playerToKan.playerNumber} has completed their Kan.")
                   else
@@ -651,16 +664,16 @@ class MahjongGame
       toKan = discarder.discardPile.contains[-1..][0]
       if(_.filter(playerToKan.hand.uncalled(),(x) -> _.isEqual(x,toKan)).length == 3)
         @phase = ["callKaning",playerToKan.playerNumber]
-        for player in @players
+        for player in @messageRecievers
           if(player.playerNumber!= playerToKan.playerNumber)
             player.sendMessage("Player #{playerToKan.playerNumber} has declared Kan.")
           else
             player.sendMessage("You have declared Kan.")
-        kanAfterTen = new Promise((resolve,reject) =>
+        kanAfterFive = new Promise((resolve,reject) =>
           setTimeout(->
             resolve("Time has Passed")
           ,5000))
-        kanAfterTen
+        kanAfterFive
           .then((message)=>
             if(_.isEqual(@phase,["callKaning",playerToKan.playerNumber]))
               @phase = "discard"
@@ -673,7 +686,7 @@ class MahjongGame
                 @liabilityChecker(playerToKan,discarder)
               drawnTile = playerToKan.hand.draw(@wall)[0]
               @wall.doraFlip()
-              for player in @players
+              for player in @messageRecievers
                 if(player.playerNumber!=playerToKan.playerNumber)
                   player.sendMessage("Player #{playerToKan.playerNumber} has completed their Kan.")
                 else
@@ -700,16 +713,16 @@ class MahjongGame
       toPon = discarder.discardPile.contains[-1..][0]
       if(_.findIndex(playerToPon.hand.uncalled(),(x)->_.isEqual(toPon,x))!=_.findLastIndex(playerToPon.hand.uncalled(),(x)->_.isEqual(toPon,x)))
         @phase = ["poning",playerToPon.playerNumber]
-        for player in @players
+        for player in @messageRecievers
           if(player.playerNumber != playerToPon.playerNumber)
             player.sendMessage("Player #{playerToPon.playerNumber} has declared Pon.")
           else
             player.sendMessage("You have declared Pon.")
-        tenSecondsToPon = new Promise((resolve,reject) =>
+        fiveSecondsToPon = new Promise((resolve,reject) =>
           setTimeout(->
             resolve("Time has Passed")
           ,5000))
-        tenSecondsToPon
+        fiveSecondsToPon
           .then((message)=>
             if(_.isEqual(@phase,["poning",playerToPon.playerNumber]))
               @phase = "discard"
@@ -725,6 +738,7 @@ class MahjongGame
                   player.sendMessage("Your Pon has completed. Please discard a tile.")
                 else
                   player.sendMessage("Player #{playerToPon.playerNumber}'s Pon has completed.")
+              @gameObservationChannel.send("Player #{playerToPon.playerNumber}'s Pon has completed.")
               @turn = playerToPon.playerNumber
               if(toPon.isHonor())
                 @liabilityChecker(playerToPon,discarder)
@@ -769,8 +783,7 @@ class MahjongGame
           @endGoAround(playerToDiscard)
           if(riichi)
             @oneRoundTracker[playerToDiscard.playerNumber-1].push("Ippatsu")
-          @gameObservationChannel.send("Player #{playerToDiscard.playerNumber} #{outtext} a #{discarded.getName()}.")
-          for player in @players
+          for player in @messageRecievers
             if(player.playerNumber != playerToDiscard.playerNumber)
               player.sendMessage("Player #{playerToDiscard.playerNumber} #{outtext} a #{discarded.getName(player.namedTiles)}.")
             else
@@ -787,11 +800,11 @@ class MahjongGame
                 player.sendMessage("You may call #{calls} on this tile.")
               if(_.some(score.tenpaiWith(player.hand),(x)->_.isEqual(x,discarded)))
                 player.sendMessage("You may Ron off of this discard, as long as you are not furiten.")
-          nextTurnAfterTen = new Promise((resolve, reject) =>
+          nextTurnAfterFive = new Promise((resolve, reject) =>
             setTimeout(->
               resolve("Time has Passed")
             ,5000))
-          nextTurnAfterTen
+          nextTurnAfterFive
             .then((message)=>
               if(@phase == "react")
                 if(!@wall.wallFinished)
