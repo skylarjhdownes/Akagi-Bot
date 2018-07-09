@@ -79,7 +79,7 @@ bot.on('message', (message) =>
         message.channel.send("""Syntax: pile <player number>
                               Examples: \"pile\", \"pile 1\", \"pile 3\"
                               Displays your discard pile, or the pile of another player.""")
-      else if(commandArgs[1] == "pile")
+      else if(commandArgs[1] == "toggle")
         message.channel.send("""Syntax: toggle <tiles || help>
                               Typing \"toggle tiles\" will toggle the display of tile text, ex. \"green dragon 🀅\" -> \"🀅\".
                               Typing \"toggle help\" will toggle help suggestions.""")
