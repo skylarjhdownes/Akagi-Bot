@@ -116,9 +116,9 @@ class Wall
   constructor: (@sortedWall = false) ->
     #Fills it up with 4 copies of each normal tile
     @inWall = []
-    @inWall.push(new Tile(x,y)) for x in ["pin","sou","wan"] for y in [1..9] for z in [0...2]
-    @inWall.push(new Tile("wind",y)) for y in ["east","south","west","north"] for z in [0...2]
-    @inWall.push(new Tile("dragon",y)) for y in ["red","white","green"] for z in [0...2]
+    @inWall.push(new Tile(x,y)) for x in ["pin","sou","wan"] for y in [1..9] for z in [0...4]
+    @inWall.push(new Tile("wind",y)) for y in ["east","south","west","north"] for z in [0...4]
+    @inWall.push(new Tile("dragon",y)) for y in ["red","white","green"] for z in [0...4]
     @dora = []
     @urDora = []
     @wallFinished = false

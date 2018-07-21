@@ -39,6 +39,8 @@ Currently contains the following commands:
 
 ~end game - Deletes all the channels involved in the game, and removes the channels and the game from the global list of such things.
 
+~play again - Starts a new game of mahjong.  Only usable after a game has ended.
+
 ~next - Used after a round is over, in order to start next round.
 
 ~riichi - Used to declare riichi, takes the tile to be discarded as its argument

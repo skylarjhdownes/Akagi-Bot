@@ -111,6 +111,7 @@ class MahjongGame
           @prevailingWind = "South"
         else
           @endGame()
+          break
     @wall = new gamePieces.Wall()
     @winningPlayer = []
     for player in @players
@@ -119,6 +120,19 @@ class MahjongGame
         @dealer = player
     @startRound()
 
+
+  #Starts a new game of Mahjong.
+  startNewGame: ->
+    for folk in @messageRecievers
+      folk.sendMessage("A new game of mahjong is starting.  Seats and play order will be randomized, and all points reset to 30000.")
+      folk.sendMessage("-----------------------------------------------------------------------------------------------------------")
+    for player in @players
+      player.roundPoints = 30000
+      player.resetHand()
+    @wall = new gamePieces.Wall()
+    @winningPlayer = []
+    @counter = 0
+    @startRoundOne()
 
   #Sends out all the appropriate messages when the game ends
   endGame: ->
