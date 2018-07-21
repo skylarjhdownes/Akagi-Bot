@@ -90,6 +90,8 @@ bot.on('message', (message) =>
                               Typing \"toggle help\" will toggle help suggestions.""")
       else if(commandArgs[1] == "end")
         message.channel.send("Typing \"end game\" will end the game and destroy all game channels.")
+      else if(commandArgs[1] == "play")
+        message.channel.send("Typing \"play again\" after the game has finished will start a new game of mahjong.")
       else if(commandArgs[1] == "next")
         message.channel.send("Start the next round.")
       else if(commandArgs[1] == "riichi")
@@ -270,7 +272,11 @@ bot.on('message', (message) =>
           player.playerChannel.delete()
         exports.parlors = (parlor for parlor in exports.parlors when parlor.id != fromGame.gameObservationChannel.id)
         fromGame.gameObservationChannel.delete()
-
+      if(commandArgs[0] == "play" and commandArgs[1] == "again" and channelType = "player")
+        if(fromGame.phase != "finished")
+          message.channel.send("Game not finished.  Please finish your first game before starting another.")
+        else
+          fromGame.startNewGame()
       if(commandArgs[0] == "next" && channelType == "player")
         if(fromGame.phase != "finished")
           message.channel.send("Round is not yet finished.")
