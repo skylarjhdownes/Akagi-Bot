@@ -111,7 +111,7 @@ class MahjongGame
           @prevailingWind = "South"
         else
           @endGame()
-          break
+          return 0
     @wall = new gamePieces.Wall()
     @winningPlayer = []
     for player in @players
