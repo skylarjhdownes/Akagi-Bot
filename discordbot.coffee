@@ -40,9 +40,12 @@ bot.on('message', (message) =>
     if(commandArgs[0] == "roll")
       message.channel.send("#{message.author.username} rolled: "+dice.rollDice(commandArgs[1..].join("")))
 
+    if(commandArgs[0] == "f")
+      message.channel.send("#{message.author.username} has paid their respects."))
+
     if(commandArgs[0] == "throw")
-      if(commandArgs[1] in ["rock","paper","scissors"]) 
-        akagiThrow = Math.floor(Math.random()*3) #Zero is rock, One is paper, two is scissors 
+      if(commandArgs[1] in ["rock","paper","scissors"])
+        akagiThrow = Math.floor(Math.random()*3) #Zero is rock, One is paper, two is scissors
         if(commandArgs[1] == "rock")
           if(akagiThrow == 0)
             message.channel.send("Rock. Tie.")
@@ -66,8 +69,8 @@ bot.on('message', (message) =>
             message.channel.send("Scissors. Tie.")
       else
         message.channel.send("Use rock, paper, or scissors.")
-    
-    
+
+
     if(commandArgs[0] == "help")
       if(commandArgs.length == 1)
         message.channel.send("Type '!help akagi' to learn about mahjong specific commands.  Type '!help general' to learn about commands that can be used anywhere.")
