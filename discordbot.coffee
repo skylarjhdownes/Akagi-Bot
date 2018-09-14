@@ -41,7 +41,7 @@ bot.on('message', (message) =>
       message.channel.send("#{message.author.username} rolled: "+dice.rollDice(commandArgs[1..].join("")))
 
     if(commandArgs[0] == "f")
-      message.channel.send("#{message.author.username} has paid their respects."))
+      message.channel.send("#{message.author.username} has paid their respects.")
 
     if(commandArgs[0] == "throw")
       if(commandArgs[1] in ["rock","paper","scissors"])
