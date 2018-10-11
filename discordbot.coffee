@@ -417,7 +417,7 @@ bot.on('message', (message) =>
   #console.log(exports)
 )
 ## Log our bot in
-bot.login(token)
+bot.login(token).catch(console.error("Couldn't log in to Discord.  Is the token correct?"))
 
 ## Keepalive loop for Heroku
 http = require("http")
