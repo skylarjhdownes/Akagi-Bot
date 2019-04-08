@@ -206,7 +206,7 @@ bot.on('message', (message) =>
 
         Promise.all([chatChannel,channelHolder[0],channelHolder[1],channelHolder[2],channelHolder[3]])
           .then((allChannels) ->
-            exports.mahjongGames.push(new mahjongGame(allChannels, message.channel.guild, ["TestGame"]))
+            exports.mahjongGames.push(new mahjongGame(allChannels, message.channel.guild, []))
             for channel in allChannels
               exports.parlors.push(channel)
             bot.user.setStatus('online','Mahjong')
