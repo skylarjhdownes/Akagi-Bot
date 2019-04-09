@@ -104,7 +104,7 @@ class Tile
   #gives a pretty printed name for the tile
   getName: (writtenName = true) ->
     if(writtenName)
-      return "#{@value} #{@suit} #{@unicode}"
+      return "#{@unicode} #{@value} #{@suit}"
     else
       return @unicode
 

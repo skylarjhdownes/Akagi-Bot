@@ -54,6 +54,12 @@ class MahjongGame
       @messageRecievers.push(new MessageSender(player,"player"))
     @startRoundOne()
 
+  getPlayerByPlayerNumber:(playerNumber) ->
+    #Returns the player who's player number is the chosen number
+    for player in @players:
+      if player.playerNumber == int(playerNumber):
+        return player
+
   startRoundOne: ->
     #Randomize starting locations, then assign each player a seat.
     @players = _.shuffle(@players)

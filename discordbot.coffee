@@ -329,7 +329,7 @@ bot.on('message', (message) =>
         if(commandArgs.length == 1 and channelType == "player")
           fromPlayer.sendMessage("Your seat wind is #{fromPlayer.wind}.")
         else if(commandArgs[1] in ["1","2","3","4"])
-          message.channel.send("Player #{commandArgs[1]} is the #{fromGame.players[commandArgs[1]-1].wind} player.")
+          message.channel.send("Player #{commandArgs[1]} is the #{fromGame.getPlayerByPlayerNumber(commandArgs[1]).wind} player.")
       if(commandArgs[0] == "dora")
         if(channelType == "player")
           message.channel.send("Dora Indicator(s): #{fromGame.wall.printDora(fromPlayer.namedTiles)}")
@@ -344,9 +344,9 @@ bot.on('message', (message) =>
           fromPlayer.sendMessage("Your melds are: #{fromPlayer.printMelds(fromPlayer.namedTiles)}")
         else if (commandArgs[1] in ["1","2","3","4"])
           if(channelType == "player")
-            fromPlayer.sendMessage("Player #{commandArgs[1]} has the following melds: #{fromGame.players[commandArgs[1]-1].printMelds(fromPlayer.namedTiles)}.")
+            fromPlayer.sendMessage("Player #{commandArgs[1]} has the following melds: #{fromGame.getPlayerByPlayerNumber(commandArgs[1]).printMelds(fromPlayer.namedTiles)}.")
           else
-            message.channel.send("Player #{commandArgs[1]} has the following melds: #{fromGame.players[commandArgs[1]-1].printMelds()}.")
+            message.channel.send("Player #{commandArgs[1]} has the following melds: #{fromGame.getPlayerByPlayerNumber(commandArgs[1]).printMelds()}.")
         else
           message.channel.send("Please select a real player.")
       if(commandArgs[0] == "tenpai" and channelType == "player")
@@ -405,9 +405,9 @@ bot.on('message', (message) =>
           fromPlayer.sendMessage("You have discarded #{fromPlayer.hand.discardPile.printDiscard(fromPlayer.namedTiles)}.")
         else if(commandArgs[1] in ["1","2","3","4"])
           if(channelType == "player")
-            fromPlayer.sendMessage("Player #{commandArgs[1]} has discarded #{fromGame.players[commandArgs[1]-1].hand.discardPile.printDiscard(fromPlayer.namedTiles)}.")
+            fromPlayer.sendMessage("Player #{commandArgs[1]} has discarded #{fromGame.getPlayerByPlayerNumber(commandArgs[1]).hand.discardPile.printDiscard(fromPlayer.namedTiles)}.")
           else
-            message.channel.send("Player #{commandArgs[1]} has discarded #{fromGame.players[commandArgs[1]-1].hand.discardPile.printDiscard()}.")
+            message.channel.send("Player #{commandArgs[1]} has discarded #{fromGame.getPlayerByPlayerNumber(commandArgs[1]).hand.discardPile.printDiscard()}.")
         else
           message.channel.send("Please select a real discard pile.")
       if(commandArgs[0] == "points")
