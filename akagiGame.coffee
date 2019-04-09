@@ -56,8 +56,8 @@ class MahjongGame
 
   getPlayerByPlayerNumber:(playerNumber) ->
     #Returns the player who's player number is the chosen number
-    for player in @players:
-      if player.playerNumber == int(playerNumber):
+    for player in @players
+      if(player.playerNumber == parseInt(playerNumber,10))
         return player
 
   startRoundOne: ->
