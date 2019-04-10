@@ -102,7 +102,7 @@ bot.on('message', (message) =>
         message.channel.send("Displays the tiles in your hand that are not part of called melds.")
       else if(commandArgs[1] == "melds")
         message.channel.send("""Syntax: melds <player number>
-                              Examples: \"melds\", \"melds 1\", \"melds 3\"
+                              Examples: \"melds\", \"melds 1\", \"melds 3\", \"melds all\"
                               Displays the tiles in either your or another player's hand that are part of called melds.""")
       else if(commandArgs[1] == "tenpai")
         message.channel.send("""Tells you if you are in tenpai, and which tiles will make you win if you are.
@@ -113,7 +113,7 @@ bot.on('message', (message) =>
                               A player who is furiten cannot win on an opponent's discard, but can only win by self-drawing the needed tile.""")
       else if(commandArgs[1] == "pile")
         message.channel.send("""Syntax: pile <player number>
-                              Examples: \"pile\", \"pile 1\", \"pile 3\"
+                              Examples: \"pile\", \"pile 1\", \"pile 3\", \"pile all\"
                               Displays your discard pile, or the pile of another player.""")
       else if(commandArgs[1] == "toggle")
         message.channel.send("""Syntax: toggle <tiles || help>
@@ -147,7 +147,7 @@ bot.on('message', (message) =>
         message.channel.send("Prints out all the dora indicators that have been revealed this hand.")
       else if(commandArgs[1] == "seat")
         message.channel.send("""Syntax: seat <player number>
-                              Examples: \"seat\", \"seat 1\", \"seat 3\"
+                              Examples: \"seat\", \"seat 1\", \"seat 3\", \"seat all\"
                               Displays your seat wind, or the seat wind of another player.""")
       else if(commandArgs[1] == "turn")
         message.channel.send("Prints the player number of the person who's turn it is.")
@@ -330,6 +330,9 @@ bot.on('message', (message) =>
           fromPlayer.sendMessage("Your seat wind is #{fromPlayer.wind}.")
         else if(commandArgs[1] in ["1","2","3","4"])
           message.channel.send("Player #{commandArgs[1]} is the #{fromGame.getPlayerByPlayerNumber(commandArgs[1]).wind} player.")
+        else if(commandArgs[1] in ["all"])
+          for player in fromGame.players
+            message.channel.send("Player #{player.playerNumber} is the #{player.wind} player.")
       if(commandArgs[0] == "dora")
         if(channelType == "player")
           message.channel.send("Dora Indicator(s): #{fromGame.wall.printDora(fromPlayer.namedTiles)}")
@@ -347,6 +350,13 @@ bot.on('message', (message) =>
             fromPlayer.sendMessage("Player #{commandArgs[1]} has the following melds: #{fromGame.getPlayerByPlayerNumber(commandArgs[1]).printMelds(fromPlayer.namedTiles)}.")
           else
             message.channel.send("Player #{commandArgs[1]} has the following melds: #{fromGame.getPlayerByPlayerNumber(commandArgs[1]).printMelds()}.")
+        else if(commandArgs[1] in ["all"])
+          if(channelType == "player")
+            for player in fromGame.players
+              message.channel.send("Player #{player.playerNumber} has the following melds: #{player.printMelds(fromPlayer.namedTiles)}.")
+          else
+            for player in fromGame.players
+              message.channel.send("Player #{player.playerNumber} has the following melds: #{player.printMelds()}.")
         else
           message.channel.send("Please select a real player.")
       if(commandArgs[0] == "tenpai" and channelType == "player")
@@ -408,6 +418,13 @@ bot.on('message', (message) =>
             fromPlayer.sendMessage("Player #{commandArgs[1]} has discarded #{fromGame.getPlayerByPlayerNumber(commandArgs[1]).hand.discardPile.printDiscard(fromPlayer.namedTiles)}.")
           else
             message.channel.send("Player #{commandArgs[1]} has discarded #{fromGame.getPlayerByPlayerNumber(commandArgs[1]).hand.discardPile.printDiscard()}.")
+        else if(commandArgs[1] in ["all"])
+          if(channelType == "player")
+            for player in fromGame.players
+              message.channel.send("Player #{player.playerNumber} has discarded #{player.hand.discardPile.printDiscard(fromPlayer.namedTiles)}.")
+          else
+            for player in fromGame.players
+              message.channel.send("Player #{player.playerNumber} has discarded #{player.hand.discardPile.printDiscard()}.")
         else
           message.channel.send("Please select a real discard pile.")
       if(commandArgs[0] == "points")
