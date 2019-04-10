@@ -167,7 +167,7 @@ bot.on('message', (message) =>
         message.channel.send("Command not recognized.  Try typing !help to get a list of commands.")
 
     if(commandArgs[0] == "mahjong")
-      playersToAddToGame = message.mentions.members.array()
+      playersToAddToGame = message.mentions.users.array()
       if (playersToAddToGame.length < 3)
         message.channel.send("Please @ mention at least 3 other users to play in your game.")
       else
@@ -190,7 +190,7 @@ bot.on('message', (message) =>
         channelHolder = []
         for i in [0..3]
           temp = message.channel.guild.createChannel(
-            commandArgs[1]+"-Mahjong-Hand-Player-"+(i+1),
+            commandArgs[1]+"-#{playersToAddToGame[i].tag}'sChannel-"+(i+1),
             "text",
             [
               {type:'role', id:message.channel.guild.defaultRole.id, deny: Discord.Permissions.FLAGS.VIEW_CHANNEL},
