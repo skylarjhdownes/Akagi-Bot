@@ -223,22 +223,23 @@ bot.on('messageCreate', (message) =>
           .catch(console.error)
 
     if(commandArgs[0] == "forge")
-      usersMentioned = message.mentions.members
-      console.log(usersMentioned.array().length)
-      message.channel.guild.createChannel(commandArgs[1],"text")
-        .then((channel) ->
-          channel.overwritePermissions(message.channel.guild.defaultRole, {READ_MESSAGES: false})
-            .then(console.log("Hidden!!"))
-            .catch(console.error)
-          channel.overwritePermissions(message, {READ_MESSAGES: true, MANAGE_CHANNELS: true})
-            .then(console.log("Revealed!!"))
-            .catch(console.error)
-          for x in usersMentioned.array()
-            channel.overwritePermissions(x, {READ_MESSAGES: true})
-              .then(console.log(x.displayName))
-              .catch(console.error)
-          exports.parlors.push(channel))
-        .catch(console.error)
+      message.channel.send("Forge is currently under development.")
+      #usersMentioned = message.mentions.members
+      #console.log(usersMentioned.array().length)
+      #message.channel.guild.createChannel(commandArgs[1],"text")
+      #  .then((channel) ->
+      #    channel.overwritePermissions(message.channel.guild.defaultRole, {READ_MESSAGES: false})
+      #      .then(console.log("Hidden!!"))
+      #      .catch(console.error)
+      #    channel.overwritePermissions(message, {READ_MESSAGES: true, MANAGE_CHANNELS: true})
+      #      .then(console.log("Revealed!!"))
+      #      .catch(console.error)
+      #    for x in usersMentioned.array()
+      #      channel.overwritePermissions(x, {READ_MESSAGES: true})
+      #        .then(console.log(x.displayName))
+      #        .catch(console.error)
+      #    exports.parlors.push(channel))
+      #  .catch(console.error)
 
     if(commandArgs[0] == "yell")
       for x in exports.parlors
