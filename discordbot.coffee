@@ -9,7 +9,13 @@ _ = require('./node_modules/lodash/lodash.js')
 Promise = require('promise')
 
 ## Create an instance of a Discord client
-bot = new Discord.Client()
+bot = new Discord.Client({
+	intents: [
+		Discord.GatewayIntentBits.Guilds,
+		Discord.GatewayIntentBits.GuildMessages,
+		Discord.GatewayIntentBits.MessageContent,
+		Discord.GatewayIntentBits.GuildMembers,
+	],})
 
 ## The token of your bot - https://discordapp.com/developers/applications/me
 token = process.env.AKAGI_BOT_TOKEN
@@ -24,15 +30,17 @@ sendID = (placeOfSending, toPrint) ->
 bot.on('ready', =>
   console.log('Logged in as %s - %s\n', bot.user.username, bot.user.id)
   console.log('I am ready!')
-  exports.activeServers = bot.guilds.array()
-  for value in exports.activeServers
-    console.log(value.name)
+  exports.activeServers = bot.guilds.cache
+  #console.log(exports.activeServers)
+  exports.activeServers.each((value) ->
+    console.log(value.name))
   exports.mahjongGames = []
   exports.parlors = [] #Created channels
 )
 
 # Create an event listener for messages
-bot.on('message', (message) =>
+bot.on('messageCreate', (message) =>
+  console.log(message.content)
   if (message.content.substring(0, 1) in ["!","/"])
     commandArgs = message.content.substring(1).split(/\s+/)
     commandArgs = _.map(commandArgs,_.toLower)
@@ -167,36 +175,37 @@ bot.on('message', (message) =>
         message.channel.send("Command not recognized.  Try typing !help to get a list of commands.")
 
     if(commandArgs[0] == "mahjong")
-      playersToAddToGame = message.mentions.users.array()
+      playersToAddToGame = Array.from(message.mentions.users.values())
       if (playersToAddToGame.length < 3)
         message.channel.send("Please @ mention at least 3 other users to play in your game.")
       else
         playersToAddToGame.unshift(message.author)
 
         userPermissions = [
-          {type:'role', id:message.channel.guild.defaultRole.id, deny: Discord.Permissions.FLAGS.VIEW_CHANNEL}
+          {type:'role', id:message.channel.guild.roles.everyone.id, deny: [Discord.PermissionsBitField.Flags.ViewChannel]}
         ]
         for gameObserver,i in playersToAddToGame
           if(i<4)
-            userPermissions.push({type:'member', id:gameObserver.id, allow: Discord.Permissions.FLAGS.VIEW_CHANNEL+Discord.Permissions.FLAGS.MANAGE_ROLES})
+            userPermissions.push({type:'member', id:gameObserver.id, allow: [Discord.PermissionsBitField.Flags.ViewChannel,Discord.PermissionsBitField.Flags.ManageRoles]})
           else
-            userPermissions.push({type:'member', id:gameObserver.id, allow: Discord.Permissions.FLAGS.VIEW_CHANNEL})
+            userPermissions.push({type:'member', id:gameObserver.id, allow: [Discord.PermissionsBitField.Flags.ViewChannel]})
 
-        chatChannel = message.channel.guild.createChannel(commandArgs[1]+"-Mahjong-Table-Center","text",userPermissions)
+        chatChannel = message.channel.guild.channels.create({name: commandArgs[1]+"-Mahjong-Table-Center", type: Discord.ChannelType.GuildText, permissionOverwrites: userPermissions})
           .then((channel) ->
             return channel)
           .catch(console.error)
 
         channelHolder = []
         for i in [0..3]
-          temp = message.channel.guild.createChannel(
-            commandArgs[1]+"-#{playersToAddToGame[i].tag}'sChannel-"+(i+1),
-            "text",
-            [
-              {type:'role', id:message.channel.guild.defaultRole.id, deny: Discord.Permissions.FLAGS.VIEW_CHANNEL},
-              {type:'member', id:playersToAddToGame[i].id, allow: Discord.Permissions.FLAGS.VIEW_CHANNEL+Discord.Permissions.FLAGS.MANAGE_ROLES}
-            ]
-            )
+          temp = message.channel.guild.channels.create({
+            name: commandArgs[1]+"-#{playersToAddToGame[i].tag}'sChannel-"+(i+1),
+            type: Discord.ChannelType.GuildText,
+            permissionOverwrites:
+              [
+                {type:'role', id:message.channel.guild.roles.everyone.id, deny: [Discord.PermissionsBitField.Flags.ViewChannel]},
+                {type:'member', id:playersToAddToGame[i].id, allow: [Discord.PermissionsBitField.Flags.ViewChannel,Discord.PermissionsBitField.Flags.ManageRoles]}
+              ]
+            })
             .then((channel) ->
               console.log("Hapa")
               return channel
@@ -296,7 +305,7 @@ bot.on('message', (message) =>
     if(channelType == "player" or channelType == "public")
       #Game Commands
       if(commandArgs[0] == "end" and commandArgs[1] == "game" and channelType == "player")
-        fromGame.gameObservationChannel.sendMessage("Game Ended")
+        fromGame.gameObservationChannel.send("Game Ended")
         exports.mahjongGames = (game for game in exports.mahjongGames when fromGame.gameObservationChannel.id != game.gameObservationChannel.id)
         for player in fromGame.players
           exports.parlors = (parlor for parlor in exports.parlors when parlor.id != player.playerChannel.id)
@@ -434,7 +443,7 @@ bot.on('message', (message) =>
   #console.log(exports)
 )
 ## Log our bot in
-bot.login(token).catch(console.error("Couldn't log in to Discord.  Is the token correct?"))
+bot.login(token).catch(console.error("Couldn't log in to Discord.  Is the token #{token} correct?"))
 
 ## Keepalive loop for Heroku
 http = require("http")
