@@ -445,11 +445,3 @@ bot.on('messageCreate', (message) =>
 )
 ## Log our bot in
 bot.login(token).catch(console.error("Couldn't log in to Discord.  Is the token #{token} correct?"))
-
-## Keepalive loop for Heroku
-http = require("http")
-setInterval(
-  () ->
-    http.get("http://akagibot.herokuapp.com")
-  300000
-)
